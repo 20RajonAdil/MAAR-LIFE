@@ -1,6 +1,6 @@
 MAAR LIFE Proprietary License
 
-Copyright (c) 2026 Md Adil
+Copyright (c) 2026 Md Adil Ahmed Rajon
 
 All rights reserved.
 
@@ -22,4 +22,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For licensing inquiries, permissions, or commercial use requests, contact the copyright holder directly.
 
-Copyright © 2026 Md Rajon Adil. All Rights Reserved.
+Copyright © 2026 Md Adil Ahmed Rajon. All Rights Reserved.
