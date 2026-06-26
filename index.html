@@ -1,0 +1,3609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MAAR LIFE — Your Personal Life Operating System</title>
+<meta name="description" content="MAAR LIFE is a personal life operating system for health, discipline, finance, faith and growth.">
+<meta name="theme-color" content="#06070A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%2306070A' stroke='%2316C98D' stroke-width='4'/%3E%3Ctext x='50' y='66' font-size='44' text-anchor='middle' fill='%2316C98D' font-family='Georgia'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2306070A'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%2316C98D' stroke-width='5'/%3E%3Ctext x='50' y='66' font-size='42' text-anchor='middle' fill='%2316C98D' font-family='Georgia'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="manifest" id="pwaManifestLink">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+/* ============================================================
+   MAAR LIFE — DESIGN TOKENS
+   ============================================================ */
+:root{
+  /* Core palette */
+  --void:#06070A;
+  --void-soft:#0A0C10;
+  --card:#0F1410;
+  --card-raised:#121810;
+  --card-border:rgba(232,230,222,0.07);
+  --card-border-hi:rgba(22,201,141,0.22);
+  --emerald-deep:#0C3B2E;
+  --emerald:#16C98D;
+  --emerald-bright:#3FE8AC;
+  --emerald-dim:rgba(22,201,141,0.14);
+  --gold:#C9A24B;
+  --gold-bright:#E3C475;
+  --gold-dim:rgba(201,162,75,0.16);
+  --ink:#E8E6DE;
+  --ink-dim:#A7A89E;
+  --ink-faint:#6E6F66;
+  --danger:#E2654F;
+  --danger-dim:rgba(226,101,79,0.14);
+  --info:#5B9EE8;
+
+  /* Type */
+  --font-display:'Fraunces', Georgia, serif;
+  --font-body:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+
+  /* Layout */
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:24px;
+  --radius-xl:32px;
+  --shadow-soft:0 8px 32px rgba(0,0,0,0.45);
+  --shadow-glow:0 0 40px rgba(22,201,141,0.12);
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--void);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.5;
+  overflow-x:hidden;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 900px 600px at 12% -8%, rgba(22,201,141,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 110% 15%, rgba(201,162,75,0.06), transparent 60%),
+    radial-gradient(ellipse 800px 700px at 50% 110%, rgba(22,201,141,0.05), transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+::selection{background:var(--emerald); color:var(--void);}
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(232,230,222,0.12); border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--emerald-dim);}
+
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+:focus-visible{outline:2px solid var(--emerald); outline-offset:2px; border-radius:4px;}
+h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.01em;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+}
+
+.app{position:relative; z-index:1; min-height:100vh;}
+.hidden{display:none !important;}
+.sr-only{position:absolute; width:1px;height:1px; overflow:hidden; clip:rect(0,0,0,0);}
+
+/* Glass card primitive */
+.glass{
+  background:linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(20px);
+  box-shadow:var(--shadow-soft);
+}
+.glass-tight{border-radius:var(--radius-md);}
+
+/* Buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 28px;
+  border-radius:14px;
+  border:1px solid transparent;
+  font-weight:600;
+  font-size:14.5px;
+  letter-spacing:0.01em;
+  transition:transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+  white-space:nowrap;
+}
+.btn-primary{
+  background:linear-gradient(135deg, var(--emerald), #0EA876);
+  color:#06140F;
+  box-shadow:0 4px 20px rgba(22,201,141,0.28);
+}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 28px rgba(22,201,141,0.4);}
+.btn-primary:active{transform:translateY(0);}
+.btn-ghost{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--card-border);
+  color:var(--ink);
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.06); border-color:rgba(232,230,222,0.16);}
+.btn-gold{
+  background:linear-gradient(135deg, var(--gold-bright), var(--gold));
+  color:#241C0A;
+  box-shadow:0 4px 20px rgba(201,162,75,0.25);
+}
+.btn-gold:hover{transform:translateY(-2px);}
+.btn-sm{padding:9px 18px; font-size:13px; border-radius:10px;}
+.btn-block{width:100%;}
+.btn-icon{padding:10px; border-radius:10px;}
+.btn:disabled{opacity:0.4; cursor:not-allowed; transform:none !important;}
+
+/* Form elements */
+.field{margin-bottom:20px;}
+.field label{display:block; font-size:13px; font-weight:600; color:var(--ink-dim); margin-bottom:8px; letter-spacing:0.02em;}
+.field input[type=text], .field input[type=number], .field input[type=email],
+.field input[type=date], .field select, .field textarea{
+  width:100%;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:13px 16px;
+  color:var(--ink);
+  font-size:14.5px;
+  transition:border-color 0.2s, background 0.2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-color:var(--emerald); background:rgba(22,201,141,0.04); outline:none;
+}
+.field textarea{resize:vertical; min-height:80px;}
+.field-hint{font-size:12px; color:var(--ink-faint); margin-top:6px;}
+.field-row{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media (max-width:560px){.field-row{grid-template-columns:1fr;}}
+
+.chip-grid{display:flex; flex-wrap:wrap; gap:10px;}
+.chip{
+  padding:10px 18px; border-radius:100px;
+  background:rgba(255,255,255,0.03); border:1px solid var(--card-border);
+  font-size:13.5px; font-weight:500; color:var(--ink-dim);
+  transition:all 0.2s var(--ease); display:flex; align-items:center; gap:6px;
+}
+.chip:hover{border-color:rgba(232,230,222,0.2); color:var(--ink);}
+.chip.selected{
+  background:var(--emerald-dim); border-color:var(--emerald); color:var(--emerald-bright);
+}
+.chip.selected.gold{background:var(--gold-dim); border-color:var(--gold); color:var(--gold-bright);}
+
+.slider-row{margin-bottom:22px;}
+.slider-row .slider-label{display:flex; justify-content:space-between; font-size:13px; color:var(--ink-dim); margin-bottom:10px; font-weight:600;}
+.slider-row .slider-label span:last-child{font-family:var(--font-mono); color:var(--emerald-bright);}
+input[type=range]{
+  width:100%; -webkit-appearance:none; appearance:none; height:6px;
+  background:rgba(255,255,255,0.08); border-radius:10px; outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+  background:var(--emerald); box-shadow:0 0 12px rgba(22,201,141,0.6); cursor:pointer;
+  border:2px solid #06140F;
+}
+input[type=range]::-moz-range-thumb{
+  width:20px; height:20px; border-radius:50%; background:var(--emerald); border:2px solid #06140F; cursor:pointer;
+}
+
+.badge{display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:100px; font-size:11.5px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;}
+.badge-emerald{background:var(--emerald-dim); color:var(--emerald-bright);}
+.badge-gold{background:var(--gold-dim); color:var(--gold-bright);}
+.badge-danger{background:var(--danger-dim); color:var(--danger);}
+
+.progress-track{height:8px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden;}
+.progress-fill{height:100%; border-radius:10px; background:linear-gradient(90deg, var(--emerald-deep), var(--emerald)); transition:width 0.6s var(--ease);}
+.progress-fill.gold{background:linear-gradient(90deg, var(--gold), var(--gold-bright));}
+
+svg.icon{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0;}
+
+/* ============================================================
+   LANDING SCREEN
+   ============================================================ */
+.landing{
+  min-height:100vh; display:flex; flex-direction:column;
+  position:relative; overflow:hidden;
+}
+.landing-nav{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:28px clamp(20px,5vw,64px); position:relative; z-index:2;
+}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:20px; font-weight:700; letter-spacing:0.01em;}
+.brand-mark{
+  width:34px; height:34px; border-radius:10px;
+  background:linear-gradient(155deg, var(--emerald-deep), var(--void));
+  border:1px solid var(--card-border-hi);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); color:var(--emerald-bright); font-size:18px; font-weight:700;
+}
+.landing-nav .resume-link{font-size:13px; color:var(--ink-dim); display:flex; align-items:center; gap:6px;}
+.landing-nav .resume-link:hover{color:var(--emerald-bright);}
+
+.landing-hero{
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:20px clamp(20px,5vw,64px) 60px; position:relative; z-index:2;
+}
+.hero-inner{max-width:780px; text-align:center;}
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--font-mono); font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--emerald-bright); margin-bottom:28px;
+  padding:8px 16px; border:1px solid var(--card-border-hi); border-radius:100px; background:var(--emerald-dim);
+}
+.hero-eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--emerald); box-shadow:0 0 8px var(--emerald); animation:pulse-dot 2s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;} 50%{opacity:0.35;}}
+.hero-inner h1{
+  font-size:clamp(40px, 7vw, 76px); line-height:1.04; letter-spacing:-0.02em;
+  font-weight:600; margin-bottom:24px;
+}
+.hero-inner h1 em{
+  font-style:italic; font-weight:500; color:var(--emerald-bright);
+  background:linear-gradient(135deg, var(--emerald-bright), var(--gold-bright));
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.hero-sub{font-size:18px; color:var(--ink-dim); line-height:1.65; max-width:560px; margin:0 auto 40px;}
+.hero-actions{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;}
+.hero-actions .btn-primary{padding:17px 36px; font-size:15.5px;}
+.hero-domains{
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:48px;
+}
+.hero-domain-tag{
+  font-size:12.5px; padding:8px 16px; border-radius:100px; color:var(--ink-faint);
+  border:1px solid var(--card-border); display:flex; align-items:center; gap:6px;
+}
+.hero-domain-tag svg{width:14px; height:14px;}
+
+/* Instrument dial decoration behind hero */
+.dial-decor{
+  position:absolute; top:50%; left:50%; width:900px; height:900px;
+  transform:translate(-50%,-50%);
+  border-radius:50%; border:1px solid rgba(232,230,222,0.04);
+  z-index:1; pointer-events:none;
+}
+.dial-decor::before{
+  content:''; position:absolute; inset:90px; border-radius:50%; border:1px solid rgba(22,201,141,0.06);
+}
+.dial-decor::after{
+  content:''; position:absolute; inset:180px; border-radius:50%; border:1px solid rgba(201,162,75,0.05);
+}
+
+.landing-strip{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  background:var(--card-border); border-top:1px solid var(--card-border); position:relative; z-index:2;
+}
+.strip-stat{background:var(--void-soft); padding:28px 20px; text-align:center;}
+.strip-stat .num{font-family:var(--font-display); font-size:30px; color:var(--emerald-bright); font-weight:600;}
+.strip-stat .lbl{font-size:12px; color:var(--ink-faint); margin-top:4px; letter-spacing:0.02em;}
+@media (max-width:700px){.landing-strip{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.hero-actions{flex-direction:column; width:100%;} .hero-actions .btn{width:100%;}}
+
+/* ============================================================
+   ONBOARDING WIZARD
+   ============================================================ */
+.wizard{min-height:100vh; display:flex; flex-direction:column; position:relative; z-index:1;}
+.wizard-top{
+  display:flex; align-items:center; gap:20px;
+  padding:24px clamp(20px,4vw,48px);
+  border-bottom:1px solid var(--card-border);
+}
+.wizard-top .brand{font-size:16px;}
+.wizard-progress-wrap{flex:1; max-width:480px; margin:0 auto;}
+.wizard-progress-track{height:4px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden;}
+.wizard-progress-fill{height:100%; background:linear-gradient(90deg,var(--emerald-deep),var(--emerald)); border-radius:10px; transition:width 0.5s var(--ease);}
+.wizard-progress-label{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); text-align:center; margin-top:8px; letter-spacing:0.04em;}
+.wizard-exit{font-size:13px; color:var(--ink-faint);}
+.wizard-exit:hover{color:var(--ink);}
+
+.wizard-body{flex:1; display:flex; align-items:flex-start; justify-content:center; padding:48px 20px 100px;}
+.wizard-card{width:100%; max-width:640px;}
+.step-eyebrow{font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--emerald-bright); margin-bottom:14px; display:flex; align-items:center; gap:8px;}
+.step-title{font-size:clamp(26px,4vw,34px); margin-bottom:10px; line-height:1.15;}
+.step-desc{color:var(--ink-dim); font-size:15px; margin-bottom:36px; line-height:1.6; max-width:520px;}
+
+.wstep{display:none; animation:stepIn 0.45s var(--ease);}
+.wstep.active{display:block;}
+@keyframes stepIn{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+
+.option-card{
+  display:flex; align-items:center; gap:16px; padding:18px 20px;
+  border-radius:16px; border:1px solid var(--card-border); background:rgba(255,255,255,0.02);
+  margin-bottom:12px; transition:all 0.2s var(--ease); cursor:pointer;
+}
+.option-card:hover{border-color:rgba(232,230,222,0.18); background:rgba(255,255,255,0.04);}
+.option-card.selected{border-color:var(--emerald); background:var(--emerald-dim);}
+.option-card .icon-wrap{
+  width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,0.04);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  color:var(--emerald-bright);
+}
+.option-card.selected .icon-wrap{background:rgba(22,201,141,0.18);}
+.option-card .opt-title{font-weight:600; font-size:14.5px;}
+.option-card .opt-sub{font-size:12.5px; color:var(--ink-faint); margin-top:2px;}
+.option-card .check{margin-left:auto; width:22px; height:22px; border-radius:50%; border:2px solid var(--card-border); flex-shrink:0; display:flex; align-items:center; justify-content:center;}
+.option-card.selected .check{background:var(--emerald); border-color:var(--emerald);}
+.option-card.selected .check svg{width:13px; height:13px; stroke:#06140F; stroke-width:3;}
+
+.religion-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+@media (max-width:540px){.religion-grid{grid-template-columns:1fr;}}
+.religion-card{
+  padding:16px; border-radius:14px; border:1px solid var(--card-border); background:rgba(255,255,255,0.02);
+  text-align:center; cursor:pointer; transition:all 0.2s var(--ease); font-weight:600; font-size:14px;
+}
+.religion-card:hover{border-color:rgba(232,230,222,0.18);}
+.religion-card.selected{border-color:var(--gold); background:var(--gold-dim); color:var(--gold-bright);}
+
+.wizard-nav{
+  position:fixed; bottom:0; left:0; right:0; z-index:10;
+  display:flex; justify-content:center; gap:14px; padding:18px 20px;
+  background:linear-gradient(to top, var(--void) 60%, transparent);
+}
+.wizard-nav-inner{display:flex; gap:12px; width:100%; max-width:640px;}
+.wizard-nav .btn{flex:1;}
+.wizard-nav .btn-back{flex:0 0 auto; padding:14px 22px;}
+
+.assessment-block{margin-bottom:30px; padding-bottom:26px; border-bottom:1px solid var(--card-border);}
+.assessment-block:last-child{border-bottom:none;}
+.assessment-block-title{font-size:13px; font-weight:700; color:var(--ink); margin-bottom:16px; display:flex; align-items:center; gap:8px; text-transform:uppercase; letter-spacing:0.04em;}
+.assessment-block-title svg{width:16px;height:16px; color:var(--emerald-bright);}
+
+.upload-zone{
+  border:2px dashed var(--card-border); border-radius:18px; padding:40px 24px; text-align:center; cursor:pointer;
+  transition:all 0.2s var(--ease);
+}
+.upload-zone:hover, .upload-zone.dragover{border-color:var(--emerald); background:var(--emerald-dim);}
+.upload-zone svg{width:36px; height:36px; color:var(--emerald-bright); margin-bottom:14px;}
+.upload-zone .uz-title{font-weight:600; margin-bottom:4px;}
+.upload-zone .uz-sub{font-size:12.5px; color:var(--ink-faint);}
+.upload-status{margin-top:14px; padding:12px 16px; border-radius:10px; background:var(--emerald-dim); color:var(--emerald-bright); font-size:13.5px; display:flex; align-items:center; gap:10px;}
+
+.tt-builder{border:1px solid var(--card-border); border-radius:16px; overflow:hidden;}
+.tt-row{display:grid; grid-template-columns:90px 1fr 110px 36px; gap:10px; align-items:center; padding:10px 14px; border-bottom:1px solid var(--card-border);}
+.tt-row:last-child{border-bottom:none;}
+.tt-row input,.tt-row select{padding:9px 10px; font-size:13px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; color:var(--ink);}
+.tt-row .tt-del{width:30px; height:30px; border-radius:8px; background:var(--danger-dim); color:var(--danger); display:flex; align-items:center; justify-content:center; border:none;}
+.tt-add-row{padding:14px; text-align:center;}
+@media (max-width:560px){.tt-row{grid-template-columns:1fr; gap:6px;}}
+
+.summary-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media (max-width:540px){.summary-grid{grid-template-columns:1fr;}}
+.summary-item{padding:16px; border-radius:14px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border);}
+.summary-item .si-label{font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;}
+.summary-item .si-value{font-weight:600; font-size:14.5px;}
+
+/* ============================================================
+   APP SHELL (post-onboarding)
+   ============================================================ */
+.appshell{display:flex; min-height:100vh; position:relative; z-index:1;}
+
+.sidebar{
+  width:240px; flex-shrink:0; border-right:1px solid var(--card-border);
+  display:flex; flex-direction:column; padding:24px 16px; position:sticky; top:0; height:100vh;
+}
+.sidebar .brand{padding:0 8px 28px; font-size:17px;}
+.nav-group{margin-bottom:6px;}
+.nav-item{
+  display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px;
+  color:var(--ink-dim); font-size:14px; font-weight:500; margin-bottom:2px; transition:all 0.15s;
+  position:relative;
+}
+.nav-item svg{width:18px; height:18px;}
+.nav-item:hover{background:rgba(255,255,255,0.04); color:var(--ink);}
+.nav-item.active{background:var(--emerald-dim); color:var(--emerald-bright);}
+.nav-item .nav-badge{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; background:rgba(255,255,255,0.08); padding:2px 7px; border-radius:6px; color:var(--ink-faint);}
+.nav-item.active .nav-badge{background:rgba(22,201,141,0.2); color:var(--emerald-bright);}
+.nav-section-label{font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-faint); padding:18px 14px 8px;}
+.sidebar-footer{margin-top:auto; padding-top:16px; border-top:1px solid var(--card-border);}
+.sidebar-profile{display:flex; align-items:center; gap:10px; padding:10px 8px; border-radius:12px;}
+.sidebar-profile:hover{background:rgba(255,255,255,0.03);}
+.sidebar-avatar{width:36px; height:36px; border-radius:10px; background:linear-gradient(155deg,var(--emerald-deep),var(--void)); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--emerald-bright); font-family:var(--font-display); flex-shrink:0;}
+.sidebar-profile .sp-name{font-size:13.5px; font-weight:600;}
+.sidebar-profile .sp-rank{font-size:11px; color:var(--gold-bright); font-family:var(--font-mono);}
+
+.main-col{flex:1; min-width:0; display:flex; flex-direction:column;}
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:18px clamp(16px,3vw,36px); border-bottom:1px solid var(--card-border);
+  position:sticky; top:0; z-index:20; background:rgba(6,7,10,0.85); backdrop-filter:blur(16px);
+}
+.topbar-title{font-size:20px;}
+.topbar-actions{display:flex; align-items:center; gap:12px;}
+.mobile-menu-btn{display:none; background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:10px; padding:9px; color:var(--ink);}
+.xp-pill{
+  display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:100px;
+  background:var(--gold-dim); border:1px solid rgba(201,162,75,0.25); font-family:var(--font-mono); font-size:12.5px; color:var(--gold-bright); font-weight:600;
+}
+.xp-pill svg{width:15px;height:15px;}
+
+.content{flex:1; padding:clamp(16px,3vw,36px); max-width:1400px;}
+.view{display:none;}
+.view.active{display:block; animation:viewIn 0.4s var(--ease);}
+@keyframes viewIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+.greeting-row{display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:28px;}
+.greeting-row h1{font-size:clamp(22px,3vw,30px);}
+.greeting-row .greet-sub{color:var(--ink-dim); font-size:14px; margin-top:4px;}
+.date-pill{font-family:var(--font-mono); font-size:12.5px; color:var(--ink-faint); padding:8px 14px; border:1px solid var(--card-border); border-radius:100px;}
+
+/* Dashboard grid: instrument panel layout */
+.dash-grid{display:grid; grid-template-columns:340px 1fr; gap:24px; align-items:start;}
+@media (max-width:1100px){.dash-grid{grid-template-columns:1fr;}}
+
+.panel{padding:24px; margin-bottom:24px;}
+.panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.panel-head h3{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;}
+.panel-head h3 svg{width:17px;height:17px; color:var(--emerald-bright);}
+.panel-link{font-size:12.5px; color:var(--emerald-bright); font-weight:600;}
+
+/* Life Score Dial */
+.score-dial-wrap{display:flex; flex-direction:column; align-items:center; padding:8px 0 4px;}
+.score-dial{position:relative; width:220px; height:220px;}
+.score-dial svg{width:100%; height:100%; transform:rotate(-90deg);}
+.score-dial-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+.score-dial-num{font-family:var(--font-display); font-size:52px; font-weight:600; color:var(--ink); line-height:1;}
+.score-dial-num span{font-size:20px; color:var(--ink-faint); font-weight:400;}
+.score-dial-lbl{font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;}
+.score-legend{display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; width:100%; margin-top:18px;}
+.score-legend-item{display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-dim);}
+.score-legend-dot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+.score-legend-item .sl-val{margin-left:auto; font-family:var(--font-mono); color:var(--ink);}
+
+/* Rank card */
+.rank-card{display:flex; align-items:center; gap:16px;}
+.rank-emblem{
+  width:64px; height:64px; border-radius:16px; flex-shrink:0;
+  background:linear-gradient(155deg, var(--gold-dim), rgba(201,162,75,0.03));
+  border:1px solid rgba(201,162,75,0.3); display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:700; color:var(--gold-bright); font-size:13px; text-align:center; line-height:1.1;
+}
+.rank-info{flex:1; min-width:0;}
+.rank-name{font-weight:700; font-size:15px; color:var(--gold-bright);}
+.rank-xp{font-size:12px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:2px;}
+.rank-progress-track{height:6px; background:rgba(255,255,255,0.06); border-radius:10px; margin-top:10px; overflow:hidden;}
+.rank-progress-fill{height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); border-radius:10px; transition:width 0.6s var(--ease);}
+
+/* Today rail - the day spine */
+.today-rail{position:relative; padding-left:28px;}
+.today-rail::before{content:''; position:absolute; left:9px; top:6px; bottom:6px; width:2px; background:linear-gradient(to bottom, var(--emerald), rgba(22,201,141,0.08));}
+.rail-item{position:relative; padding-bottom:18px;}
+.rail-item:last-child{padding-bottom:0;}
+.rail-item::before{
+  content:''; position:absolute; left:-28px; top:3px; width:14px; height:14px; border-radius:50%;
+  background:var(--void); border:2px solid var(--card-border); z-index:1;
+}
+.rail-item.done::before{background:var(--emerald); border-color:var(--emerald); box-shadow:0 0 10px rgba(22,201,141,0.5);}
+.rail-item.now::before{background:var(--gold); border-color:var(--gold); box-shadow:0 0 0 4px rgba(201,162,75,0.2); animation:pulse-now 2s infinite;}
+@keyframes pulse-now{0%,100%{box-shadow:0 0 0 4px rgba(201,162,75,0.2);} 50%{box-shadow:0 0 0 8px rgba(201,162,75,0.06);}}
+.rail-card{
+  display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:14px;
+  background:rgba(255,255,255,0.02); border:1px solid var(--card-border); transition:all 0.2s;
+}
+.rail-item.done .rail-card{opacity:0.55;}
+.rail-card:hover{border-color:rgba(232,230,222,0.16);}
+.rail-check{
+  width:26px; height:26px; border-radius:50%; border:2px solid var(--card-border); flex-shrink:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+}
+.rail-check svg{width:14px;height:14px; stroke:#06140F; stroke-width:3; opacity:0;}
+.rail-item.done .rail-check{background:var(--emerald); border-color:var(--emerald);}
+.rail-item.done .rail-check svg{opacity:1;}
+.rail-check.done{background:var(--emerald); border-color:var(--emerald);}
+.rail-check.done svg{opacity:1;}
+.rail-card .rc-time{font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); flex-shrink:0; width:48px;}
+.rail-card .rc-title{font-weight:600; font-size:13.5px;}
+.rail-card .rc-sub{font-size:11.5px; color:var(--ink-faint); margin-top:1px;}
+.rail-card .rc-tag{margin-left:auto; flex-shrink:0;}
+.rail-empty{text-align:center; padding:30px 10px; color:var(--ink-faint); font-size:13.5px;}
+
+/* Stat grid (mini cards) */
+.stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:14px;}
+.stat-card{padding:18px; border-radius:16px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border);}
+.stat-card .sc-icon{width:34px; height:34px; border-radius:10px; background:var(--emerald-dim); color:var(--emerald-bright); display:flex; align-items:center; justify-content:center; margin-bottom:12px;}
+.stat-card .sc-icon svg{width:18px;height:18px;}
+.stat-card .sc-val{font-family:var(--font-display); font-size:24px; font-weight:600;}
+.stat-card .sc-lbl{font-size:11.5px; color:var(--ink-faint); margin-top:2px;}
+.stat-card .sc-delta{font-size:11px; margin-top:8px; font-weight:600;}
+.sc-delta.up{color:var(--emerald-bright);}
+.sc-delta.down{color:var(--danger);}
+
+/* Recovery notice banner */
+.recovery-banner{
+  display:flex; align-items:center; gap:18px; padding:22px 24px; border-radius:20px;
+  background:linear-gradient(120deg, rgba(226,101,79,0.14), rgba(226,101,79,0.04));
+  border:1px solid rgba(226,101,79,0.35); margin-bottom:24px;
+}
+.recovery-banner .rb-icon{width:48px; height:48px; border-radius:14px; background:rgba(226,101,79,0.18); color:#FF8A70; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.recovery-banner .rb-icon svg{width:24px;height:24px;}
+.recovery-banner .rb-title{font-weight:700; font-size:15px; margin-bottom:3px;}
+.recovery-banner .rb-sub{font-size:13px; color:var(--ink-dim); line-height:1.5;}
+.recovery-banner .btn{flex-shrink:0;}
+@media (max-width:640px){.recovery-banner{flex-direction:column; text-align:center;}}
+
+/* Quote card */
+.quote-card{padding:24px; text-align:center;}
+.quote-card .q-mark{font-family:var(--font-display); font-size:40px; color:var(--gold-bright); opacity:0.5; line-height:0.5;}
+.quote-card p{font-family:var(--font-display); font-size:17px; line-height:1.5; margin:10px 0; font-style:italic;}
+.quote-card .q-author{font-size:12px; color:var(--ink-faint); font-family:var(--font-mono);}
+
+.mobile-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:39; display:none;}
+@media (max-width:900px){
+  .sidebar{position:fixed; left:0; top:0; z-index:40; transform:translateX(-100%); transition:transform 0.3s var(--ease); background:var(--void); box-shadow:20px 0 60px rgba(0,0,0,0.5);}
+  .sidebar.open{transform:translateX(0);}
+  .mobile-overlay.open{display:block;}
+  .mobile-menu-btn{display:flex;}
+}
+
+/* ============================================================
+   SHARED "CENTER" COMPONENTS (Finance, Health, Diet, Study, etc.)
+   ============================================================ */
+.view-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:26px;}
+.view-head h1{font-size:clamp(22px,3vw,28px);}
+.view-head .vh-sub{color:var(--ink-dim); font-size:13.5px; margin-top:4px;}
+
+.tabs{display:flex; gap:6px; padding:5px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:14px; margin-bottom:22px; overflow-x:auto;}
+.tab-btn{padding:9px 18px; border-radius:10px; font-size:13.5px; font-weight:600; color:var(--ink-faint); white-space:nowrap; transition:all 0.2s;}
+.tab-btn.active{background:var(--emerald); color:#06140F;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block; animation:viewIn 0.3s var(--ease);}
+
+.cards-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px;}
+.metric-card{padding:18px 20px; border-radius:16px;}
+.metric-card .mc-lbl{font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;}
+.metric-card .mc-val{font-family:var(--font-display); font-size:26px; font-weight:600;}
+.metric-card .mc-val.small{font-size:18px;}
+.metric-card .mc-sub{font-size:12px; color:var(--ink-faint); margin-top:6px;}
+
+.two-col{display:grid; grid-template-columns:1.3fr 1fr; gap:22px; align-items:start;}
+@media (max-width:980px){.two-col{grid-template-columns:1fr;}}
+
+.list-row{display:flex; align-items:center; gap:14px; padding:14px 4px; border-bottom:1px solid var(--card-border);}
+.list-row:last-child{border-bottom:none;}
+.list-row .lr-icon{width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--emerald-bright);}
+.list-row .lr-icon svg{width:18px;height:18px;}
+.list-row .lr-title{font-weight:600; font-size:13.5px;}
+.list-row .lr-sub{font-size:12px; color:var(--ink-faint); margin-top:1px;}
+.list-row .lr-amt{margin-left:auto; font-family:var(--font-mono); font-weight:600; font-size:14px; flex-shrink:0;}
+.lr-amt.neg{color:var(--danger);}
+.lr-amt.pos{color:var(--emerald-bright);}
+.lr-del{width:28px; height:28px; border-radius:8px; background:transparent; color:var(--ink-faint); display:flex; align-items:center; justify-content:center; flex-shrink:0; border:none;}
+.lr-del:hover{background:var(--danger-dim); color:var(--danger);}
+
+.empty-state{text-align:center; padding:50px 20px; color:var(--ink-faint);}
+.empty-state svg{width:40px; height:40px; margin-bottom:14px; opacity:0.5;}
+.empty-state .es-title{font-weight:600; color:var(--ink-dim); margin-bottom:4px; font-size:14.5px;}
+.empty-state .es-sub{font-size:13px;}
+
+.section-title-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.section-title-row h3{font-size:15px; display:flex; align-items:center; gap:8px;}
+.section-title-row h3 svg{width:17px;height:17px; color:var(--emerald-bright);}
+
+/* Modal */
+.modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:90; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.2s;}
+.modal-backdrop.open{opacity:1; pointer-events:auto;}
+.modal-box{background:var(--card); border:1px solid var(--card-border); border-radius:22px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; padding:28px; transform:translateY(20px) scale(0.97); transition:transform 0.25s var(--ease); box-shadow:0 30px 80px rgba(0,0,0,0.6);}
+.modal-backdrop.open .modal-box{transform:translateY(0) scale(1);}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
+.modal-head h3{font-size:18px;}
+.modal-close{width:32px; height:32px; border-radius:10px; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; color:var(--ink-dim); border:none;}
+.modal-close:hover{background:rgba(255,255,255,0.08); color:var(--ink);}
+.modal-actions{display:flex; gap:10px; margin-top:24px;}
+.modal-actions .btn{flex:1;}
+
+.habit-card{padding:18px; border-radius:16px; margin-bottom:12px; display:flex; align-items:center; gap:14px;}
+.habit-card .hc-streak{
+  width:46px; height:46px; border-radius:12px; background:var(--gold-dim); color:var(--gold-bright);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; font-family:var(--font-mono);
+}
+.habit-card .hc-streak .num{font-size:15px; font-weight:700; line-height:1;}
+.habit-card .hc-streak .lbl{font-size:8px; text-transform:uppercase; letter-spacing:0.02em;}
+.habit-card .hc-info{flex:1; min-width:0;}
+.habit-card .hc-title{font-weight:600; font-size:14px;}
+.habit-card .hc-sub{font-size:12px; color:var(--ink-faint); margin-top:2px;}
+.habit-card .hc-strength-track{height:5px; background:rgba(255,255,255,0.06); border-radius:10px; margin-top:8px; overflow:hidden; max-width:200px;}
+.habit-card .hc-strength-fill{height:100%; background:linear-gradient(90deg,var(--emerald-deep),var(--emerald)); border-radius:10px;}
+.habit-card .hc-check{flex-shrink:0;}
+
+.goal-card{padding:20px; border-radius:18px; margin-bottom:14px;}
+.goal-card .gc-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px;}
+.goal-card .gc-title{font-weight:700; font-size:15px;}
+.goal-card .gc-meta{font-size:12px; color:var(--ink-faint); margin-top:3px;}
+.goal-card .gc-today-action{
+  display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px; background:var(--emerald-dim); margin-top:12px; font-size:13px; color:var(--emerald-bright); font-weight:500;
+}
+.goal-card .gc-today-action svg{width:16px;height:16px; flex-shrink:0;}
+
+.journal-entry{padding:18px; border-radius:16px; margin-bottom:12px;}
+.journal-entry .je-date{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); margin-bottom:8px;}
+.journal-entry .je-text{font-size:13.5px; line-height:1.6; color:var(--ink); margin-bottom:8px; white-space:pre-wrap;}
+.journal-entry .je-tags{display:flex; gap:6px; flex-wrap:wrap;}
+
+.mini-chart-wrap{position:relative; height:220px;}
+.chart-wrap-tall{position:relative; height:300px;}
+
+.timer-display{font-family:var(--font-mono); font-size:64px; font-weight:600; text-align:center; color:var(--emerald-bright); letter-spacing:0.02em; margin:20px 0;}
+
+.recovery-page-banner{padding:28px; border-radius:20px; background:linear-gradient(120deg,rgba(226,101,79,0.12),rgba(226,101,79,0.03)); border:1px solid rgba(226,101,79,0.3); text-align:center; margin-bottom:24px;}
+
+.day-checklist{display:flex; gap:8px; margin-top:10px;}
+.day-dot{width:24px; height:24px; border-radius:7px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-faint); font-family:var(--font-mono);}
+.day-dot.filled{background:var(--emerald); color:#06140F; font-weight:700;}
+
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); z-index:200;
+  background:var(--card); border:1px solid var(--card-border-hi); border-radius:14px; padding:14px 20px;
+  display:flex; align-items:center; gap:10px; box-shadow:0 12px 40px rgba(0,0,0,0.5); opacity:0; transition:all 0.3s var(--ease); pointer-events:none;
+  font-size:13.5px; font-weight:500; max-width:90vw;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+.toast .t-icon{width:22px;height:22px; border-radius:50%; background:var(--emerald-dim); color:var(--emerald-bright); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.toast .t-icon svg{width:13px;height:13px; stroke-width:3;}
+
+.xp-float{
+  position:fixed; z-index:300; font-family:var(--font-mono); font-weight:700; color:var(--gold-bright); font-size:14px;
+  pointer-events:none; animation:xpFloat 1.1s var(--ease) forwards;
+}
+@keyframes xpFloat{0%{opacity:0; transform:translateY(0) scale(0.8);} 15%{opacity:1; transform:translateY(-8px) scale(1.1);} 100%{opacity:0; transform:translateY(-50px) scale(1);}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ============================================================
+       LANDING SCREEN
+       ============================================================ -->
+  <section class="landing" id="screen-landing">
+    <div class="dial-decor" aria-hidden="true"></div>
+    <nav class="landing-nav">
+      <div class="brand"><span class="brand-mark">M</span> MAAR LIFE</div>
+      <a href="#" class="resume-link hidden" id="resumeLink">
+        <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v8h8"/></svg>
+        Resume your setup
+      </a>
+    </nav>
+    <div class="landing-hero">
+      <div class="hero-inner">
+        <div class="hero-eyebrow"><span class="dot"></span> A personal life operating system</div>
+        <h1>Run your life like<br><em>a well-built system.</em></h1>
+        <p class="hero-sub">MAAR LIFE turns health, money, faith, study and discipline into small daily actions — tracked, scored, and compounded. One dashboard. Every important part of your life.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="btnStartJourney">
+            Start My Journey
+            <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="btnLearnMore">What's inside</button>
+        </div>
+        <div class="hero-domains" id="heroDomains"></div>
+      </div>
+    </div>
+    <div class="landing-strip">
+      <div class="strip-stat"><div class="num">9</div><div class="lbl">Life domains tracked</div></div>
+      <div class="strip-stat"><div class="num">21</div><div class="lbl">Rank tiers to climb</div></div>
+      <div class="strip-stat"><div class="num">100%</div><div class="lbl">Private — data stays on device</div></div>
+      <div class="strip-stat"><div class="num">0</div><div class="lbl">Accounts or servers needed</div></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ONBOARDING WIZARD
+       ============================================================ -->
+  <section class="wizard hidden" id="screen-wizard">
+    <div class="wizard-top">
+      <div class="brand"><span class="brand-mark">M</span></div>
+      <div class="wizard-progress-wrap">
+        <div class="wizard-progress-track"><div class="wizard-progress-fill" id="wizProgressFill" style="width:4%"></div></div>
+        <div class="wizard-progress-label" id="wizProgressLabel">STEP 1 OF 24</div>
+      </div>
+      <a href="#" class="wizard-exit" id="btnExitWizard">Exit</a>
+    </div>
+
+    <div class="wizard-body">
+      <div class="wizard-card">
+
+        <!-- STEP: welcome -->
+        <div class="wstep" data-step="welcome">
+          <div class="step-eyebrow">◆ Getting started</div>
+          <h2 class="step-title">Let's build your system.</h2>
+          <p class="step-desc">This takes about five minutes. Answer honestly — MAAR LIFE only works as well as the picture you give it. Nothing leaves your device.</p>
+          <div class="option-card" style="cursor:default; align-items:flex-start;">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div>
+            <div><div class="opt-title">What you'll set up</div><div class="opt-sub">Your profile, timetable, faith practice, life assessment, and starter goals — all in one short flow.</div></div>
+          </div>
+        </div>
+
+        <!-- STEP: name/age -->
+        <div class="wstep" data-step="profile1">
+          <div class="step-eyebrow">◆ About you</div>
+          <h2 class="step-title">First, who are we building this for?</h2>
+          <p class="step-desc">Used only to personalise your dashboard.</p>
+          <div class="field"><label for="inpName">Your name</label><input type="text" id="inpName" placeholder="e.g. Adil"></div>
+          <div class="field-row">
+            <div class="field"><label for="inpAge">Age</label><input type="number" id="inpAge" min="10" max="100" placeholder="e.g. 24"></div>
+            <div class="field"><label for="inpCountry">Country</label><input type="text" id="inpCountry" placeholder="e.g. United Kingdom"></div>
+          </div>
+        </div>
+
+        <!-- STEP: occupation/education/income -->
+        <div class="wstep" data-step="profile2">
+          <div class="step-eyebrow">◆ About you</div>
+          <h2 class="step-title">A little about your day-to-day.</h2>
+          <p class="step-desc">This helps MAAR LIFE shape realistic daily targets.</p>
+          <div class="field"><label for="inpOccupation">Occupation</label><input type="text" id="inpOccupation" placeholder="e.g. Student, Software Engineer, Self-employed"></div>
+          <div class="field"><label for="inpEducation">Education level</label>
+            <select id="inpEducation">
+              <option value="">Select…</option>
+              <option>Secondary school</option>
+              <option>College / Sixth form</option>
+              <option>Undergraduate</option>
+              <option>Postgraduate</option>
+              <option>Vocational / Trade</option>
+              <option>Self-taught</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field"><label for="inpIncome">Monthly income (approx., optional)</label>
+            <input type="number" id="inpIncome" placeholder="e.g. 1800">
+            <div class="field-hint">Used only for your private Finance Center. Leave blank if you'd rather not say.</div>
+          </div>
+        </div>
+
+        <!-- STEP: has timetable? -->
+        <div class="wstep" data-step="ttHas">
+          <div class="step-eyebrow">◆ Your schedule</div>
+          <h2 class="step-title">Do you already keep a timetable?</h2>
+          <p class="step-desc">Your timetable becomes the backbone of your daily plan.</p>
+          <div class="option-card" data-choice="yes">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div><div class="opt-title">Yes, I have one</div><div class="opt-sub">Import it from a calendar or PDF</div></div>
+            <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+          </div>
+          <div class="option-card" data-choice="no">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+            <div><div class="opt-title">No, not yet</div><div class="opt-sub">Build one now, or set it up later</div></div>
+            <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+          </div>
+        </div>
+
+        <!-- STEP: import timetable -->
+        <div class="wstep" data-step="ttImport">
+          <div class="step-eyebrow">◆ Your schedule</div>
+          <h2 class="step-title">Import your timetable.</h2>
+          <p class="step-desc">Upload a PDF timetable, or an .ics calendar export from Outlook, Google Calendar or Apple Calendar.</p>
+          <div class="upload-zone" id="uzPdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            <div class="uz-title">Upload PDF timetable</div>
+            <div class="uz-sub">Click to choose a file, or drag it here</div>
+            <input type="file" id="fileTtPdf" accept="application/pdf" class="hidden">
+          </div>
+          <div id="pdfUploadStatus"></div>
+          <div style="height:14px"></div>
+          <div class="upload-zone" id="uzIcs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <div class="uz-title">Import .ics calendar</div>
+            <div class="uz-sub">From Outlook, Google Calendar or Apple Calendar</div>
+            <input type="file" id="fileTtIcs" accept=".ics" class="hidden">
+          </div>
+          <div id="icsUploadStatus"></div>
+        </div>
+
+        <!-- STEP: create now or later -->
+        <div class="wstep" data-step="ttCreateChoice">
+          <div class="step-eyebrow">◆ Your schedule</div>
+          <h2 class="step-title">Build a timetable now, or later?</h2>
+          <p class="step-desc">You can always edit this from the Timetable section in your dashboard.</p>
+          <div class="option-card" data-choice="now">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+            <div><div class="opt-title">Build it now</div><div class="opt-sub">Takes about two minutes</div></div>
+            <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+          </div>
+          <div class="option-card" data-choice="later">
+            <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+            <div><div class="opt-title">I'll do this later</div><div class="opt-sub">Start with goals and habits instead</div></div>
+            <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+          </div>
+        </div>
+
+        <!-- STEP: timetable builder -->
+        <div class="wstep" data-step="ttBuilder">
+          <div class="step-eyebrow">◆ Your schedule</div>
+          <h2 class="step-title">Build your weekly timetable.</h2>
+          <p class="step-desc">Add the blocks that make up a typical day — school, work, sleep, exercise, meals, faith, hobbies. You can refine this anytime.</p>
+          <div class="tt-builder" id="ttBuilderRows"></div>
+          <div class="tt-add-row"><button class="btn btn-ghost btn-sm" id="btnAddTtRow">+ Add time block</button></div>
+        </div>
+
+        <!-- STEP: religion -->
+        <div class="wstep" data-step="religion">
+          <div class="step-eyebrow">◆ Faith & practice</div>
+          <h2 class="step-title">Do you follow a faith or spiritual practice?</h2>
+          <p class="step-desc">This is entirely optional and only shapes small, gentle daily habits — never anything intrusive.</p>
+          <div class="religion-grid" id="religionGrid"></div>
+        </div>
+
+        <!-- STEP: assessment -->
+        <div class="wstep" data-step="assessment">
+          <div class="step-eyebrow">◆ Life assessment</div>
+          <h2 class="step-title">How's life right now?</h2>
+          <p class="step-desc">Drag each slider honestly — this calibrates your starting Life Score and daily priorities.</p>
+          <div id="assessmentSliders"></div>
+        </div>
+
+        <!-- STEP: habits to improve -->
+        <div class="wstep" data-step="habitsImprove">
+          <div class="step-eyebrow">◆ Habits</div>
+          <h2 class="step-title">What would you like to work on?</h2>
+          <p class="step-desc">Pick as many as apply. MAAR LIFE will turn each one into a small daily action — never an overwhelming overhaul.</p>
+          <div class="chip-grid" id="habitsChipGrid"></div>
+          <div class="field" style="margin-top:20px;">
+            <label for="inpCustomHabit">Add a custom habit (optional)</label>
+            <input type="text" id="inpCustomHabit" placeholder="Type and press Enter">
+          </div>
+        </div>
+
+        <!-- STEP: improvement areas -->
+        <div class="wstep" data-step="improveAreas">
+          <div class="step-eyebrow">◆ Focus areas</div>
+          <h2 class="step-title">Which areas of life matter most right now?</h2>
+          <p class="step-desc">Choose your top priorities — this shapes what your dashboard surfaces first.</p>
+          <div class="chip-grid" id="improveAreasGrid"></div>
+        </div>
+
+        <!-- STEP: first goal -->
+        <div class="wstep" data-step="firstGoal">
+          <div class="step-eyebrow">◆ Your first goal</div>
+          <h2 class="step-title">Set one meaningful goal to start.</h2>
+          <p class="step-desc">Big or small — MAAR LIFE will break it into a daily action automatically. You can add more goals later.</p>
+          <div class="field"><label for="inpGoalText">What do you want to achieve?</label><input type="text" id="inpGoalText" placeholder="e.g. Save £500, Read 12 books this year, Run a 5K"></div>
+          <div class="field-row">
+            <div class="field"><label for="inpGoalCategory">Category</label>
+              <select id="inpGoalCategory">
+                <option>Finance</option><option>Health</option><option>Learning</option><option>Faith</option><option>Career</option><option>Personal</option>
+              </select>
+            </div>
+            <div class="field"><label for="inpGoalDeadline">Target date (optional)</label><input type="date" id="inpGoalDeadline"></div>
+          </div>
+          <div id="goalPreview"></div>
+        </div>
+
+        <!-- STEP: summary -->
+        <div class="wstep" data-step="summary">
+          <div class="step-eyebrow">◆ All set</div>
+          <h2 class="step-title">Your system is ready, <span id="summaryName">friend</span>.</h2>
+          <p class="step-desc">Here's what MAAR LIFE has set up for you. You can change any of this from Settings.</p>
+          <div class="summary-grid" id="summaryGrid"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="wizard-nav">
+      <div class="wizard-nav-inner">
+        <button class="btn btn-ghost btn-back" id="btnWizBack">Back</button>
+        <button class="btn btn-primary btn-block" id="btnWizNext">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       MAIN APP SHELL
+       ============================================================ -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <div class="appshell hidden" id="screen-app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><span class="brand-mark">M</span> MAAR LIFE</div>
+      <nav id="navList">
+        <div class="nav-group">
+          <a href="#" class="nav-item active" data-view="home"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Dashboard</a>
+          <a href="#" class="nav-item" data-view="timetable"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Timetable</a>
+          <a href="#" class="nav-item" data-view="goals"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Goals & Planning</a>
+          <a href="#" class="nav-item" data-view="habits"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Habits</a>
+        </div>
+        <div class="nav-section-label">Life Centers</div>
+        <div class="nav-group">
+          <a href="#" class="nav-item" data-view="finance"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M7 15h.01"/></svg> Finance</a>
+          <a href="#" class="nav-item" data-view="health"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg> Health</a>
+          <a href="#" class="nav-item" data-view="diet"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg> Diet</a>
+          <a href="#" class="nav-item" data-view="study"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Study</a>
+          <a href="#" class="nav-item" data-view="faith"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M5 9l7-7 7 7M5 14h14"/></svg> Faith</a>
+          <a href="#" class="nav-item" data-view="journal"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Journal</a>
+          <a href="#" class="nav-item" data-view="mood"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg> Mood</a>
+        </div>
+        <div class="nav-section-label">Progress</div>
+        <div class="nav-group">
+          <a href="#" class="nav-item" data-view="analytics"><svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg> Analytics</a>
+          <a href="#" class="nav-item" data-view="rank"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg> Rank & XP</a>
+          <a href="#" class="nav-item" data-view="milestones"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Milestones</a>
+          <a href="#" class="nav-item" data-view="reports"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg> Reports</a>
+          <a href="#" class="nav-item" data-view="settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-profile">
+          <div class="sidebar-avatar" id="sbAvatar">A</div>
+          <div>
+            <div class="sp-name" id="sbName">—</div>
+            <div class="sp-rank" id="sbRank">Bronze I</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <header class="topbar">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button class="mobile-menu-btn" id="btnMobileMenu"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+          <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        </div>
+        <div class="topbar-actions">
+          <div class="xp-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg> <span id="topXp">0</span> XP</div>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <!-- ===================== HOME / DASHBOARD ===================== -->
+        <div class="view active" id="view-home">
+          <div class="greeting-row">
+            <div>
+              <h1 id="greetText">Good morning</h1>
+              <div class="greet-sub" id="greetSub">Here's what today looks like.</div>
+            </div>
+            <div class="date-pill" id="todayDatePill">—</div>
+          </div>
+
+          <div id="recoveryBannerSlot"></div>
+
+          <div class="dash-grid">
+            <div>
+              <div class="glass panel">
+                <div class="panel-head"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Life Score</h3></div>
+                <div class="score-dial-wrap">
+                  <div class="score-dial">
+                    <svg viewBox="0 0 220 220" id="scoreDialSvg"></svg>
+                    <div class="score-dial-center">
+                      <div class="score-dial-num" id="scoreDialNum">0<span>/100</span></div>
+                      <div class="score-dial-lbl" id="scoreDialLbl">Building</div>
+                    </div>
+                  </div>
+                  <div class="score-legend" id="scoreLegend"></div>
+                </div>
+              </div>
+
+              <div class="glass panel">
+                <div class="panel-head"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg> Rank</h3>
+                  <a href="#" class="panel-link" data-view-link="rank">Details</a>
+                </div>
+                <div class="rank-card">
+                  <div class="rank-emblem" id="rankEmblem">BR I</div>
+                  <div class="rank-info">
+                    <div class="rank-name" id="rankName">Bronze I</div>
+                    <div class="rank-xp" id="rankXpText">0 / 500 XP</div>
+                    <div class="rank-progress-track"><div class="rank-progress-fill" id="rankProgressFill" style="width:0%"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass panel quote-card">
+                <div class="q-mark">"</div>
+                <p id="dailyQuoteText">Discipline is choosing between what you want now and what you want most.</p>
+                <div class="q-author" id="dailyQuoteAuthor">— Abraham Lincoln</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="stat-grid" id="homeStatGrid" style="margin-bottom:24px;"></div>
+
+              <div class="glass panel">
+                <div class="panel-head"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg> Today</h3>
+                  <a href="#" class="panel-link" data-view-link="goals">Plan ahead</a>
+                </div>
+                <div class="today-rail" id="todayRail"></div>
+              </div>
+
+              <div class="glass panel">
+                <div class="panel-head"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 9l7-7 7 7M5 14h14"/></svg> Faith practice today</h3></div>
+                <div id="faithTodayBlock"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other views are injected by JS -->
+        <div class="view" id="view-timetable"></div>
+        <div class="view" id="view-goals"></div>
+        <div class="view" id="view-habits"></div>
+        <div class="view" id="view-finance"></div>
+        <div class="view" id="view-health"></div>
+        <div class="view" id="view-diet"></div>
+        <div class="view" id="view-study"></div>
+        <div class="view" id="view-faith"></div>
+        <div class="view" id="view-journal"></div>
+        <div class="view" id="view-mood"></div>
+        <div class="view" id="view-analytics"></div>
+        <div class="view" id="view-rank"></div>
+        <div class="view" id="view-milestones"></div>
+        <div class="view" id="view-reports"></div>
+        <div class="view" id="view-settings"></div>
+
+      </main>
+    </div>
+  </div>
+
+</div>
+<div id="toast-root" aria-live="polite"></div>
+<script>
+window.ML = window.ML || {};
+
+/* ============================================================
+   CONSTANTS & SEED DATA
+   ============================================================ */
+const STORAGE_KEY = 'maarlife_state_v1';
+
+const DOMAIN_META = {
+  health:    {label:'Health',     color:'#3FE8AC'},
+  habits:    {label:'Habits',     color:'#16C98D'},
+  productivity: {label:'Focus',   color:'#5B9EE8'},
+  finance:   {label:'Finance',    color:'#C9A24B'},
+  faith:     {label:'Faith',      color:'#E3C475'},
+  consistency:{label:'Consistency',color:'#9B8CF2'},
+};
+
+const RELIGIONS = [
+  {id:'islam', name:'Islam', practices:['Read one page of the Qur\'an','Make du\'a for two minutes','Reflect on a hadith you know']},
+  {id:'christianity', name:'Christianity', practices:['Read one Bible verse','Pray for two minutes','Reflect on a value to practice today']},
+  {id:'judaism', name:'Judaism', practices:['Read one passage of Torah','Say a short prayer of gratitude','Reflect on a mitzvah you can do today']},
+  {id:'hinduism', name:'Hinduism', practices:['Read one verse of scripture','Sit in quiet meditation for two minutes','Reflect on a value of dharma today']},
+  {id:'buddhism', name:'Buddhism', practices:['Meditate for two minutes','Read one short teaching','Reflect on a moment of mindfulness today']},
+  {id:'sikhism', name:'Sikhism', practices:['Read one line of Gurbani','Reflect for two minutes on seva','Practice a moment of gratitude'] },
+  {id:'jainism', name:'Jainism', practices:['Reflect on ahimsa for two minutes','Read one passage of scripture','Practice a small act of non-harm today']},
+  {id:'bahai', name:'Baháʼí', practices:['Read one passage from the Writings','Reflect for two minutes in prayer','Practice a small act of service today']},
+  {id:'taoism', name:'Taoism', practices:['Sit quietly for two minutes','Read one passage of the Tao Te Ching','Reflect on simplicity today']},
+  {id:'other', name:'Other / Custom', practices:['Take two minutes for quiet reflection','Read something meaningful to you','Note one thing you\'re grateful for']},
+  {id:'none', name:'Prefer not to say / Not religious', practices:[]},
+];
+
+const HABIT_OPTIONS = [
+  'Procrastination','Excessive social media','Gaming too much','Overspending','Poor sleep habits',
+  'Lack of exercise','Unhealthy eating','Poor study habits','Smoking','Negative self-talk','Pornography'
+];
+
+const IMPROVE_AREAS = [
+  'Health & fitness','Productivity','Finances','Learning','Faith & spirituality','Discipline','Relationships','Mental wellbeing','Career'
+];
+
+const RANKS = (() => {
+  const tiers = ['Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Legend','Mythic'];
+  const out = [];
+  let xpFloor = 0;
+  tiers.forEach(t => {
+    ['I','II','III'].forEach((sub,i) => {
+      const xpNeeded = 500 + out.length * 220;
+      out.push({name:`${t} ${sub}`, short:(t[0]+t[1]).toUpperCase()+' '+sub, xpNeeded, floor:xpFloor});
+      xpFloor += xpNeeded;
+    });
+  });
+  out.push({name:'Supreme Human', short:'SUP', xpNeeded:999999, floor:xpFloor});
+  return out;
+})();
+
+const QUOTES = [
+  {q:"Discipline is choosing between what you want now and what you want most.", a:"Abraham Lincoln"},
+  {q:"You do not rise to the level of your goals. You fall to the level of your systems.", a:"James Clear"},
+  {q:"Small daily improvements are the key to staggering long-term results.", a:"James Clear"},
+  {q:"We are what we repeatedly do. Excellence is not an act but a habit.", a:"Will Durant"},
+  {q:"The pain of discipline weighs ounces; the pain of regret weighs tons.", a:"Jim Rohn"},
+  {q:"Consistency is what transforms average into excellence.", a:"Unknown"},
+  {q:"A river cuts through rock not because of its power, but its persistence.", a:"Jim Watkins"},
+  {q:"Motivation gets you going, but discipline keeps you growing.", a:"John C. Maxwell"},
+  {q:"Every action you take is a vote for the type of person you wish to become.", a:"James Clear"},
+  {q:"Patience and persistence are a magical combination.", a:"John Quincy Adams"},
+  {q:"What is not started today is never finished tomorrow.", a:"Johann Wolfgang von Goethe"},
+  {q:"The future depends on what you do today.", a:"Mahatma Gandhi"},
+  {q:"A goal without a plan is just a wish.", a:"Antoine de Saint-Exupéry"},
+  {q:"You don't have to be extreme, just consistent.", a:"Unknown"},
+];
+
+const TT_CATEGORIES = ['School','Work','Study','Exercise','Sleep','Faith','Meals','Hobby','Personal','Other'];
+const TT_COLORS = {School:'#5B9EE8',Work:'#C9A24B',Study:'#9B8CF2',Exercise:'#E2654F',Sleep:'#6E6F66',Faith:'#E3C475',Meals:'#3FE8AC',Hobby:'#16C98D',Personal:'#A7A89E',Other:'#A7A89E'};
+
+const DEFAULT_STATE = () => ({
+  onboarded:false,
+  onboardStep:0,
+  profile:{name:'',age:'',country:'',occupation:'',education:'',income:''},
+  timetable:{has:null, mode:null, blocks:[]},
+  religion:null,
+  assessment:{},
+  habitsToImprove:[],
+  improveAreas:[],
+  goals:[],
+  xp:0,
+  streakLongest:0,
+  createdAt:null,
+  finance:{income:0, transactions:[], budgets:{}, subscriptions:[], debts:[], investments:[]},
+  health:{sleepLog:[], waterLog:[], exerciseLog:[], weightLog:[]},
+  diet:{meals:[]},
+  study:{subjects:[], sessions:[], exams:[]},
+  habitsTracking:[],
+  journal:[],
+  mood:[],
+  faithLog:[],
+  taskCompletions:{}, // date -> [taskIds]
+  achievements:[],
+  lastVisit:null,
+});
+
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      return Object.assign(DEFAULT_STATE(), parsed);
+    }
+  }catch(e){ console.warn('Could not load state', e); }
+  return DEFAULT_STATE();
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ console.warn('Could not save state', e); }
+}
+
+/* ---------- Utility helpers ---------- */
+function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
+function todayKey(d=new Date()){ return d.toISOString().slice(0,10); }
+function fmtDate(d){ return d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'}); }
+function fmtMoney(n, currency=''){
+  const v = Number(n)||0;
+  return (currency||'£') + v.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+function dayOfWeekIdx(d=new Date()){ return d.getDay(); } // 0=Sun
+const DOW_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function showToast(msg, opts={}){
+  let root = document.getElementById('toast-root');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<span class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg></span><span>${escapeHtml(msg)}</span>`;
+  root.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=> el.remove(), 350); }, 2600);
+}
+
+function floatXp(amount, x, y){
+  const el = document.createElement('div');
+  el.className = 'xp-float';
+  el.textContent = `+${amount} XP`;
+  el.style.left = (x||window.innerWidth/2) + 'px';
+  el.style.top = (y||window.innerHeight/2) + 'px';
+  document.body.appendChild(el);
+  setTimeout(()=> el.remove(), 1200);
+}
+
+function addXp(amount, evt){
+  state.xp += amount;
+  saveState();
+  let x = window.innerWidth/2, y = 100;
+  if(evt && evt.clientX){ x = evt.clientX; y = evt.clientY; }
+  floatXp(amount, x, y);
+  updateXpPill();
+  checkRankUp();
+}
+
+function getRankInfo(xp){
+  let acc = 0;
+  for(let i=0;i<RANKS.length;i++){
+    const r = RANKS[i];
+    if(xp < acc + r.xpNeeded || i === RANKS.length-1){
+      return {index:i, rank:r, into:xp-acc, needed:r.xpNeeded, pct: i===RANKS.length-1 ? 100 : clamp(((xp-acc)/r.xpNeeded)*100,0,100)};
+    }
+    acc += r.xpNeeded;
+  }
+  return {index:0, rank:RANKS[0], into:xp, needed:RANKS[0].xpNeeded, pct:0};
+}
+
+let _lastRankIdx = null;
+function checkRankUp(){
+  const info = getRankInfo(state.xp);
+  if(_lastRankIdx !== null && info.index > _lastRankIdx){
+    showToast(`Rank up! You're now ${info.rank.name} 🏆`);
+  }
+  _lastRankIdx = info.index;
+  renderRankWidgets();
+}
+
+function updateXpPill(){
+  const el = document.getElementById('topXp');
+  if(el) el.textContent = state.xp;
+}
+
+/* ============================================================
+   PWA SUPPORT — manifest + service worker built inline so the
+   whole app stays a single HTML file with no separate assets.
+   ============================================================ */
+function setupPwa(){
+  try{
+    const manifest = {
+      name: "MAAR LIFE — Personal Life Operating System",
+      short_name: "MAAR LIFE",
+      description: "A personal life operating system for health, discipline, finance, faith and growth.",
+      start_url: "./",
+      scope: "./",
+      display: "standalone",
+      background_color: "#06070A",
+      theme_color: "#06070A",
+      icons: [
+        {src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='#06070A'/><circle cx='50' cy='50' r='40' fill='none' stroke='#16C98D' stroke-width='5'/><text x='50' y='66' font-size='42' text-anchor='middle' fill='#16C98D' font-family='Georgia'>M</text></svg>`), sizes:"192x192", type:"image/svg+xml"},
+        {src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='#06070A'/><circle cx='50' cy='50' r='40' fill='none' stroke='#16C98D' stroke-width='5'/><text x='50' y='66' font-size='42' text-anchor='middle' fill='#16C98D' font-family='Georgia'>M</text></svg>`), sizes:"512x512", type:"image/svg+xml"}
+      ]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    const link = document.getElementById('pwaManifestLink');
+    if(link) link.setAttribute('href', manifestUrl);
+  }catch(e){ console.warn('PWA manifest setup skipped', e); }
+
+  // Service worker for basic offline caching of this single page.
+  if('serviceWorker' in navigator && location.protocol !== 'file:'){
+    try{
+      const swCode = `
+        const CACHE = 'maarlife-v1';
+        self.addEventListener('install', e => {
+          e.waitUntil(caches.open(CACHE).then(c => c.add(self.registration.scope)));
+        });
+        self.addEventListener('fetch', e => {
+          e.respondWith(
+            caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+              const copy = res.clone();
+              caches.open(CACHE).then(c => c.put(e.request, copy));
+              return res;
+            }).catch(() => cached))
+          );
+        });
+      `;
+      const swBlob = new Blob([swCode], {type:'application/javascript'});
+      const swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl).catch(()=>{ /* offline support unavailable, app still works online */ });
+    }catch(e){ console.warn('Service worker setup skipped', e); }
+  }
+}
+
+let _deferredInstallPrompt = null;
+function setupInstallPrompt(){
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    const btn = document.getElementById('sInstallBtn');
+    if(btn) btn.classList.remove('hidden');
+  });
+}
+
+/* ============================================================
+   SCREEN ROUTING
+   ============================================================ */
+function showScreen(name){
+  ['landing','wizard','app'].forEach(s=>{
+    const el = document.getElementById('screen-'+s);
+    if(el) el.classList.toggle('hidden', s!==name);
+  });
+  window.scrollTo(0,0);
+}
+
+function boot(){
+  setupPwa();
+  setupInstallPrompt();
+  renderHeroDomains();
+  const resumeLink = document.getElementById('resumeLink');
+  if(state.onboardStep > 0 && !state.onboarded){
+    resumeLink.classList.remove('hidden');
+  }
+  document.getElementById('btnStartJourney').addEventListener('click', ()=>{
+    showScreen('wizard');
+    initWizard();
+  });
+  resumeLink.addEventListener('click', (e)=>{
+    e.preventDefault();
+    showScreen('wizard');
+    initWizard();
+  });
+  document.getElementById('btnLearnMore').addEventListener('click', ()=>{
+    document.querySelector('.landing-strip').scrollIntoView({behavior:'smooth'});
+  });
+
+  if(state.onboarded){
+    enterApp();
+  } else {
+    showScreen('landing');
+  }
+}
+
+function renderHeroDomains(){
+  const items = [
+    ['Health','M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z'],
+    ['Finance','M2 10h20M7 15h.01M2 6h20v13H2z'],
+    ['Faith','M12 2v20M5 9l7-7 7 7M5 14h14'],
+    ['Learning','M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'],
+    ['Discipline','M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],
+    ['Habits','M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83'],
+    ['Goals','M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2'],
+    ['Growth','M3 3v18h18M7 14l4-4 4 4 5-6'],
+    ['Productivity','M12 8v4l3 3M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z'],
+  ];
+  const wrap = document.getElementById('heroDomains');
+  wrap.innerHTML = items.map(([label,path])=>`<span class="hero-domain-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="${path}"/></svg>${label}</span>`).join('');
+}
+
+/* ============================================================
+   ONBOARDING WIZARD CONTROLLER
+   ============================================================ */
+const ASSESSMENT_QUESTIONS = [
+  {key:'sleepQuality', label:'Sleep quality', group:'Health'},
+  {key:'exercise', label:'Exercise habits', group:'Health'},
+  {key:'diet', label:'Diet quality', group:'Health'},
+  {key:'waterIntake', label:'Water intake', group:'Health'},
+  {key:'studyHabits', label:'Study habits', group:'Productivity'},
+  {key:'screenTime', label:'Screen time control', group:'Productivity'},
+  {key:'socialMedia', label:'Social media control', group:'Productivity'},
+  {key:'financialHabits', label:'Financial habits', group:'Finance'},
+  {key:'savingsHabits', label:'Savings habits', group:'Finance'},
+  {key:'productivityLevel', label:'Overall productivity', group:'Productivity'},
+  {key:'stressLevel', label:'Stress level (low = good)', group:'Wellbeing', invert:true},
+  {key:'mood', label:'General mood', group:'Wellbeing'},
+  {key:'motivation', label:'Motivation', group:'Wellbeing'},
+];
+
+function wizardStepList(){
+  const steps = ['welcome','profile1','profile2','ttHas'];
+  if(state.timetable.has === 'yes') steps.push('ttImport');
+  else if(state.timetable.has === 'no'){
+    steps.push('ttCreateChoice');
+    if(state.timetable.mode === 'now') steps.push('ttBuilder');
+  }
+  steps.push('religion','assessment','habitsImprove','improveAreas','firstGoal','summary');
+  return steps;
+}
+
+let wizCurrentIdx = 0;
+
+function initWizard(){
+  wizCurrentIdx = state.onboardStep || 0;
+  renderWizardStep();
+  bindWizardOptionClicks();
+}
+
+function renderWizardStep(){
+  const steps = wizardStepList();
+  wizCurrentIdx = clamp(wizCurrentIdx, 0, steps.length-1);
+  state.onboardStep = wizCurrentIdx;
+  saveState();
+  const current = steps[wizCurrentIdx];
+
+  document.querySelectorAll('.wstep').forEach(el=>{
+    el.classList.toggle('active', el.dataset.step === current);
+  });
+
+  const pct = Math.round(((wizCurrentIdx+1)/steps.length)*100);
+  document.getElementById('wizProgressFill').style.width = pct+'%';
+  document.getElementById('wizProgressLabel').textContent = `STEP ${wizCurrentIdx+1} OF ${steps.length}`;
+
+  document.getElementById('btnWizBack').style.visibility = wizCurrentIdx===0 ? 'hidden' : 'visible';
+  const nextBtn = document.getElementById('btnWizNext');
+  nextBtn.textContent = current==='summary' ? 'Enter MAAR LIFE' : 'Continue';
+
+  // Step-specific render
+  if(current === 'profile1'){
+    document.getElementById('inpName').value = state.profile.name||'';
+    document.getElementById('inpAge').value = state.profile.age||'';
+    document.getElementById('inpCountry').value = state.profile.country||'';
+  }
+  if(current === 'profile2'){
+    document.getElementById('inpOccupation').value = state.profile.occupation||'';
+    document.getElementById('inpEducation').value = state.profile.education||'';
+    document.getElementById('inpIncome').value = state.profile.income||'';
+  }
+  if(current === 'ttHas'){
+    markOptionSelected('ttHas', state.timetable.has);
+  }
+  if(current === 'ttCreateChoice'){
+    markOptionSelected('ttCreateChoice', state.timetable.mode);
+  }
+  if(current === 'ttBuilder'){
+    renderTtBuilder();
+  }
+  if(current === 'religion'){
+    renderReligionGrid();
+  }
+  if(current === 'assessment'){
+    renderAssessmentSliders();
+  }
+  if(current === 'habitsImprove'){
+    renderHabitsChipGrid();
+  }
+  if(current === 'improveAreas'){
+    renderImproveAreasGrid();
+  }
+  if(current === 'firstGoal'){
+    document.getElementById('inpGoalText').value = state._draftGoal?.text || '';
+    updateGoalPreview();
+  }
+  if(current === 'summary'){
+    renderWizardSummary();
+  }
+}
+
+function markOptionSelected(stepName, value){
+  const step = document.querySelector(`.wstep[data-step="${stepName}"]`);
+  step.querySelectorAll('.option-card').forEach(c=>{
+    c.classList.toggle('selected', c.dataset.choice === value);
+  });
+}
+
+function bindWizardOptionClicks(){
+  document.querySelectorAll('#screen-wizard .option-card[data-choice]').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const step = card.closest('.wstep').dataset.step;
+      const choice = card.dataset.choice;
+      if(step === 'ttHas') state.timetable.has = choice;
+      if(step === 'ttCreateChoice') state.timetable.mode = choice;
+      saveState();
+      markOptionSelected(step, choice);
+    });
+  });
+
+  document.getElementById('btnWizNext').addEventListener('click', onWizardNext);
+  document.getElementById('btnWizBack').addEventListener('click', ()=>{
+    wizCurrentIdx = Math.max(0, wizCurrentIdx-1);
+    renderWizardStep();
+  });
+  document.getElementById('btnExitWizard').addEventListener('click', (e)=>{
+    e.preventDefault();
+    showScreen('landing');
+  });
+
+  // profile inputs persist live
+  ['inpName','inpAge','inpCountry','inpOccupation','inpEducation','inpIncome'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', ()=>{
+      const map = {inpName:'name',inpAge:'age',inpCountry:'country',inpOccupation:'occupation',inpEducation:'education',inpIncome:'income'};
+      state.profile[map[id]] = el.value;
+      saveState();
+    });
+  });
+
+  // PDF / ICS uploads
+  document.getElementById('uzPdf').addEventListener('click', ()=> document.getElementById('fileTtPdf').click());
+  document.getElementById('fileTtPdf').addEventListener('change', handlePdfUpload);
+  document.getElementById('uzIcs').addEventListener('click', ()=> document.getElementById('fileTtIcs').click());
+  document.getElementById('fileTtIcs').addEventListener('change', handleIcsUpload);
+
+  document.getElementById('btnAddTtRow').addEventListener('click', ()=>{ addTtRow(); });
+
+  document.getElementById('inpCustomHabit').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      const val = e.target.value.trim();
+      if(val && !state.habitsToImprove.includes(val)){
+        state.habitsToImprove.push(val);
+        saveState();
+        renderHabitsChipGrid();
+        e.target.value='';
+      }
+    }
+  });
+
+  ['inpGoalText','inpGoalCategory','inpGoalDeadline'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updateGoalPreview);
+    document.getElementById(id).addEventListener('change', updateGoalPreview);
+  });
+}
+
+function onWizardNext(){
+  const steps = wizardStepList();
+  const current = steps[wizCurrentIdx];
+
+  // validation per step
+  if(current === 'profile1' && !state.profile.name.trim()){
+    showToast('Please enter your name to continue'); return;
+  }
+  if(current === 'ttHas' && !state.timetable.has){
+    showToast('Please choose an option'); return;
+  }
+  if(current === 'ttCreateChoice' && !state.timetable.mode){
+    showToast('Please choose an option'); return;
+  }
+  if(current === 'firstGoal'){
+    const text = document.getElementById('inpGoalText').value.trim();
+    if(text){
+      const category = document.getElementById('inpGoalCategory').value;
+      const deadline = document.getElementById('inpGoalDeadline').value;
+      addGoalFromWizard(text, category, deadline);
+    }
+  }
+  if(current === 'summary'){
+    finishOnboarding();
+    return;
+  }
+
+  const newSteps = wizardStepList(); // re-derive in case branch changed
+  wizCurrentIdx = Math.min(wizCurrentIdx+1, newSteps.length-1);
+  renderWizardStep();
+  document.querySelector('.wizard-body').scrollTo?.(0,0);
+  window.scrollTo(0,0);
+}
+
+/* ---------- PDF / ICS import (lightweight parse, no backend) ---------- */
+function handlePdfUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  state.timetable.importedFileName = file.name;
+  state.timetable.importType = 'pdf';
+  saveState();
+  document.getElementById('pdfUploadStatus').innerHTML = `<div class="upload-status"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> "${escapeHtml(file.name)}" saved. You can review and adjust your timetable any time from the Timetable section.</div>`;
+  // Seed a sensible default timetable so the app isn't empty even though we can't parse PDF content client-side reliably
+  if(state.timetable.blocks.length === 0) seedDefaultTimetable();
+}
+
+function handleIcsUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try{
+      const events = parseIcs(ev.target.result);
+      if(events.length){
+        state.timetable.blocks = events;
+        state.timetable.importType = 'ics';
+        state.timetable.importedFileName = file.name;
+        saveState();
+        document.getElementById('icsUploadStatus').innerHTML = `<div class="upload-status"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> Imported ${events.length} events from "${escapeHtml(file.name)}".</div>`;
+      } else {
+        document.getElementById('icsUploadStatus').innerHTML = `<div class="upload-status" style="background:var(--danger-dim); color:var(--danger);">No recognisable events found in that file.</div>`;
+      }
+    }catch(err){
+      document.getElementById('icsUploadStatus').innerHTML = `<div class="upload-status" style="background:var(--danger-dim); color:var(--danger);">Couldn't read that file. Try the timetable builder instead.</div>`;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseIcs(text){
+  const events = [];
+  const blocks = text.split('BEGIN:VEVENT').slice(1);
+  blocks.forEach(b=>{
+    const summaryMatch = b.match(/SUMMARY:(.*)/);
+    const dtStartMatch = b.match(/DTSTART[^:]*:(\d{8}T?\d{0,6})/);
+    const dtEndMatch = b.match(/DTEND[^:]*:(\d{8}T?\d{0,6})/);
+    if(summaryMatch && dtStartMatch){
+      const start = parseIcsDate(dtStartMatch[1]);
+      const end = dtEndMatch ? parseIcsDate(dtEndMatch[1]) : null;
+      events.push({
+        id:uid(),
+        title:summaryMatch[1].trim().slice(0,60),
+        day: start ? DOW_NAMES[start.getDay()] : 'Mon',
+        start: start ? `${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}` : '09:00',
+        end: end ? `${String(end.getHours()).padStart(2,'0')}:${String(end.getMinutes()).padStart(2,'0')}` : '10:00',
+        category:'Other'
+      });
+    }
+  });
+  return events.slice(0,80);
+}
+function parseIcsDate(raw){
+  if(!raw) return null;
+  const y=raw.slice(0,4), m=raw.slice(4,6), d=raw.slice(6,8);
+  let hh='09', mm='00';
+  if(raw.includes('T')){
+    const t = raw.split('T')[1];
+    hh = t.slice(0,2); mm = t.slice(2,4);
+  }
+  const dt = new Date(`${y}-${m}-${d}T${hh}:${mm}:00`);
+  return isNaN(dt.getTime()) ? null : dt;
+}
+
+/* ---------- Timetable builder ---------- */
+function seedDefaultTimetable(){
+  state.timetable.blocks = [
+    {id:uid(), title:'Sleep', day:'Mon', start:'23:00', end:'07:00', category:'Sleep'},
+    {id:uid(), title:'Morning routine', day:'Mon', start:'07:00', end:'08:00', category:'Personal'},
+    {id:uid(), title:'Work / School', day:'Mon', start:'09:00', end:'17:00', category:'Work'},
+    {id:uid(), title:'Exercise', day:'Mon', start:'18:00', end:'19:00', category:'Exercise'},
+    {id:uid(), title:'Dinner', day:'Mon', start:'19:30', end:'20:00', category:'Meals'},
+  ];
+}
+function addTtRow(prefill){
+  const row = prefill || {id:uid(), title:'', day:'Mon', start:'09:00', end:'10:00', category:'Work'};
+  state.timetable.blocks.push(row);
+  saveState();
+  renderTtBuilder();
+}
+function renderTtBuilder(){
+  const wrap = document.getElementById('ttBuilderRows');
+  if(state.timetable.blocks.length === 0) addTtRow({id:uid(), title:'Sleep', day:'Mon', start:'23:00', end:'07:00', category:'Sleep'});
+  wrap.innerHTML = state.timetable.blocks.map(b=>`
+    <div class="tt-row" data-id="${b.id}">
+      <select class="tt-day">${DOW_NAMES.map(d=>`<option ${b.day===d?'selected':''}>${d}</option>`).join('')}</select>
+      <input type="text" class="tt-title" placeholder="Activity (e.g. Study)" value="${escapeHtml(b.title)}">
+      <select class="tt-cat">${TT_CATEGORIES.map(c=>`<option ${b.category===c?'selected':''}>${c}</option>`).join('')}</select>
+      <button class="tt-del" type="button" title="Remove"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="tt-row" data-id="${b.id}-time" style="grid-template-columns:90px 1fr 1fr 36px;">
+      <span style="font-size:11px; color:var(--ink-faint); align-self:center;">Time</span>
+      <input type="time" class="tt-start" value="${b.start}">
+      <input type="time" class="tt-end" value="${b.end}">
+      <span></span>
+    </div>
+  `).join('');
+
+  wrap.querySelectorAll('.tt-row[data-id]').forEach(row=>{
+    const id = row.dataset.id.replace('-time','');
+    const block = state.timetable.blocks.find(b=>b.id===id);
+    if(!block) return;
+    const dayEl = row.querySelector('.tt-day');
+    const titleEl = row.querySelector('.tt-title');
+    const catEl = row.querySelector('.tt-cat');
+    const startEl = row.querySelector('.tt-start');
+    const endEl = row.querySelector('.tt-end');
+    const delBtn = row.querySelector('.tt-del');
+    if(dayEl) dayEl.addEventListener('change', ()=>{ block.day=dayEl.value; saveState(); });
+    if(titleEl) titleEl.addEventListener('input', ()=>{ block.title=titleEl.value; saveState(); });
+    if(catEl) catEl.addEventListener('change', ()=>{ block.category=catEl.value; saveState(); });
+    if(startEl) startEl.addEventListener('input', ()=>{ block.start=startEl.value; saveState(); });
+    if(endEl) endEl.addEventListener('input', ()=>{ block.end=endEl.value; saveState(); });
+    if(delBtn) delBtn.addEventListener('click', ()=>{
+      state.timetable.blocks = state.timetable.blocks.filter(b=>b.id!==id);
+      saveState(); renderTtBuilder();
+    });
+  });
+}
+
+/* ---------- Religion step ---------- */
+function renderReligionGrid(){
+  const grid = document.getElementById('religionGrid');
+  grid.innerHTML = RELIGIONS.map(r=>`
+    <div class="religion-card ${state.religion===r.id?'selected':''}" data-rel="${r.id}">${r.name}</div>
+  `).join('');
+  grid.querySelectorAll('.religion-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      state.religion = card.dataset.rel;
+      saveState();
+      renderReligionGrid();
+    });
+  });
+}
+
+/* ---------- Assessment sliders ---------- */
+function renderAssessmentSliders(){
+  const wrap = document.getElementById('assessmentSliders');
+  const groups = {};
+  ASSESSMENT_QUESTIONS.forEach(q=>{ (groups[q.group]=groups[q.group]||[]).push(q); });
+  wrap.innerHTML = Object.entries(groups).map(([group, qs])=>`
+    <div class="assessment-block">
+      <div class="assessment-block-title">${group}</div>
+      ${qs.map(q=>{
+        const val = state.assessment[q.key] ?? 5;
+        return `<div class="slider-row">
+          <div class="slider-label"><span>${q.label}</span><span data-disp="${q.key}">${val}/10</span></div>
+          <input type="range" min="1" max="10" value="${val}" data-key="${q.key}">
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+  wrap.querySelectorAll('input[type=range]').forEach(slider=>{
+    slider.addEventListener('input', ()=>{
+      const key = slider.dataset.key;
+      state.assessment[key] = Number(slider.value);
+      document.querySelector(`[data-disp="${key}"]`).textContent = slider.value+'/10';
+      saveState();
+    });
+  });
+}
+
+/* ---------- Habits to improve ---------- */
+function renderHabitsChipGrid(){
+  const grid = document.getElementById('habitsChipGrid');
+  grid.innerHTML = HABIT_OPTIONS.map(h=>`<div class="chip ${state.habitsToImprove.includes(h)?'selected':''}" data-h="${escapeHtml(h)}">${h}</div>`).join('') +
+    state.habitsToImprove.filter(h=>!HABIT_OPTIONS.includes(h)).map(h=>`<div class="chip selected" data-h="${escapeHtml(h)}">${escapeHtml(h)} ✕</div>`).join('');
+  grid.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const h = chip.dataset.h;
+      const idx = state.habitsToImprove.indexOf(h);
+      if(idx>-1) state.habitsToImprove.splice(idx,1);
+      else state.habitsToImprove.push(h);
+      saveState();
+      renderHabitsChipGrid();
+    });
+  });
+}
+
+/* ---------- Improve areas ---------- */
+function renderImproveAreasGrid(){
+  const grid = document.getElementById('improveAreasGrid');
+  grid.innerHTML = IMPROVE_AREAS.map(a=>`<div class="chip gold-opt ${state.improveAreas.includes(a)?'selected gold':''}" data-a="${escapeHtml(a)}">${a}</div>`).join('');
+  grid.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const a = chip.dataset.a;
+      const idx = state.improveAreas.indexOf(a);
+      if(idx>-1) state.improveAreas.splice(idx,1);
+      else state.improveAreas.push(a);
+      saveState();
+      renderImproveAreasGrid();
+    });
+  });
+}
+
+/* ---------- First goal ---------- */
+function updateGoalPreview(){
+  const text = document.getElementById('inpGoalText').value.trim();
+  const category = document.getElementById('inpGoalCategory').value;
+  const deadline = document.getElementById('inpGoalDeadline').value;
+  state._draftGoal = {text, category, deadline};
+  const preview = document.getElementById('goalPreview');
+  if(!text){ preview.innerHTML=''; return; }
+  const action = deriveDailyAction({text, category, deadline});
+  preview.innerHTML = `<div class="option-card" style="cursor:default; margin-top:8px;">
+    <div class="icon-wrap"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
+    <div><div class="opt-title">Today's action</div><div class="opt-sub">${escapeHtml(action.label)}</div></div>
+  </div>`;
+}
+
+function deriveDailyAction(goal){
+  const text = goal.text.toLowerCase();
+  const moneyMatch = goal.text.match(/£?\$?€?\s?(\d[\d,]*\.?\d*)/);
+  let weeks = 12;
+  if(goal.deadline){
+    const days = Math.max(7,(new Date(goal.deadline) - new Date())/86400000);
+    weeks = Math.max(1, Math.round(days/7));
+  }
+  if(/save|saving/.test(text) && moneyMatch){
+    const amount = parseFloat(moneyMatch[1].replace(/,/g,''));
+    const perWeek = amount/weeks;
+    const perDay = perWeek/7;
+    return {label:`Save ${fmtMoney(perDay)} today (≈ ${fmtMoney(perWeek)}/week toward ${fmtMoney(amount)})`, perDay, perWeek, amount, weeks};
+  }
+  if(/read.*book|book/.test(text)){
+    return {label:'Read one page today'};
+  }
+  if(/run|5k|fit|exercise|gym|workout/.test(text)){
+    return {label:'Do one short workout or a 15-minute walk today'};
+  }
+  if(/learn|study|course/.test(text)){
+    return {label:'Spend 15 focused minutes on this today'};
+  }
+  return {label:`Take one small step today toward: ${goal.text}`};
+}
+
+function addGoalFromWizard(text, category, deadline){
+  const goal = {id:uid(), text, category, deadline, createdAt:todayKey(), progress:0, completedDates:[]};
+  goal.dailyAction = deriveDailyAction(goal);
+  state.goals.push(goal);
+  saveState();
+}
+
+/* ---------- Summary ---------- */
+function renderWizardSummary(){
+  document.getElementById('summaryName').textContent = state.profile.name || 'friend';
+  const rel = RELIGIONS.find(r=>r.id===state.religion);
+  const grid = document.getElementById('summaryGrid');
+  const items = [
+    ['Name', state.profile.name || '—'],
+    ['Timetable', state.timetable.blocks.length ? `${state.timetable.blocks.length} blocks set` : 'Not yet set up'],
+    ['Faith practice', rel && rel.id!=='none' ? rel.name : 'Not set'],
+    ['Habits to improve', state.habitsToImprove.length ? state.habitsToImprove.join(', ') : 'None selected'],
+    ['Top focus areas', state.improveAreas.length ? state.improveAreas.join(', ') : 'General improvement'],
+    ['First goal', state.goals.length ? state.goals[state.goals.length-1].text : 'None set yet'],
+  ];
+  grid.innerHTML = items.map(([l,v])=>`<div class="summary-item"><div class="si-label">${l}</div><div class="si-value">${escapeHtml(String(v))}</div></div>`).join('');
+}
+
+function finishOnboarding(){
+  state.onboarded = true;
+  state.createdAt = state.createdAt || new Date().toISOString();
+  if(state.timetable.blocks.length === 0 && state.timetable.mode !== 'later') seedDefaultTimetable();
+  HABIT_OPTIONS.forEach(()=>{});
+  saveState();
+  showToast('Welcome to MAAR LIFE — your system is live.');
+  enterApp();
+}
+
+/* ============================================================
+   APP ENTRY + NAVIGATION
+   ============================================================ */
+const VIEW_TITLES = {
+  home:'Dashboard', timetable:'Timetable', goals:'Goals & Planning', habits:'Habits',
+  finance:'Finance Center', health:'Health Center', diet:'Diet Center', study:'Study Center',
+  faith:'Faith', journal:'Journal', mood:'Mood & Wellbeing', analytics:'Analytics',
+  rank:'Rank & XP', milestones:'Milestones', reports:'Reports', settings:'Settings'
+};
+
+function enterApp(){
+  showScreen('app');
+  _lastRankIdx = getRankInfo(state.xp).index;
+  bindAppNav();
+  renderSidebarProfile();
+  updateXpPill();
+  navigateTo('home');
+  checkDailyReset();
+}
+
+function bindAppNav(){
+  document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
+    item.addEventListener('click', (e)=>{
+      e.preventDefault();
+      navigateTo(item.dataset.view);
+      closeMobileSidebar();
+    });
+  });
+  document.getElementById('btnMobileMenu').addEventListener('click', ()=>{
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('mobileOverlay').classList.add('open');
+  });
+  document.getElementById('mobileOverlay').addEventListener('click', closeMobileSidebar);
+}
+function closeMobileSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('open');
+}
+
+const VIEW_RENDERERS = {}; // populated by each center module below
+
+function navigateTo(viewName){
+  document.querySelectorAll('.nav-item[data-view]').forEach(n=> n.classList.toggle('active', n.dataset.view===viewName));
+  document.querySelectorAll('.view').forEach(v=> v.classList.toggle('active', v.id === 'view-'+viewName));
+  document.getElementById('topbarTitle').textContent = VIEW_TITLES[viewName] || 'MAAR LIFE';
+  if(viewName === 'home') renderHome();
+  else if(VIEW_RENDERERS[viewName]) VIEW_RENDERERS[viewName]();
+  window.scrollTo(0,0);
+}
+
+// Allow inline "panel-link" data-view-link to navigate
+document.addEventListener('click', (e)=>{
+  const link = e.target.closest('[data-view-link]');
+  if(link){
+    e.preventDefault();
+    const v = link.dataset.viewLink;
+    document.querySelector(`.nav-item[data-view="${v}"]`)?.click();
+  }
+});
+
+function renderSidebarProfile(){
+  const name = state.profile.name || 'Explorer';
+  document.getElementById('sbAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('sbName').textContent = name;
+  const info = getRankInfo(state.xp);
+  document.getElementById('sbRank').textContent = info.rank.name;
+}
+
+function checkDailyReset(){
+  const today = todayKey();
+  if(state.lastVisit !== today){
+    state.lastVisit = today;
+    saveState();
+  }
+}
+
+/* ============================================================
+   LIFE SCORE CALCULATION
+   ============================================================ */
+function computeLifeScore(){
+  const a = state.assessment;
+  const avg = (keys) => {
+    const vals = keys.map(k=>a[k]).filter(v=>v!=null);
+    if(!vals.length) return 5;
+    return vals.reduce((s,v)=>s+v,0)/vals.length;
+  };
+  const healthBase = avg(['sleepQuality','exercise','diet','waterIntake']);
+  const productivityBase = avg(['studyHabits','screenTime','socialMedia','productivityLevel']);
+  const financeBase = avg(['financialHabits','savingsHabits']);
+  const wellbeingBase = (11-(a.stressLevel||5) + (a.mood||5) + (a.motivation||5))/3;
+
+  // habit completion contributes
+  const habitRate = habitCompletionRate();
+  const taskRate = todayTaskCompletionRate();
+  const faithRate = faithStreakScore();
+
+  const health = clamp(healthBase*7 + habitRate*30, 0, 100);
+  const habits = clamp(habitRate*100, 0, 100);
+  const productivity = clamp(productivityBase*7 + taskRate*30, 0, 100);
+  const finance = clamp(financeBase*10 + financeHealthScore()*0, 0, 100) ;
+  const finance2 = clamp(financeBase*7 + financeHealthScore()*30, 0,100);
+  const faith = clamp(faithRate, 0, 100);
+  const consistency = clamp(longestStreakScore(), 0, 100);
+
+  const domains = {health, habits, productivity, finance:finance2, faith, consistency};
+  const overall = Math.round((domains.health+domains.habits+domains.productivity+domains.finance+domains.faith+domains.consistency)/6);
+  return {overall, domains};
+}
+
+function habitCompletionRate(){
+  const tracked = state.habitsTracking;
+  if(!tracked.length) return 0.3;
+  const today = todayKey();
+  const doneToday = tracked.filter(h=>h.log && h.log.includes(today)).length;
+  return clamp(doneToday/Math.max(1,tracked.length), 0, 1);
+}
+function todayTaskCompletionRate(){
+  const today = todayKey();
+  const tasks = generateTodayTasks();
+  if(!tasks.length) return 0.3;
+  const completions = state.taskCompletions[today] || [];
+  const done = tasks.filter(t=>completions.includes(t.id)).length;
+  return done/tasks.length;
+}
+function faithStreakScore(){
+  if(!state.religion || state.religion==='none') return 50;
+  const log = state.faithLog || [];
+  const last7 = lastNDays(7).filter(d=>log.includes(d)).length;
+  return (last7/7)*100;
+}
+function financeHealthScore(){
+  const f = state.finance;
+  const totalIncome = f.transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0) || f.income || 1;
+  const totalExpense = f.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const savingsRate = clamp((totalIncome-totalExpense)/Math.max(1,totalIncome), -1, 1);
+  return clamp((savingsRate+1)/2, 0, 1)*100/100 * 1; // 0..1 scale below used *30 above intentionally over 1.0 not 100
+}
+function longestStreakScore(){
+  const tracked = state.habitsTracking;
+  if(!tracked.length) return 30;
+  const maxStreak = Math.max(0,...tracked.map(h=>currentStreak(h.log||[])));
+  return clamp(maxStreak*8, 0, 100);
+}
+function currentStreak(logArr){
+  let streak = 0;
+  let d = new Date();
+  while(true){
+    const key = todayKey(d);
+    if(logArr.includes(key)){ streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+function lastNDays(n){
+  const out = [];
+  const d = new Date();
+  for(let i=0;i<n;i++){ out.push(todayKey(d)); d.setDate(d.getDate()-1); }
+  return out;
+}
+
+/* ============================================================
+   TODAY TASK GENERATION (the heart of "today, not someday")
+   ============================================================ */
+function generateTodayTasks(){
+  const tasks = [];
+  const today = new Date();
+  const dow = DOW_NAMES[today.getDay()];
+
+  // From timetable
+  state.timetable.blocks.filter(b=>b.day===dow).forEach(b=>{
+    tasks.push({id:'tt_'+b.id, type:'timetable', title:b.title||b.category, sub:`${b.start} – ${b.end}`, time:b.start, category:b.category});
+  });
+
+  // From habits to improve (reduce) -> reframed as positive micro-actions
+  state.habitsToImprove.forEach(h=>{
+    if(/pornography/i.test(h)) return; // handled via recovery banner, not a daily task tick
+    tasks.push({id:'hab_'+slug(h), type:'habit', title:microActionFor(h), sub:'Habit focus', time:'', category:'Habit'});
+  });
+
+  // From custom habit tracking list
+  state.habitsTracking.forEach(h=>{
+    tasks.push({id:'track_'+h.id, type:'habit', title:h.name, sub:`Streak: ${currentStreak(h.log||[])} days`, time:'', category:'Habit'});
+  });
+
+  // From goals
+  state.goals.forEach(g=>{
+    tasks.push({id:'goal_'+g.id, type:'goal', title:g.dailyAction?.label || `Step toward: ${g.text}`, sub:g.text, time:'', category:g.category});
+  });
+
+  // Faith
+  const rel = RELIGIONS.find(r=>r.id===state.religion);
+  if(rel && rel.id!=='none' && rel.practices.length){
+    const practice = rel.practices[today.getDate() % rel.practices.length];
+    tasks.push({id:'faith_today', type:'faith', title:practice, sub:rel.name, time:'', category:'Faith'});
+  }
+
+  // Sort by time if present
+  tasks.sort((a,b)=> (a.time||'99:99').localeCompare(b.time||'99:99'));
+  return tasks;
+}
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'_'); }
+function microActionFor(habit){
+  const h = habit.toLowerCase();
+  if(h.includes('procrastinat')) return 'Do the most important task first, for just 10 minutes';
+  if(h.includes('social media')) return 'Keep social media under your limit today';
+  if(h.includes('gaming')) return 'Cap gaming time and notice how it feels';
+  if(h.includes('overspend')) return 'Track every expense today, no exceptions';
+  if(h.includes('sleep')) return 'Be in bed at your target time tonight';
+  if(h.includes('exercise')) return 'Move your body for at least 10 minutes';
+  if(h.includes('eating')) return 'Choose one healthy meal today';
+  if(h.includes('study')) return 'Do one focused 25-minute study block';
+  if(h.includes('smoking')) return 'Delay your next cigarette by 10 minutes';
+  if(h.includes('negative self')) return 'Notice one negative thought and reframe it';
+  return `Take one small step on: ${habit}`;
+}
+
+function toggleTaskComplete(taskId, evt){
+  const today = todayKey();
+  if(!state.taskCompletions[today]) state.taskCompletions[today] = [];
+  const arr = state.taskCompletions[today];
+  const idx = arr.indexOf(taskId);
+  let justCompleted = false;
+  if(idx>-1){ arr.splice(idx,1); }
+  else { arr.push(taskId); justCompleted = true; }
+  saveState();
+
+  if(taskId.startsWith('track_')){
+    const habitId = taskId.replace('track_','');
+    const habit = state.habitsTracking.find(h=>h.id===habitId);
+    if(habit){
+      habit.log = habit.log || [];
+      const i = habit.log.indexOf(today);
+      if(justCompleted && i===-1) habit.log.push(today);
+      if(!justCompleted && i>-1) habit.log.splice(i,1);
+      saveState();
+    }
+  }
+  if(taskId === 'faith_today' && justCompleted){
+    if(!state.faithLog.includes(today)) state.faithLog.push(today);
+    saveState();
+  }
+  if(taskId === 'faith_today' && !justCompleted){
+    state.faithLog = state.faithLog.filter(d=>d!==today);
+    saveState();
+  }
+
+  if(justCompleted){
+    addXp(8, evt);
+    checkAchievements();
+  }
+  renderHome();
+}
+
+/* ============================================================
+   HOME DASHBOARD RENDER
+   ============================================================ */
+function renderHome(){
+  const name = state.profile.name || 'there';
+  const hour = new Date().getHours();
+  const greet = hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greetText').textContent = `${greet}, ${name}`;
+  document.getElementById('greetSub').textContent = "Here's what matters today.";
+  document.getElementById('todayDatePill').textContent = fmtDate(new Date());
+
+  renderRecoveryBanner();
+  renderLifeScoreDial();
+  renderRankWidgets();
+  renderHomeStatGrid();
+  renderTodayRail();
+  renderFaithTodayBlock();
+  renderDailyQuote();
+}
+
+function renderRecoveryBanner(){
+  const slot = document.getElementById('recoveryBannerSlot');
+  const wantsHelp = state.habitsToImprove.some(h=>/pornography/i.test(h));
+  if(!wantsHelp){ slot.innerHTML=''; return; }
+  slot.innerHTML = `
+    <div class="recovery-banner">
+      <div class="rb-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>
+      <div style="flex:1;">
+        <div class="rb-title">You told us this matters to you — there's dedicated support for it</div>
+        <div class="rb-sub">MAAR LIFE focuses on your whole life, but for recovery specifically, our partner platform MAAR is built for exactly this.</div>
+      </div>
+      <a href="https://20rajonadil.github.io/MAARnofap/" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Open MAAR <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+    </div>`;
+}
+
+function renderLifeScoreDial(){
+  const {overall, domains} = computeLifeScore();
+  document.getElementById('scoreDialNum').innerHTML = `${overall}<span>/100</span>`;
+  document.getElementById('scoreDialLbl').textContent = overall>=80?'Thriving':overall>=60?'On track':overall>=40?'Building':'Just starting';
+
+  const order = ['health','habits','productivity','finance','faith','consistency'];
+  const total = order.reduce((s,k)=>s+domains[k],0) || 1;
+  const r = 95, cx=110, cy=110, circumference = 2*Math.PI*r;
+  let offset = 0;
+  const segs = order.map(key=>{
+    const val = domains[key];
+    const frac = val/ (order.length*100); // each domain max 100, weight equally within ring
+    const segLen = (circumference/order.length) - 4; // gap between segments
+    const filled = segLen * (val/100);
+    const seg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${DOMAIN_META[key].color}" stroke-width="10"
+      stroke-dasharray="${filled} ${circumference}" stroke-dashoffset="${-offset}" stroke-linecap="round" opacity="0.95"/>`;
+    offset += circumference/order.length;
+    return seg;
+  });
+  const bgRing = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>`;
+  document.getElementById('scoreDialSvg').innerHTML = bgRing + segs.join('');
+
+  document.getElementById('scoreLegend').innerHTML = order.map(key=>`
+    <div class="score-legend-item">
+      <span class="score-legend-dot" style="background:${DOMAIN_META[key].color}"></span>
+      ${DOMAIN_META[key].label} <span class="sl-val">${Math.round(domains[key])}</span>
+    </div>
+  `).join('');
+}
+
+function renderRankWidgets(){
+  const info = getRankInfo(state.xp);
+  const elEmblem = document.getElementById('rankEmblem');
+  const elName = document.getElementById('rankName');
+  const elXp = document.getElementById('rankXpText');
+  const elFill = document.getElementById('rankProgressFill');
+  if(elEmblem){
+    elEmblem.textContent = info.rank.short;
+    elName.textContent = info.rank.name;
+    elXp.textContent = `${Math.round(info.into)} / ${info.needed} XP`;
+    elFill.style.width = info.pct+'%';
+  }
+  const sbRank = document.getElementById('sbRank');
+  if(sbRank) sbRank.textContent = info.rank.name;
+  if(VIEW_RENDERERS.rank && document.getElementById('view-rank').classList.contains('active')) VIEW_RENDERERS.rank();
+}
+
+function renderHomeStatGrid(){
+  const today = todayKey();
+  const tasks = generateTodayTasks();
+  const completions = state.taskCompletions[today] || [];
+  const doneCount = tasks.filter(t=>completions.includes(t.id)).length;
+  const maxStreak = Math.max(0, ...state.habitsTracking.map(h=>currentStreak(h.log||[])), state.religion && state.religion!=='none' ? currentStreak(state.faithLog) : 0);
+  const f = state.finance;
+  const totalIncome = f.transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const totalExpense = f.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const netSavings = totalIncome - totalExpense + Number(f.income||0)*0;
+
+  const stats = [
+    {icon:'M5 12l5 5L20 7', label:"Today's tasks done", val:`${doneCount}/${tasks.length}`},
+    {icon:'M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83', label:'Best streak', val:`${maxStreak}d`},
+    {icon:'M2 10h20M7 15h.01M2 6h20v13H2z', label:'Net this period', val: fmtMoney(netSavings)},
+    {icon:'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z', label:'Total XP', val: state.xp},
+  ];
+  document.getElementById('homeStatGrid').innerHTML = stats.map(s=>`
+    <div class="glass stat-card">
+      <div class="sc-icon"><svg class="icon" viewBox="0 0 24 24"><path d="${s.icon}"/></svg></div>
+      <div class="sc-val">${s.val}</div>
+      <div class="sc-lbl">${s.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderTodayRail(){
+  const tasks = generateTodayTasks();
+  const today = todayKey();
+  const completions = state.taskCompletions[today] || [];
+  const rail = document.getElementById('todayRail');
+  if(!tasks.length){
+    rail.innerHTML = `<div class="rail-empty">No tasks yet today — add a goal or habit to get started.</div>`;
+    return;
+  }
+  const nowMin = new Date().getHours()*60 + new Date().getMinutes();
+  rail.innerHTML = tasks.map(t=>{
+    const done = completions.includes(t.id);
+    let isNow = false;
+    if(t.time){
+      const [h,m] = t.time.split(':').map(Number);
+      const tm = h*60+m;
+      isNow = !done && Math.abs(tm-nowMin) < 60;
+    }
+    return `
+    <div class="rail-item ${done?'done':''} ${isNow?'now':''}">
+      <div class="rail-card">
+        <div class="rail-check" data-task="${t.id}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
+        ${t.time?`<span class="rc-time">${t.time}</span>`:''}
+        <div style="flex:1; min-width:0;">
+          <div class="rc-title">${escapeHtml(t.title)}</div>
+          <div class="rc-sub">${escapeHtml(t.sub||'')}</div>
+        </div>
+        <span class="rc-tag badge badge-emerald">${t.category}</span>
+      </div>
+    </div>`;
+  }).join('');
+  rail.querySelectorAll('.rail-check').forEach(chk=>{
+    chk.addEventListener('click', (e)=> toggleTaskComplete(chk.dataset.task, e));
+  });
+}
+
+function renderFaithTodayBlock(){
+  const block = document.getElementById('faithTodayBlock');
+  const rel = RELIGIONS.find(r=>r.id===state.religion);
+  if(!rel || rel.id==='none' || !rel.practices.length){
+    block.innerHTML = `<div class="empty-state" style="padding:20px 10px;"><div class="es-sub">No faith practice set. You can add one in Settings.</div></div>`;
+    return;
+  }
+  const today = todayKey();
+  const done = state.faithLog.includes(today);
+  const streak = currentStreak(state.faithLog);
+  const practice = rel.practices[new Date().getDate() % rel.practices.length];
+  block.innerHTML = `
+    <div class="list-row" style="border:none; padding:6px 4px;">
+      <div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M5 9l7-7 7 7M5 14h14"/></svg></div>
+      <div><div class="lr-title">${escapeHtml(practice)}</div><div class="lr-sub">${rel.name} · ${streak} day streak</div></div>
+      <div class="rail-check ${done?'done':''}" style="margin-left:auto;" data-task="faith_today">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
+    </div>`;
+  block.querySelector('.rail-check').addEventListener('click', (e)=> toggleTaskComplete('faith_today', e));
+}
+
+function renderDailyQuote(){
+  const idx = new Date().getDate() % QUOTES.length;
+  document.getElementById('dailyQuoteText').textContent = QUOTES[idx].q;
+  document.getElementById('dailyQuoteAuthor').textContent = '— '+QUOTES[idx].a;
+}
+
+function checkAchievements(){
+  const today = todayKey();
+  const completions = state.taskCompletions[today] || [];
+  if(completions.length >= 5 && !state.achievements.includes('first_5_tasks')){
+    state.achievements.push('first_5_tasks');
+    saveState();
+    showToast('Achievement unlocked: 5 tasks in one day 🏅');
+  }
+}
+
+/* ============================================================
+   TIMETABLE VIEW
+   ============================================================ */
+VIEW_RENDERERS.timetable = function(){
+  const view = document.getElementById('view-timetable');
+  view.innerHTML = `
+    <div class="view-head">
+      <div><h1>Timetable</h1><div class="vh-sub">The backbone of your daily plan. Edit any block, any day.</div></div>
+      <button class="btn btn-primary btn-sm" id="ttAddBtn">+ Add block</button>
+    </div>
+    <div class="glass panel" style="overflow-x:auto;">
+      <div id="ttWeekGrid" style="display:grid; grid-template-columns:repeat(7,minmax(120px,1fr)); gap:10px; min-width:760px;"></div>
+    </div>
+    <div class="glass panel" style="margin-top:20px;">
+      <div class="section-title-row"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/></svg> All blocks</h3></div>
+      <div id="ttListAll"></div>
+    </div>
+  `;
+  renderTtWeekGrid();
+  renderTtListAll();
+  document.getElementById('ttAddBtn').addEventListener('click', ()=> openTtModal());
+};
+
+function renderTtWeekGrid(){
+  const grid = document.getElementById('ttWeekGrid');
+  grid.innerHTML = DOW_NAMES.map(day=>{
+    const blocks = state.timetable.blocks.filter(b=>b.day===day).sort((a,b)=>a.start.localeCompare(b.start));
+    return `<div>
+      <div style="font-size:11.5px; font-weight:700; color:var(--ink-faint); text-transform:uppercase; margin-bottom:10px; text-align:center;">${day}</div>
+      ${blocks.map(b=>`
+        <div class="list-row" style="flex-direction:column; align-items:flex-start; gap:2px; padding:10px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); margin-bottom:8px; cursor:pointer;" data-edit="${b.id}">
+          <span style="font-size:10px; font-family:var(--font-mono); color:${TT_COLORS[b.category]||'var(--ink-faint)'}">${b.start}–${b.end}</span>
+          <span style="font-size:12.5px; font-weight:600;">${escapeHtml(b.title||b.category)}</span>
+        </div>
+      `).join('') || `<div style="font-size:11.5px; color:var(--ink-faint); text-align:center; padding:14px 0;">—</div>`}
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('[data-edit]').forEach(el=> el.addEventListener('click', ()=> openTtModal(el.dataset.edit)));
+}
+
+function renderTtListAll(){
+  const wrap = document.getElementById('ttListAll');
+  if(!state.timetable.blocks.length){ wrap.innerHTML = emptyState('No blocks yet','Add your first time block to build your day.'); return; }
+  const sorted = [...state.timetable.blocks].sort((a,b)=> DOW_NAMES.indexOf(a.day)-DOW_NAMES.indexOf(b.day) || a.start.localeCompare(b.start));
+  wrap.innerHTML = sorted.map(b=>`
+    <div class="list-row">
+      <div class="lr-icon" style="color:${TT_COLORS[b.category]}"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
+      <div><div class="lr-title">${escapeHtml(b.title||b.category)}</div><div class="lr-sub">${b.day} · ${b.start}–${b.end} · ${b.category}</div></div>
+      <button class="lr-del" data-del="${b.id}"><svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('[data-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+    state.timetable.blocks = state.timetable.blocks.filter(b=>b.id!==btn.dataset.del);
+    saveState(); VIEW_RENDERERS.timetable();
+  }));
+}
+
+function openTtModal(id){
+  const existing = id ? state.timetable.blocks.find(b=>b.id===id) : null;
+  const m = openModal('Time block', `
+    <div class="field"><label>Activity</label><input type="text" id="mTtTitle" value="${existing?escapeHtml(existing.title):''}" placeholder="e.g. Study session"></div>
+    <div class="field-row">
+      <div class="field"><label>Day</label><select id="mTtDay">${DOW_NAMES.map(d=>`<option ${existing?.day===d?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="field"><label>Category</label><select id="mTtCat">${TT_CATEGORIES.map(c=>`<option ${existing?.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Start</label><input type="time" id="mTtStart" value="${existing?.start||'09:00'}"></div>
+      <div class="field"><label>End</label><input type="time" id="mTtEnd" value="${existing?.end||'10:00'}"></div>
+    </div>
+    <div class="modal-actions">
+      ${existing?'<button class="btn btn-ghost" id="mTtDelete">Delete</button>':''}
+      <button class="btn btn-primary" id="mTtSave">Save</button>
+    </div>
+  `);
+  document.getElementById('mTtSave').addEventListener('click', ()=>{
+    const data = {
+      title: document.getElementById('mTtTitle').value.trim(),
+      day: document.getElementById('mTtDay').value,
+      category: document.getElementById('mTtCat').value,
+      start: document.getElementById('mTtStart').value,
+      end: document.getElementById('mTtEnd').value,
+    };
+    if(existing) Object.assign(existing, data);
+    else state.timetable.blocks.push({id:uid(), ...data});
+    saveState(); closeModal(); VIEW_RENDERERS.timetable();
+  });
+  if(existing){
+    document.getElementById('mTtDelete').addEventListener('click', ()=>{
+      state.timetable.blocks = state.timetable.blocks.filter(b=>b.id!==existing.id);
+      saveState(); closeModal(); VIEW_RENDERERS.timetable();
+    });
+  }
+}
+
+/* ============================================================
+   GOALS & PLANNING VIEW
+   ============================================================ */
+VIEW_RENDERERS.goals = function(){
+  const view = document.getElementById('view-goals');
+  view.innerHTML = `
+    <div class="view-head">
+      <div><h1>Goals & Planning</h1><div class="vh-sub">Every goal becomes a small action you can do today.</div></div>
+      <button class="btn btn-primary btn-sm" id="goalAddBtn">+ New goal</button>
+    </div>
+    <div class="tabs" id="goalsTabs">
+      <button class="tab-btn active" data-tab="daily">Daily</button>
+      <button class="tab-btn" data-tab="weekly">Weekly</button>
+      <button class="tab-btn" data-tab="monthly">Monthly</button>
+      <button class="tab-btn" data-tab="longterm">Long-term</button>
+    </div>
+    <div class="tab-panel active" data-panel="daily" id="goalsPanelDaily"></div>
+    <div class="tab-panel" data-panel="weekly" id="goalsPanelWeekly"></div>
+    <div class="tab-panel" data-panel="monthly" id="goalsPanelMonthly"></div>
+    <div class="tab-panel" data-panel="longterm" id="goalsPanelLongterm"></div>
+  `;
+  bindTabs('goalsTabs');
+  renderGoalsDaily();
+  renderGoalsWeekly();
+  renderGoalsMonthly();
+  renderGoalsLongterm();
+  document.getElementById('goalAddBtn').addEventListener('click', ()=> openGoalModal());
+};
+
+function bindTabs(groupId){
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      group.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const parent = group.parentElement;
+      parent.querySelectorAll('.tab-panel').forEach(p=> p.classList.toggle('active', p.dataset.panel===btn.dataset.tab));
+    });
+  });
+}
+
+function renderGoalsDaily(){
+  const tasks = generateTodayTasks();
+  const today = todayKey();
+  const completions = state.taskCompletions[today] || [];
+  const wrap = document.getElementById('goalsPanelDaily');
+  wrap.innerHTML = `<div class="glass panel"><div class="today-rail" id="goalsDailyRail"></div></div>`;
+  const rail = document.getElementById('goalsDailyRail');
+  if(!tasks.length){ rail.innerHTML = emptyState('No daily tasks yet','Add a goal or habit and it will appear here automatically.'); return; }
+  rail.innerHTML = tasks.map(t=>{
+    const done = completions.includes(t.id);
+    return `<div class="rail-item ${done?'done':''}">
+      <div class="rail-card">
+        <div class="rail-check" data-task="${t.id}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
+        ${t.time?`<span class="rc-time">${t.time}</span>`:''}
+        <div style="flex:1;min-width:0;"><div class="rc-title">${escapeHtml(t.title)}</div><div class="rc-sub">${escapeHtml(t.sub||'')}</div></div>
+        <span class="rc-tag badge badge-emerald">${t.category}</span>
+      </div></div>`;
+  }).join('');
+  rail.querySelectorAll('.rail-check').forEach(chk=> chk.addEventListener('click', (e)=>{ toggleTaskComplete(chk.dataset.task, e); renderGoalsDaily(); }));
+}
+
+function renderGoalsWeekly(){
+  const wrap = document.getElementById('goalsPanelWeekly');
+  const days = lastNDays(7);
+  const today = todayKey();
+  const completionRate = days.map(d=>{
+    const all = d===today ? generateTodayTasks().length : Object.keys(state.taskCompletions[d]||{}).length || 0;
+    const done = (state.taskCompletions[d]||[]).length;
+    return {d, done};
+  });
+  wrap.innerHTML = `
+    <div class="glass panel">
+      <div class="section-title-row"><h3>This week's consistency</h3></div>
+      <div class="day-checklist">${days.reverse().map(d=>`<div class="day-dot ${state.taskCompletions[d]?.length?'filled':''}" title="${d}">${new Date(d).getDate()}</div>`).join('')}</div>
+      <div style="height:20px;"></div>
+      <div class="section-title-row"><h3>Active goals — weekly milestones</h3></div>
+      ${state.goals.length ? state.goals.map(g=> renderGoalCard(g)).join('') : emptyState('No goals yet','Add one and we\'ll auto-build daily, weekly and monthly steps.')}
+    </div>`;
+}
+function renderGoalsMonthly(){
+  document.getElementById('goalsPanelMonthly').innerHTML = `
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Monthly milestones</h3></div>
+      ${state.goals.length ? state.goals.map(g=>{
+        const action = g.dailyAction;
+        const monthlyText = action?.perWeek ? `≈ ${fmtMoney(action.perWeek*4.33)} this month` : 'Stay consistent with your daily action — monthly progress compounds from it.';
+        return `<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div><div class="lr-title">${escapeHtml(g.text)}</div><div class="lr-sub">${monthlyText}</div></div></div>`;
+      }).join('') : emptyState('No goals yet','Set a goal to see its monthly trajectory.')}
+    </div>`;
+}
+function renderGoalsLongterm(){
+  document.getElementById('goalsPanelLongterm').innerHTML = `
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Long-term vision</h3></div>
+      ${state.goals.length ? state.goals.map(g=>`
+        <div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
+        <div><div class="lr-title">${escapeHtml(g.text)}</div><div class="lr-sub">${g.deadline?('Target: '+new Date(g.deadline).toLocaleDateString()):'No deadline set'} · ${g.category}</div></div></div>
+      `).join('') : emptyState('No long-term goals yet','Big goals belong here — we\'ll still give you something small to do today.')}
+    </div>`;
+}
+
+function renderGoalCard(g){
+  const today = todayKey();
+  const doneToday = (state.taskCompletions[today]||[]).includes('goal_'+g.id);
+  return `<div class="goal-card glass-tight" style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border);">
+    <div class="gc-top">
+      <div><div class="gc-title">${escapeHtml(g.text)}</div><div class="gc-meta">${g.category}${g.deadline?(' · due '+new Date(g.deadline).toLocaleDateString()):''}</div></div>
+      <button class="lr-del" data-goal-del="${g.id}"><svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="gc-today-action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
+      ${escapeHtml(g.dailyAction?.label || 'Take one step today')}
+      ${doneToday?'<span class="badge badge-emerald" style="margin-left:auto;">Done today</span>':''}
+    </div>
+  </div>`;
+}
+
+function openGoalModal(){
+  const m = openModal('New goal', `
+    <div class="field"><label>What do you want to achieve?</label><input type="text" id="mGoalText" placeholder="e.g. Save £500, Read 12 books"></div>
+    <div class="field-row">
+      <div class="field"><label>Category</label><select id="mGoalCat"><option>Finance</option><option>Health</option><option>Learning</option><option>Faith</option><option>Career</option><option>Personal</option></select></div>
+      <div class="field"><label>Target date</label><input type="date" id="mGoalDate"></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-primary btn-block" id="mGoalSave">Create goal</button></div>
+  `);
+  document.getElementById('mGoalSave').addEventListener('click', ()=>{
+    const text = document.getElementById('mGoalText').value.trim();
+    if(!text){ showToast('Enter a goal first'); return; }
+    addGoalFromWizard(text, document.getElementById('mGoalCat').value, document.getElementById('mGoalDate').value);
+    closeModal(); addXp(15); showToast('Goal created'); VIEW_RENDERERS.goals();
+  });
+}
+document.addEventListener('click', (e)=>{
+  const del = e.target.closest('[data-goal-del]');
+  if(del){
+    state.goals = state.goals.filter(g=>g.id!==del.dataset.goalDel);
+    saveState(); VIEW_RENDERERS.goals();
+  }
+});
+
+/* ============================================================
+   HABITS VIEW
+   ============================================================ */
+VIEW_RENDERERS.habits = function(){
+  const view = document.getElementById('view-habits');
+  view.innerHTML = `
+    <div class="view-head">
+      <div><h1>Habits</h1><div class="vh-sub">Tiny, repeatable actions. Build the identity, not just the streak.</div></div>
+      <button class="btn btn-primary btn-sm" id="habitAddBtn">+ New habit</button>
+    </div>
+    <div class="cards-row" id="habitStatsRow"></div>
+    <div id="habitsList"></div>
+  `;
+  renderHabitStatsRow();
+  renderHabitsList();
+  document.getElementById('habitAddBtn').addEventListener('click', ()=> openHabitModal());
+};
+
+function renderHabitStatsRow(){
+  const tracked = state.habitsTracking;
+  const totalStreak = tracked.reduce((s,h)=>s+currentStreak(h.log||[]),0);
+  const best = Math.max(0,...tracked.map(h=>currentStreak(h.log||[])));
+  const today = todayKey();
+  const doneToday = tracked.filter(h=> (h.log||[]).includes(today)).length;
+  document.getElementById('habitStatsRow').innerHTML = `
+    <div class="glass metric-card"><div class="mc-lbl">Active habits</div><div class="mc-val">${tracked.length}</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Best streak</div><div class="mc-val">${best}d</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Done today</div><div class="mc-val">${doneToday}/${tracked.length}</div></div>
+  `;
+}
+
+function renderHabitsList(){
+  const wrap = document.getElementById('habitsList');
+  const tracked = state.habitsTracking;
+  const today = todayKey();
+  let html = '';
+  if(state.habitsToImprove.length){
+    html += `<div class="section-title-row" style="margin-top:4px;"><h3>From your onboarding</h3></div>`;
+    html += state.habitsToImprove.filter(h=>!/pornography/i.test(h)).map(h=>{
+      const taskId = 'hab_'+slug(h);
+      const done = (state.taskCompletions[today]||[]).includes(taskId);
+      return `<div class="habit-card glass-tight" style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border);">
+        <div class="hc-streak"><span class="num">${currentStreak((state.taskCompletions._derived?.[taskId])||[])||'–'}</span><span class="lbl">streak</span></div>
+        <div class="hc-info"><div class="hc-title">${escapeHtml(microActionFor(h))}</div><div class="hc-sub">Working on: ${escapeHtml(h)}</div></div>
+        <div class="rail-check hc-check ${done?'done':''}" data-task="${taskId}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
+      </div>`;
+    }).join('');
+  }
+  html += `<div class="section-title-row" style="margin-top:18px;"><h3>Custom habits</h3></div>`;
+  if(!tracked.length){
+    html += emptyState('No custom habits yet','Add one to start building a streak.');
+  } else {
+    html += tracked.map(h=>{
+      const streak = currentStreak(h.log||[]);
+      const strength = clamp(streak*10,0,100);
+      const done = (h.log||[]).includes(today);
+      return `<div class="habit-card glass-tight" style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border);">
+        <div class="hc-streak"><span class="num">${streak}</span><span class="lbl">days</span></div>
+        <div class="hc-info">
+          <div class="hc-title">${escapeHtml(h.name)}</div>
+          <div class="hc-sub">${h.identity ? 'Identity: '+escapeHtml(h.identity) : 'Habit strength'}</div>
+          <div class="hc-strength-track"><div class="hc-strength-fill" style="width:${strength}%"></div></div>
+        </div>
+        <button class="lr-del" data-habit-del="${h.id}" style="margin-right:4px;"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        <div class="rail-check hc-check ${done?'done':''}" data-task="track_${h.id}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
+      </div>`;
+    }).join('');
+  }
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('.hc-check').forEach(chk=> chk.addEventListener('click', (e)=>{ toggleTaskComplete(chk.dataset.task, e); renderHabitsList(); renderHabitStatsRow(); }));
+  wrap.querySelectorAll('[data-habit-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+    state.habitsTracking = state.habitsTracking.filter(h=>h.id!==btn.dataset.habitDel);
+    saveState(); renderHabitsList(); renderHabitStatsRow();
+  }));
+}
+
+function openHabitModal(){
+  const m = openModal('New habit', `
+    <div class="field"><label>Habit (small action)</label><input type="text" id="mHabitName" placeholder="e.g. Read one page"></div>
+    <div class="field"><label>Identity (optional)</label><input type="text" id="mHabitIdentity" placeholder="e.g. I am a reader"></div>
+    <div class="modal-actions"><button class="btn btn-primary btn-block" id="mHabitSave">Create habit</button></div>
+  `);
+  document.getElementById('mHabitSave').addEventListener('click', ()=>{
+    const name = document.getElementById('mHabitName').value.trim();
+    if(!name){ showToast('Name your habit first'); return; }
+    state.habitsTracking.push({id:uid(), name, identity:document.getElementById('mHabitIdentity').value.trim(), log:[]});
+    saveState(); closeModal(); addXp(10); VIEW_RENDERERS.habits();
+  });
+}
+
+/* ---------- shared small helpers ---------- */
+function emptyState(title, sub){
+  return `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 9h.01M15 9h.01M8 15s1.5-2 4-2 4 2 4 2"/></svg>
+    <div class="es-title">${title}</div><div class="es-sub">${sub}</div></div>`;
+}
+
+/* ---------- Modal system ---------- */
+function openModal(title, bodyHtml){
+  closeModal();
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.id = 'activeModal';
+  backdrop.innerHTML = `<div class="modal-box">
+    <div class="modal-head"><h3>${title}</h3><button class="modal-close" id="modalCloseBtn"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+    ${bodyHtml}
+  </div>`;
+  document.body.appendChild(backdrop);
+  requestAnimationFrame(()=> backdrop.classList.add('open'));
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) closeModal(); });
+  return backdrop;
+}
+function closeModal(){
+  const m = document.getElementById('activeModal');
+  if(m){ m.classList.remove('open'); setTimeout(()=> m.remove(), 200); }
+}
+
+/* ============================================================
+   FINANCE CENTER
+   ============================================================ */
+let _financeChart, _spendCategoryChart;
+VIEW_RENDERERS.finance = function(){
+  const view = document.getElementById('view-finance');
+  view.innerHTML = `
+    <div class="view-head">
+      <div><h1>Finance Center</h1><div class="vh-sub">Income, spending, savings and subscriptions — all in one place.</div></div>
+      <button class="btn btn-primary btn-sm" id="finAddBtn">+ Add transaction</button>
+    </div>
+    <div class="cards-row" id="finMetrics"></div>
+    <div class="two-col">
+      <div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg> Savings trend (30 days)</h3></div>
+          <div class="mini-chart-wrap"><canvas id="finTrendChart"></canvas></div>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Transactions</h3></div>
+          <div id="finTxList"></div>
+        </div>
+      </div>
+      <div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Spending by category</h3></div>
+          <div class="mini-chart-wrap"><canvas id="finCatChart"></canvas></div>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Subscriptions</h3><button class="btn btn-ghost btn-sm" id="finSubAddBtn">+ Add</button></div>
+          <div id="finSubList"></div>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Goals progress</h3></div>
+          <div id="finGoalsList"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  renderFinMetrics();
+  renderFinTrendChart();
+  renderFinCatChart();
+  renderFinTxList();
+  renderFinSubList();
+  renderFinGoalsList();
+  document.getElementById('finAddBtn').addEventListener('click', ()=> openTxModal());
+  document.getElementById('finSubAddBtn').addEventListener('click', ()=> openSubModal());
+};
+
+function finTotals(){
+  const f = state.finance;
+  const income = f.transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0) + Number(f.income||0);
+  const expense = f.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const subTotal = f.subscriptions.reduce((s,sub)=>s+Number(sub.amount||0),0);
+  return {income, expense, net: income-expense, subTotal};
+}
+
+function renderFinMetrics(){
+  const {income, expense, net, subTotal} = finTotals();
+  document.getElementById('finMetrics').innerHTML = `
+    <div class="glass metric-card"><div class="mc-lbl">Income</div><div class="mc-val">${fmtMoney(income)}</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Expenses</div><div class="mc-val">${fmtMoney(expense)}</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Net</div><div class="mc-val" style="color:${net>=0?'var(--emerald-bright)':'var(--danger)'}">${fmtMoney(net)}</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Monthly subscriptions</div><div class="mc-val">${fmtMoney(subTotal)}</div></div>
+  `;
+}
+
+function renderFinTrendChart(){
+  const ctx = document.getElementById('finTrendChart');
+  const days = lastNDays(30).reverse();
+  let running = 0;
+  const data = days.map(d=>{
+    const dayTx = state.finance.transactions.filter(t=>t.date===d);
+    dayTx.forEach(t=> running += t.type==='income' ? t.amount : -t.amount);
+    return running;
+  });
+  if(_financeChart){ try{_financeChart.destroy();}catch(e){} }
+  _financeChart = safeChart('finTrendChart', (c) => new Chart(c, {
+    type:'line',
+    data:{labels:days.map(d=>d.slice(5)), datasets:[{data, borderColor:'#16C98D', backgroundColor:'rgba(22,201,141,0.12)', fill:true, tension:0.35, pointRadius:0, borderWidth:2}]},
+    options: chartBaseOptions(true)
+  }));
+}
+
+function renderFinCatChart(){
+  const ctx = document.getElementById('finCatChart');
+  const cats = {};
+  state.finance.transactions.filter(t=>t.type==='expense').forEach(t=>{ cats[t.category]=(cats[t.category]||0)+t.amount; });
+  const labels = Object.keys(cats);
+  if(_spendCategoryChart){ try{_spendCategoryChart.destroy();}catch(e){} }
+  if(!labels.length){
+    ctx.parentElement.innerHTML = emptyState('No spending yet','Add an expense to see your breakdown.');
+    return;
+  }
+  _spendCategoryChart = safeChart('finCatChart', (c) => new Chart(c, {
+    type:'doughnut',
+    data:{labels, datasets:[{data:Object.values(cats), backgroundColor:['#16C98D','#C9A24B','#5B9EE8','#E2654F','#9B8CF2','#3FE8AC','#E3C475'], borderWidth:0}]},
+    options:{plugins:{legend:{position:'bottom', labels:{color:'#A7A89E', font:{size:11}}}}, cutout:'65%'}
+  }));
+}
+
+function chartBaseOptions(hideY){
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6E6F66', font:{size:10}}},
+      y:{display:!hideY, grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6E6F66', font:{size:10}}}
+    }
+  };
+}
+
+/* Chart.js may fail to load (offline, ad-blocker, CDN blip). Wrap every chart
+   creation so a missing library degrades to a friendly message instead of
+   crashing the whole render pipeline. */
+const chartsAvailable = () => typeof Chart !== 'undefined';
+function safeChart(canvasId, factoryFn){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return null;
+  if(!chartsAvailable()){
+    canvas.parentElement.innerHTML = `<div class="empty-state" style="padding:30px 10px;"><div class="es-sub">Charts couldn't load (offline or blocked). Your data is still saved.</div></div>`;
+    return null;
+  }
+  try{ return factoryFn(canvas); }
+  catch(e){ console.warn('Chart render failed', e); return null; }
+}
+
+function renderFinTxList(){
+  const wrap = document.getElementById('finTxList');
+  const tx = [...state.finance.transactions].sort((a,b)=> b.date.localeCompare(a.date)).slice(0,30);
+  if(!tx.length){ wrap.innerHTML = emptyState('No transactions yet','Add your first income or expense.'); return; }
+  wrap.innerHTML = tx.map(t=>`
+    <div class="list-row">
+      <div class="lr-icon" style="color:${t.type==='income'?'var(--emerald-bright)':'var(--danger)'}">
+        <svg class="icon" viewBox="0 0 24 24">${t.type==='income'?'<path d="M12 19V5M5 12l7-7 7 7"/>':'<path d="M12 5v14M5 12l7 7 7-7"/>'}</svg>
+      </div>
+      <div><div class="lr-title">${escapeHtml(t.label)}</div><div class="lr-sub">${t.date} · ${t.category}</div></div>
+      <div class="lr-amt ${t.type==='income'?'pos':'neg'}">${t.type==='income'?'+':'-'}${fmtMoney(t.amount)}</div>
+      <button class="lr-del" data-tx-del="${t.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('[data-tx-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+    state.finance.transactions = state.finance.transactions.filter(t=>t.id!==btn.dataset.txDel);
+    saveState(); VIEW_RENDERERS.finance();
+  }));
+}
+
+function renderFinSubList(){
+  const wrap = document.getElementById('finSubList');
+  if(!state.finance.subscriptions.length){ wrap.innerHTML = emptyState('No subscriptions tracked',''); return; }
+  wrap.innerHTML = state.finance.subscriptions.map(s=>`
+    <div class="list-row">
+      <div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
+      <div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">Renews on day ${s.renewDay||'1'}</div></div>
+      <div class="lr-amt neg">${fmtMoney(s.amount)}/mo</div>
+      <button class="lr-del" data-sub-del="${s.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('[data-sub-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+    state.finance.subscriptions = state.finance.subscriptions.filter(s=>s.id!==btn.dataset.subDel);
+    saveState(); VIEW_RENDERERS.finance();
+  }));
+}
+
+function renderFinGoalsList(){
+  const wrap = document.getElementById('finGoalsList');
+  const financeGoals = state.goals.filter(g=>g.category==='Finance');
+  if(!financeGoals.length){ wrap.innerHTML = emptyState('No finance goals','Add one from Goals & Planning.'); return; }
+  wrap.innerHTML = financeGoals.map(g=>{
+    const action = g.dailyAction;
+    const saved = (state.finance.transactions.filter(t=>t.type==='income' && t.label.includes(g.text.slice(0,8))).reduce((s,t)=>s+t.amount,0));
+    const pct = action?.amount ? clamp((saved/action.amount)*100,0,100) : 0;
+    return `<div style="margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>${escapeHtml(g.text)}</span><span style="color:var(--ink-faint); font-family:var(--font-mono);">${Math.round(pct)}%</span></div>
+      <div class="progress-track gold"><div class="progress-fill gold" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function openTxModal(){
+  const m = openModal('Add transaction', `
+    <div class="field-row">
+      <div class="field"><label>Type</label><select id="mTxType"><option value="expense">Expense</option><option value="income">Income</option></select></div>
+      <div class="field"><label>Amount</label><input type="number" id="mTxAmount" placeholder="0.00" step="0.01"></div>
+    </div>
+    <div class="field"><label>Description</label><input type="text" id="mTxLabel" placeholder="e.g. Groceries"></div>
+    <div class="field-row">
+      <div class="field"><label>Category</label><select id="mTxCat"><option>Food</option><option>Transport</option><option>Rent</option><option>Bills</option><option>Shopping</option><option>Entertainment</option><option>Savings</option><option>Salary</option><option>Other</option></select></div>
+      <div class="field"><label>Date</label><input type="date" id="mTxDate" value="${todayKey()}"></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-primary btn-block" id="mTxSave">Save transaction</button></div>
+  `);
+  document.getElementById('mTxSave').addEventListener('click', ()=>{
+    const amount = parseFloat(document.getElementById('mTxAmount').value);
+    if(!amount || amount<=0){ showToast('Enter a valid amount'); return; }
+    state.finance.transactions.push({
+      id:uid(), type:document.getElementById('mTxType').value, amount,
+      label: document.getElementById('mTxLabel').value.trim() || 'Untitled',
+      category: document.getElementById('mTxCat').value, date: document.getElementById('mTxDate').value || todayKey(),
+    });
+    saveState(); closeModal(); addXp(5); VIEW_RENDERERS.finance();
+  });
+}
+function openSubModal(){
+  const m = openModal('Add subscription', `
+    <div class="field"><label>Name</label><input type="text" id="mSubName" placeholder="e.g. Netflix"></div>
+    <div class="field-row">
+      <div class="field"><label>Monthly amount</label><input type="number" id="mSubAmount" step="0.01"></div>
+      <div class="field"><label>Renews on day</label><input type="number" id="mSubDay" min="1" max="31" value="1"></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-primary btn-block" id="mSubSave">Add subscription</button></div>
+  `);
+  document.getElementById('mSubSave').addEventListener('click', ()=>{
+    const name = document.getElementById('mSubName').value.trim();
+    const amount = parseFloat(document.getElementById('mSubAmount').value);
+    if(!name||!amount){ showToast('Fill in both fields'); return; }
+    state.finance.subscriptions.push({id:uid(), name, amount, renewDay:document.getElementById('mSubDay').value});
+    saveState(); closeModal(); VIEW_RENDERERS.finance();
+  });
+}
+
+/* ============================================================
+   HEALTH CENTER
+   ============================================================ */
+let _healthChart;
+VIEW_RENDERERS.health = function(){
+  const view = document.getElementById('view-health');
+  const today = todayKey();
+  const todayWater = state.health.waterLog.find(w=>w.date===today)?.glasses || 0;
+  const todaySleep = state.health.sleepLog.find(s=>s.date===today)?.hours || null;
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Health Center</h1><div class="vh-sub">Sleep, exercise, water and wellness — tracked daily.</div></div></div>
+    <div class="cards-row" id="healthMetrics"></div>
+    <div class="two-col">
+      <div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Sleep trend (14 days)</h3></div>
+          <div class="mini-chart-wrap"><canvas id="healthSleepChart"></canvas></div>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Log exercise</h3></div>
+          <div class="field-row">
+            <div class="field"><label>Activity</label><input type="text" id="hExerciseType" placeholder="e.g. Run, Gym, Walk"></div>
+            <div class="field"><label>Minutes</label><input type="number" id="hExerciseMin" placeholder="30"></div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="hExerciseSave">Log exercise</button>
+          <div id="hExerciseList" style="margin-top:14px;"></div>
+        </div>
+      </div>
+      <div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Today's water</h3></div>
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+            <button class="btn btn-ghost btn-icon" id="hWaterMinus">−</button>
+            <div style="font-family:var(--font-mono); font-size:28px; font-weight:700; color:var(--info);" id="hWaterCount">${todayWater}</div>
+            <button class="btn btn-ghost btn-icon" id="hWaterPlus">+</button>
+            <span style="font-size:12.5px; color:var(--ink-faint);">glasses today</span>
+          </div>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Log sleep</h3></div>
+          <div class="field"><label>Hours slept last night</label><input type="number" step="0.5" id="hSleepHours" value="${todaySleep||''}" placeholder="7.5"></div>
+          <button class="btn btn-primary btn-sm" id="hSleepSave">Save</button>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Weight (optional)</h3></div>
+          <div class="field"><label>Today's weight (kg)</label><input type="number" step="0.1" id="hWeight" placeholder="e.g. 72.5"></div>
+          <button class="btn btn-primary btn-sm" id="hWeightSave">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+  renderHealthMetrics();
+  renderHealthSleepChart();
+  renderHExerciseList();
+  document.getElementById('hWaterMinus').addEventListener('click', ()=> adjustWater(-1));
+  document.getElementById('hWaterPlus').addEventListener('click', ()=> adjustWater(1));
+  document.getElementById('hSleepSave').addEventListener('click', ()=>{
+    const hours = parseFloat(document.getElementById('hSleepHours').value);
+    if(!hours){ showToast('Enter hours slept'); return; }
+    upsertByDate(state.health.sleepLog, today, {hours});
+    saveState(); addXp(5); showToast('Sleep logged'); VIEW_RENDERERS.health();
+  });
+  document.getElementById('hWeightSave').addEventListener('click', ()=>{
+    const w = parseFloat(document.getElementById('hWeight').value);
+    if(!w){ showToast('Enter your weight'); return; }
+    state.health.weightLog.push({date:today, weight:w});
+    saveState(); showToast('Weight logged'); VIEW_RENDERERS.health();
+  });
+  document.getElementById('hExerciseSave').addEventListener('click', ()=>{
+    const type = document.getElementById('hExerciseType').value.trim();
+    const min = parseInt(document.getElementById('hExerciseMin').value);
+    if(!type||!min){ showToast('Fill in both fields'); return; }
+    state.health.exerciseLog.push({id:uid(), date:today, type, minutes:min});
+    saveState(); addXp(12); showToast('Exercise logged'); VIEW_RENDERERS.health();
+  });
+};
+function upsertByDate(arr, date, data){
+  const existing = arr.find(x=>x.date===date);
+  if(existing) Object.assign(existing, data);
+  else arr.push({date, ...data});
+}
+function adjustWater(delta){
+  const today = todayKey();
+  let rec = state.health.waterLog.find(w=>w.date===today);
+  if(!rec){ rec = {date:today, glasses:0}; state.health.waterLog.push(rec); }
+  rec.glasses = Math.max(0, rec.glasses+delta);
+  saveState();
+  document.getElementById('hWaterCount').textContent = rec.glasses;
+  if(delta>0) addXp(2);
+  renderHealthMetrics();
+}
+function renderHealthMetrics(){
+  const today = todayKey();
+  const last7 = lastNDays(7);
+  const avgSleep = avgOf(state.health.sleepLog.filter(s=>last7.includes(s.date)).map(s=>s.hours));
+  const totalExerciseMin = state.health.exerciseLog.filter(e=>last7.includes(e.date)).reduce((s,e)=>s+e.minutes,0);
+  const avgWater = avgOf(state.health.waterLog.filter(w=>last7.includes(w.date)).map(w=>w.glasses));
+  document.getElementById('healthMetrics').innerHTML = `
+    <div class="glass metric-card"><div class="mc-lbl">Avg sleep (7d)</div><div class="mc-val">${avgSleep?avgSleep.toFixed(1):'–'}h</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Exercise (7d)</div><div class="mc-val">${totalExerciseMin}m</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Avg water (7d)</div><div class="mc-val">${avgWater?avgWater.toFixed(1):'–'}</div></div>
+  `;
+}
+function avgOf(arr){ const a = arr.filter(v=>v!=null); return a.length ? a.reduce((s,v)=>s+v,0)/a.length : null; }
+function renderHealthSleepChart(){
+  const ctx = document.getElementById('healthSleepChart');
+  const days = lastNDays(14).reverse();
+  const data = days.map(d=> state.health.sleepLog.find(s=>s.date===d)?.hours ?? null);
+  if(_healthChart){ try{_healthChart.destroy();}catch(e){} }
+  _healthChart = safeChart('healthSleepChart', (c) => new Chart(c, {
+    type:'bar',
+    data:{labels:days.map(d=>d.slice(5)), datasets:[{data, backgroundColor:'#3FE8AC', borderRadius:6, maxBarThickness:18}]},
+    options: chartBaseOptions(false)
+  }));
+}
+function renderHExerciseList(){
+  const wrap = document.getElementById('hExerciseList');
+  const recent = [...state.health.exerciseLog].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+  if(!recent.length){ wrap.innerHTML=''; return; }
+  wrap.innerHTML = recent.map(e=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 3l3 3-3 3M6 18l-3 3 3 3M9.5 6.5L3 13l1.5 1.5L11 8M14.5 17.5L21 11l-1.5-1.5L13 16"/></svg></div><div><div class="lr-title">${escapeHtml(e.type)}</div><div class="lr-sub">${e.date}</div></div><div class="lr-amt pos">${e.minutes}m</div></div>`).join('');
+}
+
+/* ============================================================
+   DIET CENTER
+   ============================================================ */
+VIEW_RENDERERS.diet = function(){
+  const view = document.getElementById('view-diet');
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Diet Center</h1><div class="vh-sub">Log meals, score the day, build better eating habits.</div></div></div>
+    <div class="cards-row" id="dietMetrics"></div>
+    <div class="two-col">
+      <div class="glass panel">
+        <div class="section-title-row"><h3>Add a meal</h3></div>
+        <div class="field"><label>What did you eat?</label><input type="text" id="dMealName" placeholder="e.g. Grilled chicken & rice"></div>
+        <div class="field"><label>How healthy was it?</label>
+          <div class="chip-grid">
+            <div class="chip" data-quality="healthy">Healthy</div>
+            <div class="chip" data-quality="average">Average</div>
+            <div class="chip" data-quality="unhealthy">Unhealthy</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="dMealSave" style="margin-top:8px;">Log meal</button>
+      </div>
+      <div class="glass panel">
+        <div class="section-title-row"><h3>Today's nutrition score</h3></div>
+        <div id="dietTodayScore"></div>
+      </div>
+    </div>
+    <div class="glass panel" style="margin-top:20px;">
+      <div class="section-title-row"><h3>Recent meals</h3></div>
+      <div id="dietMealList"></div>
+    </div>
+  `;
+  let selectedQuality = 'average';
+  view.querySelectorAll('[data-quality]').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      view.querySelectorAll('[data-quality]').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedQuality = chip.dataset.quality;
+    });
+  });
+  view.querySelector('[data-quality="average"]').classList.add('selected');
+  document.getElementById('dMealSave').addEventListener('click', ()=>{
+    const name = document.getElementById('dMealName').value.trim();
+    if(!name){ showToast('Enter a meal name'); return; }
+    state.diet.meals.push({id:uid(), name, quality:selectedQuality, date:todayKey(), time:new Date().toTimeString().slice(0,5)});
+    saveState(); addXp(selectedQuality==='healthy'?10:4); showToast('Meal logged'); VIEW_RENDERERS.diet();
+  });
+  renderDietMetrics();
+  renderDietTodayScore();
+  renderDietMealList();
+};
+function renderDietMetrics(){
+  const last7 = lastNDays(7);
+  const meals7 = state.diet.meals.filter(m=>last7.includes(m.date));
+  const healthyPct = meals7.length ? Math.round(meals7.filter(m=>m.quality==='healthy').length/meals7.length*100) : 0;
+  document.getElementById('dietMetrics').innerHTML = `
+    <div class="glass metric-card"><div class="mc-lbl">Meals logged (7d)</div><div class="mc-val">${meals7.length}</div></div>
+    <div class="glass metric-card"><div class="mc-lbl">Healthy meals</div><div class="mc-val">${healthyPct}%</div></div>
+  `;
+}
+function renderDietTodayScore(){
+  const today = todayKey();
+  const meals = state.diet.meals.filter(m=>m.date===today);
+  const wrap = document.getElementById('dietTodayScore');
+  if(!meals.length){ wrap.innerHTML = emptyState('No meals logged today',''); return; }
+  const score = Math.round(meals.reduce((s,m)=> s + (m.quality==='healthy'?100:m.quality==='average'?60:20), 0)/meals.length);
+  wrap.innerHTML = `<div style="text-align:center; padding:10px 0;">
+    <div style="font-family:var(--font-display); font-size:44px; font-weight:600; color:${score>=70?'var(--emerald-bright)':score>=45?'var(--gold-bright)':'var(--danger)'}">${score}</div>
+    <div style="font-size:12.5px; color:var(--ink-faint); margin-top:4px;">${meals.length} meal${meals.length>1?'s':''} logged</div>
+  </div>`;
+}
+function renderDietMealList(){
+  const wrap = document.getElementById('dietMealList');
+  const recent = [...state.diet.meals].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,15);
+  if(!recent.length){ wrap.innerHTML = emptyState('No meals yet',''); return; }
+  const qColor = {healthy:'var(--emerald-bright)', average:'var(--gold-bright)', unhealthy:'var(--danger)'};
+  wrap.innerHTML = recent.map(m=>`
+    <div class="list-row">
+      <div class="lr-icon" style="color:${qColor[m.quality]}"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/></svg></div>
+      <div><div class="lr-title">${escapeHtml(m.name)}</div><div class="lr-sub">${m.date} · ${m.time}</div></div>
+      <span class="badge" style="background:rgba(255,255,255,0.06); color:${qColor[m.quality]}">${m.quality}</span>
+      <button class="lr-del" data-meal-del="${m.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('[data-meal-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+    state.diet.meals = state.diet.meals.filter(m=>m.id!==btn.dataset.mealDel);
+    saveState(); VIEW_RENDERERS.diet();
+  }));
+}
+
+/* ============================================================
+   STUDY CENTER
+   ============================================================ */
+let _studyTimerInterval, _studySeconds = 0, _studyRunning=false;
+VIEW_RENDERERS.study = function(){
+  const view = document.getElementById('view-study');
+  view.innerHTML = `
+    <div class="view-head">
+      <div><h1>Study Center</h1><div class="vh-sub">Subjects, exams, focus sessions — all tracked.</div></div>
+      <button class="btn btn-primary btn-sm" id="studySubjectAddBtn">+ Add subject</button>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="glass panel" style="text-align:center;">
+          <div class="section-title-row" style="justify-content:center;"><h3>Focus timer</h3></div>
+          <div class="timer-display" id="studyTimerDisplay">25:00</div>
+          <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="btn btn-primary" id="studyTimerStart">Start</button>
+            <button class="btn btn-ghost" id="studyTimerReset">Reset</button>
+          </div>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Subjects</h3></div>
+          <div id="studySubjectList"></div>
+        </div>
+      </div>
+      <div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Exam countdowns</h3><button class="btn btn-ghost btn-sm" id="studyExamAddBtn">+ Add</button></div>
+          <div id="studyExamList"></div>
+        </div>
+        <div class="glass panel">
+          <div class="section-title-row"><h3>Recent sessions</h3></div>
+          <div id="studySessionList"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  renderStudySubjects();
+  renderStudyExams();
+  renderStudySessions();
+  document.getElementById('studySubjectAddBtn').addEventListener('click', ()=> openSubjectModal());
+  document.getElementById('studyExamAddBtn').addEventListener('click', ()=> openExamModal());
+  document.getElementById('studyTimerStart').addEventListener('click', toggleStudyTimer);
+  document.getElementById('studyTimerReset').addEventListener('click', resetStudyTimer);
+  updateStudyTimerDisplay();
+};
+function toggleStudyTimer(){
+  _studyRunning = !_studyRunning;
+  document.getElementById('studyTimerStart').textContent = _studyRunning ? 'Pause' : 'Start';
+  if(_studyRunning){
+    _studyTimerInterval = setInterval(()=>{
+      _studySeconds++;
+      updateStudyTimerDisplay();
+      if(_studySeconds >= 25*60){
+        clearInterval(_studyTimerInterval);
+        _studyRunning = false;
+        state.study.sessions.push({id:uid(), date:todayKey(), minutes:25});
+        saveState(); addXp(20); showToast('Focus session complete — 20 XP earned');
+        resetStudyTimer();
+        if(document.getElementById('view-study')?.classList.contains('active')) renderStudySessions();
+      }
+    },1000);
+  } else clearInterval(_studyTimerInterval);
+}
+function resetStudyTimer(){
+  clearInterval(_studyTimerInterval); _studyRunning=false; _studySeconds=0;
+  const btn = document.getElementById('studyTimerStart'); if(btn) btn.textContent='Start';
+  updateStudyTimerDisplay();
+}
+function updateStudyTimerDisplay(){
+  const remaining = 25*60 - _studySeconds;
+  const m = Math.floor(remaining/60), s = remaining%60;
+  const el = document.getElementById('studyTimerDisplay');
+  if(el) el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function renderStudySubjects(){
+  const wrap = document.getElementById('studySubjectList');
+  if(!state.study.subjects.length){ wrap.innerHTML = emptyState('No subjects yet',''); return; }
+  wrap.innerHTML = state.study.subjects.map(s=>`
+    <div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/></svg></div>
+    <div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">${s.homework||0} homework items</div></div>
+    <button class="lr-del" data-subj-del="${s.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+  `).join('');
+  wrap.querySelectorAll('[data-subj-del]').forEach(btn=>btn.addEventListener('click', ()=>{
+    state.study.subjects = state.study.subjects.filter(s=>s.id!==btn.dataset.subjDel);
+    saveState(); VIEW_RENDERERS.study();
+  }));
+}
+function renderStudyExams(){
+  const wrap = document.getElementById('studyExamList');
+  if(!state.study.exams.length){ wrap.innerHTML = emptyState('No exams scheduled',''); return; }
+  const sorted = [...state.study.exams].sort((a,b)=>a.date.localeCompare(b.date));
+  wrap.innerHTML = sorted.map(ex=>{
+    const days = Math.ceil((new Date(ex.date)-new Date())/86400000);
+    return `<div class="list-row"><div class="lr-icon" style="color:var(--gold-bright)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+    <div><div class="lr-title">${escapeHtml(ex.name)}</div><div class="lr-sub">${ex.date}</div></div>
+    <span class="badge ${days<=3?'badge-danger':'badge-gold'}">${days>=0?days+'d left':'past'}</span>
+    <button class="lr-del" data-exam-del="${ex.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`;
+  }).join('');
+  wrap.querySelectorAll('[data-exam-del]').forEach(btn=>btn.addEventListener('click', ()=>{
+    state.study.exams = state.study.exams.filter(e=>e.id!==btn.dataset.examDel);
+    saveState(); VIEW_RENDERERS.study();
+  }));
+}
+function renderStudySessions(){
+  const wrap = document.getElementById('studySessionList');
+  const recent = [...state.study.sessions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+  if(!recent.length){ wrap.innerHTML = emptyState('No focus sessions yet',''); return; }
+  wrap.innerHTML = recent.map(s=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><div class="lr-title">Focus session</div><div class="lr-sub">${s.date}</div></div><div class="lr-amt pos">${s.minutes}m</div></div>`).join('');
+}
+function openSubjectModal(){
+  const m = openModal('Add subject', `<div class="field"><label>Subject name</label><input type="text" id="mSubjName" placeholder="e.g. Mathematics"></div><div class="modal-actions"><button class="btn btn-primary btn-block" id="mSubjSave">Add</button></div>`);
+  document.getElementById('mSubjSave').addEventListener('click', ()=>{
+    const name = document.getElementById('mSubjName').value.trim();
+    if(!name) return showToast('Enter a subject name');
+    state.study.subjects.push({id:uid(), name, homework:0});
+    saveState(); closeModal(); VIEW_RENDERERS.study();
+  });
+}
+function openExamModal(){
+  const m = openModal('Add exam', `<div class="field"><label>Exam name</label><input type="text" id="mExamName" placeholder="e.g. Chemistry final"></div><div class="field"><label>Date</label><input type="date" id="mExamDate"></div><div class="modal-actions"><button class="btn btn-primary btn-block" id="mExamSave">Add</button></div>`);
+  document.getElementById('mExamSave').addEventListener('click', ()=>{
+    const name = document.getElementById('mExamName').value.trim();
+    const date = document.getElementById('mExamDate').value;
+    if(!name||!date) return showToast('Fill in both fields');
+    state.study.exams.push({id:uid(), name, date});
+    saveState(); closeModal(); VIEW_RENDERERS.study();
+  });
+}
+
+/* ============================================================
+   FAITH CENTER
+   ============================================================ */
+VIEW_RENDERERS.faith = function(){
+  const view = document.getElementById('view-faith');
+  const rel = RELIGIONS.find(r=>r.id===state.religion);
+  if(!rel || rel.id==='none'){
+    view.innerHTML = `
+      <div class="view-head"><div><h1>Faith</h1><div class="vh-sub">Set up a gentle daily faith practice.</div></div></div>
+      <div class="glass panel">
+        <div class="religion-grid" id="faithReligionGrid"></div>
+      </div>`;
+    renderFaithReligionPicker();
+    return;
+  }
+  const streak = currentStreak(state.faithLog);
+  const last30 = lastNDays(30).reverse();
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Faith</h1><div class="vh-sub">${rel.name} · small, consistent practice.</div></div>
+      <button class="btn btn-ghost btn-sm" id="faithChangeBtn">Change faith</button>
+    </div>
+    <div class="cards-row">
+      <div class="glass metric-card"><div class="mc-lbl">Current streak</div><div class="mc-val">${streak}d</div></div>
+      <div class="glass metric-card"><div class="mc-lbl">Total practices logged</div><div class="mc-val">${state.faithLog.length}</div></div>
+    </div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>This month</h3></div>
+      <div class="day-checklist" style="flex-wrap:wrap;">${last30.map(d=>`<div class="day-dot ${state.faithLog.includes(d)?'filled':''}" title="${d}">${new Date(d).getDate()}</div>`).join('')}</div>
+    </div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Daily practices</h3></div>
+      ${rel.practices.map((p,i)=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M5 9l7-7 7 7M5 14h14"/></svg></div><div class="lr-title">${escapeHtml(p)}</div></div>`).join('')}
+    </div>
+  `;
+  document.getElementById('faithChangeBtn').addEventListener('click', ()=>{
+    state.religion = null; saveState(); VIEW_RENDERERS.faith();
+  });
+};
+function renderFaithReligionPicker(){
+  const grid = document.getElementById('faithReligionGrid');
+  grid.innerHTML = RELIGIONS.map(r=>`<div class="religion-card" data-rel="${r.id}">${r.name}</div>`).join('');
+  grid.querySelectorAll('.religion-card').forEach(card=> card.addEventListener('click', ()=>{
+    state.religion = card.dataset.rel; saveState(); showToast('Faith practice set'); VIEW_RENDERERS.faith();
+  }));
+}
+
+/* ============================================================
+   JOURNAL CENTER
+   ============================================================ */
+VIEW_RENDERERS.journal = function(){
+  const view = document.getElementById('view-journal');
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Journal</h1><div class="vh-sub">Reflections, gratitude, lessons and wins.</div></div></div>
+    <div class="glass panel">
+      <div class="field"><label>What's on your mind today?</label><textarea id="jEntryText" placeholder="Write freely — gratitude, a lesson learned, a challenge, an achievement…"></textarea></div>
+      <div class="chip-grid" id="jTagGrid" style="margin-bottom:14px;">
+        ${['Gratitude','Lesson','Achievement','Challenge','Reflection'].map(t=>`<div class="chip" data-jtag="${t}">${t}</div>`).join('')}
+      </div>
+      <button class="btn btn-primary btn-sm" id="jSaveBtn">Save entry</button>
+    </div>
+    <div id="journalList"></div>
+  `;
+  let activeTags = [];
+  view.querySelectorAll('[data-jtag]').forEach(chip=> chip.addEventListener('click', ()=>{
+    chip.classList.toggle('selected');
+    const t = chip.dataset.jtag;
+    if(activeTags.includes(t)) activeTags = activeTags.filter(x=>x!==t); else activeTags.push(t);
+  }));
+  document.getElementById('jSaveBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('jEntryText').value.trim();
+    if(!text){ showToast('Write something first'); return; }
+    state.journal.unshift({id:uid(), date:new Date().toISOString(), text, tags:[...activeTags]});
+    saveState(); addXp(8); showToast('Journal entry saved'); VIEW_RENDERERS.journal();
+  });
+  renderJournalList();
+};
+function renderJournalList(){
+  const wrap = document.getElementById('journalList');
+  if(!state.journal.length){ wrap.innerHTML = emptyState('No entries yet','Your reflections will appear here.'); return; }
+  wrap.innerHTML = state.journal.map(j=>`
+    <div class="glass journal-entry">
+      <div class="je-date">${new Date(j.date).toLocaleString(undefined,{dateStyle:'medium', timeStyle:'short'})}</div>
+      <div class="je-text">${escapeHtml(j.text)}</div>
+      <div class="je-tags">${j.tags.map(t=>`<span class="badge badge-emerald">${t}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   MOOD & WELLBEING CENTER
+   ============================================================ */
+let _moodChart;
+VIEW_RENDERERS.mood = function(){
+  const view = document.getElementById('view-mood');
+  const today = todayKey();
+  const loggedToday = state.mood.find(m=>m.date===today);
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Mood & Wellbeing</h1><div class="vh-sub">Track how you feel — find your patterns over time.</div></div></div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>How are you feeling today?</h3></div>
+      <div class="slider-row"><div class="slider-label"><span>Mood</span><span id="mMoodVal">${loggedToday?.mood ?? 5}</span></div><input type="range" min="1" max="10" id="mMoodSlider" value="${loggedToday?.mood ?? 5}"></div>
+      <div class="slider-row"><div class="slider-label"><span>Energy</span><span id="mEnergyVal">${loggedToday?.energy ?? 5}</span></div><input type="range" min="1" max="10" id="mEnergySlider" value="${loggedToday?.energy ?? 5}"></div>
+      <div class="slider-row"><div class="slider-label"><span>Stress (lower is better)</span><span id="mStressVal">${loggedToday?.stress ?? 5}</span></div><input type="range" min="1" max="10" id="mStressSlider" value="${loggedToday?.stress ?? 5}"></div>
+      <div class="slider-row"><div class="slider-label"><span>Motivation</span><span id="mMotivationVal">${loggedToday?.motivation ?? 5}</span></div><input type="range" min="1" max="10" id="mMotivationSlider" value="${loggedToday?.motivation ?? 5}"></div>
+      <button class="btn btn-primary" id="mMoodSave">${loggedToday?'Update today\'s entry':'Save today\'s mood'}</button>
+    </div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>30-day trend</h3></div>
+      <div class="mini-chart-wrap"><canvas id="moodTrendChart"></canvas></div>
+    </div>
+  `;
+  ['mMood','mEnergy','mStress','mMotivation'].forEach(key=>{
+    document.getElementById(key+'Slider').addEventListener('input', (e)=>{
+      document.getElementById(key+'Val').textContent = e.target.value;
+    });
+  });
+  document.getElementById('mMoodSave').addEventListener('click', ()=>{
+    const entry = {
+      date: today,
+      mood: Number(document.getElementById('mMoodSlider').value),
+      energy: Number(document.getElementById('mEnergySlider').value),
+      stress: Number(document.getElementById('mStressSlider').value),
+      motivation: Number(document.getElementById('mMotivationSlider').value),
+    };
+    upsertByDate(state.mood, today, entry);
+    saveState(); addXp(6); showToast('Mood saved'); VIEW_RENDERERS.mood();
+  });
+  renderMoodTrendChart();
+};
+function renderMoodTrendChart(){
+  const ctx = document.getElementById('moodTrendChart');
+  const days = lastNDays(30).reverse();
+  const moodData = days.map(d=> state.mood.find(m=>m.date===d)?.mood ?? null);
+  const energyData = days.map(d=> state.mood.find(m=>m.date===d)?.energy ?? null);
+  if(_moodChart){ try{_moodChart.destroy();}catch(e){} }
+  _moodChart = safeChart('moodTrendChart', (c) => new Chart(c, {
+    type:'line',
+    data:{labels:days.map(d=>d.slice(5)), datasets:[
+      {label:'Mood', data:moodData, borderColor:'#16C98D', backgroundColor:'transparent', tension:0.35, spanGaps:true, pointRadius:2},
+      {label:'Energy', data:energyData, borderColor:'#C9A24B', backgroundColor:'transparent', tension:0.35, spanGaps:true, pointRadius:2},
+    ]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#A7A89E', font:{size:11}}}},
+      scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6E6F66', font:{size:10}}}, y:{min:0,max:10, grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6E6F66', font:{size:10}}}}}
+  }));
+}
+
+/* ============================================================
+   ANALYTICS CENTER
+   ============================================================ */
+let _anaHabitChart, _anaLifeScoreChart, _anaFinanceChart, _anaStudyChart;
+VIEW_RENDERERS.analytics = function(){
+  const view = document.getElementById('view-analytics');
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Analytics</h1><div class="vh-sub">Every chart updates automatically as you log data.</div></div></div>
+    <div class="two-col">
+      <div class="glass panel"><div class="section-title-row"><h3>Life Score — last 14 days</h3></div><div class="mini-chart-wrap"><canvas id="anaLifeScoreChart"></canvas></div></div>
+      <div class="glass panel"><div class="section-title-row"><h3>Habit completion rate</h3></div><div class="mini-chart-wrap"><canvas id="anaHabitChart"></canvas></div></div>
+    </div>
+    <div class="two-col">
+      <div class="glass panel"><div class="section-title-row"><h3>Savings growth</h3></div><div class="mini-chart-wrap"><canvas id="anaFinanceChart"></canvas></div></div>
+      <div class="glass panel"><div class="section-title-row"><h3>Study minutes (14 days)</h3></div><div class="mini-chart-wrap"><canvas id="anaStudyChart"></canvas></div></div>
+    </div>
+    <div class="glass panel"><div class="section-title-row"><h3>Timetable adherence</h3></div><div id="anaAdherence"></div></div>
+  `;
+  renderAnaLifeScore();
+  renderAnaHabitChart();
+  renderAnaFinanceChart();
+  renderAnaStudyChart();
+  renderAnaAdherence();
+};
+function renderAnaLifeScore(){
+  // approximate historical life score using current weights (we don't store history granularly, so simulate from task completion history)
+  const days = lastNDays(14).reverse();
+  const data = days.map(d=>{
+    const completions = (state.taskCompletions[d]||[]).length;
+    return clamp(40 + completions*6, 0, 100);
+  });
+  if(_anaLifeScoreChart){ try{_anaLifeScoreChart.destroy();}catch(e){} }
+  _anaLifeScoreChart = safeChart('anaLifeScoreChart', (c) => new Chart(c, {
+    type:'line', data:{labels:days.map(d=>d.slice(5)), datasets:[{data, borderColor:'#16C98D', backgroundColor:'rgba(22,201,141,0.12)', fill:true, tension:0.4, pointRadius:0, borderWidth:2}]},
+    options: chartBaseOptions(false)
+  }));
+}
+function renderAnaHabitChart(){
+  const tracked = state.habitsTracking;
+  const labels = tracked.map(h=>h.name).slice(0,8);
+  const data = tracked.map(h=>{
+    const last30 = lastNDays(30);
+    return Math.round((h.log||[]).filter(d=>last30.includes(d)).length/30*100);
+  }).slice(0,8);
+  if(_anaHabitChart){ try{_anaHabitChart.destroy();}catch(e){} }
+  if(!labels.length){ document.getElementById('anaHabitChart').parentElement.innerHTML = emptyState('No habits tracked yet',''); return; }
+  _anaHabitChart = safeChart('anaHabitChart', (c) => new Chart(c, {
+    type:'bar', data:{labels, datasets:[{data, backgroundColor:'#9B8CF2', borderRadius:6}]},
+    options:{...chartBaseOptions(false), indexAxis:'y'}
+  }));
+}
+function renderAnaFinanceChart(){
+  const days = lastNDays(30).reverse();
+  let running=0;
+  const data = days.map(d=>{
+    state.finance.transactions.filter(t=>t.date===d).forEach(t=> running += t.type==='income'?t.amount:-t.amount);
+    return running;
+  });
+  if(_anaFinanceChart){ try{_anaFinanceChart.destroy();}catch(e){} }
+  _anaFinanceChart = safeChart('anaFinanceChart', (c) => new Chart(c, {
+    type:'line', data:{labels:days.map(d=>d.slice(5)), datasets:[{data, borderColor:'#C9A24B', backgroundColor:'rgba(201,162,75,0.1)', fill:true, tension:0.35, pointRadius:0, borderWidth:2}]},
+    options: chartBaseOptions(false)
+  }));
+}
+function renderAnaStudyChart(){
+  const days = lastNDays(14).reverse();
+  const data = days.map(d=> state.study.sessions.filter(s=>s.date===d).reduce((s,x)=>s+x.minutes,0));
+  if(_anaStudyChart){ try{_anaStudyChart.destroy();}catch(e){} }
+  _anaStudyChart = safeChart('anaStudyChart', (c) => new Chart(c, {
+    type:'bar', data:{labels:days.map(d=>d.slice(5)), datasets:[{data, backgroundColor:'#5B9EE8', borderRadius:6, maxBarThickness:18}]},
+    options: chartBaseOptions(false)
+  }));
+}
+function renderAnaAdherence(){
+  const wrap = document.getElementById('anaAdherence');
+  const dow = DOW_NAMES[new Date().getDay()];
+  const blocksToday = state.timetable.blocks.filter(b=>b.day===dow);
+  const today = todayKey();
+  const completions = state.taskCompletions[today] || [];
+  const done = blocksToday.filter(b=> completions.includes('tt_'+b.id)).length;
+  const pct = blocksToday.length ? Math.round(done/blocksToday.length*100) : 0;
+  wrap.innerHTML = `<div style="display:flex; align-items:center; gap:16px;">
+    <div style="font-family:var(--font-display); font-size:36px; font-weight:600; color:var(--emerald-bright);">${pct}%</div>
+    <div style="flex:1;"><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><div style="font-size:12px; color:var(--ink-faint); margin-top:6px;">${done} of ${blocksToday.length} timetable blocks completed today</div></div>
+  </div>`;
+}
+
+/* ============================================================
+   RANK & XP CENTER
+   ============================================================ */
+VIEW_RENDERERS.rank = function(){
+  renderRankView();
+};
+function renderRankView(){
+  const view = document.getElementById('view-rank');
+  const info = getRankInfo(state.xp);
+  const categories = [
+    {key:'health', label:'Health', xp: categoryXp('health')},
+    {key:'finance', label:'Finance', xp: categoryXp('finance')},
+    {key:'discipline', label:'Discipline', xp: categoryXp('discipline')},
+    {key:'knowledge', label:'Knowledge', xp: categoryXp('knowledge')},
+    {key:'faith', label:'Faith', xp: categoryXp('faith')},
+  ];
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Rank & XP</h1><div class="vh-sub">21 tiers from Bronze to Supreme Human. Earn XP from every part of life.</div></div></div>
+    <div class="glass panel" style="text-align:center; padding:36px 24px;">
+      <div class="rank-emblem" style="width:88px; height:88px; font-size:17px; margin:0 auto 16px;">${info.rank.short}</div>
+      <div style="font-family:var(--font-display); font-size:26px; color:var(--gold-bright); font-weight:600;">${info.rank.name}</div>
+      <div style="font-family:var(--font-mono); font-size:13px; color:var(--ink-faint); margin:8px 0 16px;">${Math.round(info.into)} / ${info.needed} XP to next tier</div>
+      <div class="progress-track gold" style="max-width:360px; margin:0 auto;"><div class="progress-fill gold" style="width:${info.pct}%"></div></div>
+    </div>
+    <div class="cards-row">
+      ${categories.map(c=>`<div class="glass metric-card"><div class="mc-lbl">${c.label} XP</div><div class="mc-val">${c.xp}</div></div>`).join('')}
+    </div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Rank ladder</h3></div>
+      <div style="max-height:380px; overflow-y:auto;">
+        ${RANKS.map((r,i)=>`<div class="list-row" style="${i===info.index?'background:var(--gold-dim); border-radius:10px;':''}">
+          <div class="lr-icon" style="color:${i<=info.index?'var(--gold-bright)':'var(--ink-faint)'}"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div>
+          <div class="lr-title">${r.name}</div>
+          ${i===info.index?'<span class="badge badge-gold" style="margin-left:auto;">Current</span>':''}
+        </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+function categoryXp(cat){
+  // rough proportional split for display purposes, deterministic from real activity counts
+  const counts = {
+    health: state.health.exerciseLog.length*12 + state.health.sleepLog.length*5 + state.diet.meals.length*6,
+    finance: state.finance.transactions.length*5,
+    discipline: Object.values(state.taskCompletions).reduce((s,arr)=>s+arr.length,0)*2,
+    knowledge: state.study.sessions.length*20,
+    faith: state.faithLog.length*8,
+  };
+  return counts[cat]||0;
+}
+
+/* ============================================================
+   MILESTONES CENTER
+   ============================================================ */
+VIEW_RENDERERS.milestones = function(){
+  const view = document.getElementById('view-milestones');
+  const events = buildMilestoneTimeline();
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Milestones</h1><div class="vh-sub">Your whole journey, in one timeline.</div></div></div>
+    <div class="glass panel">
+      <div class="today-rail">${events.length ? events.map(ev=>`
+        <div class="rail-item done"><div class="rail-card">
+          <span class="rc-time">${ev.date}</span>
+          <div style="flex:1;"><div class="rc-title">${escapeHtml(ev.title)}</div><div class="rc-sub">${escapeHtml(ev.sub)}</div></div>
+          <span class="rc-tag badge badge-gold">${ev.type}</span>
+        </div></div>
+      `).join('') : emptyState('Your timeline starts now','Complete tasks, hit streaks and reach goals to fill this in.')}</div>
+    </div>
+  `;
+};
+function buildMilestoneTimeline(){
+  const events = [];
+  if(state.createdAt) events.push({date:new Date(state.createdAt).toLocaleDateString(), title:'Joined MAAR LIFE', sub:'System activated', type:'Start'});
+  state.goals.forEach(g=> events.push({date:new Date(g.createdAt).toLocaleDateString(), title:`Goal set: ${g.text}`, sub:g.category, type:'Goal'}));
+  state.achievements.forEach(a=> events.push({date:'—', title:'Achievement unlocked', sub:a.replace(/_/g,' '), type:'Achievement'}));
+  const info = getRankInfo(state.xp);
+  events.push({date:'Current', title:`Reached ${info.rank.name}`, sub:`${state.xp} total XP`, type:'Rank'});
+  return events.reverse();
+}
+
+/* ============================================================
+   REPORTS CENTER
+   ============================================================ */
+VIEW_RENDERERS.reports = function(){
+  const view = document.getElementById('view-reports');
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Reports</h1><div class="vh-sub">A snapshot of your progress, ready to download.</div></div></div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Generate a progress report</h3></div>
+      <p style="color:var(--ink-dim); font-size:13.5px; margin-bottom:18px; line-height:1.6;">Includes your Life Score, rank, habits, finances, goals and achievements — exported as a text summary you can save or print.</p>
+      <button class="btn btn-primary" id="reportGenBtn">Download report</button>
+    </div>
+    <div class="glass panel" id="reportPreviewWrap" style="display:none;">
+      <div class="section-title-row"><h3>Preview</h3></div>
+      <pre id="reportPreview" style="white-space:pre-wrap; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim); line-height:1.7;"></pre>
+    </div>
+  `;
+  document.getElementById('reportGenBtn').addEventListener('click', generateReport);
+};
+function generateReport(){
+  const {overall, domains} = computeLifeScore();
+  const info = getRankInfo(state.xp);
+  const lines = [];
+  lines.push('MAAR LIFE — PROGRESS REPORT');
+  lines.push('Generated: '+new Date().toLocaleString());
+  lines.push('='.repeat(40));
+  lines.push(`Name: ${state.profile.name||'—'}`);
+  lines.push(`Life Score: ${overall}/100`);
+  Object.entries(domains).forEach(([k,v])=> lines.push(`  ${DOMAIN_META[k].label}: ${Math.round(v)}/100`));
+  lines.push(`Rank: ${info.rank.name} (${state.xp} XP total)`);
+  lines.push('');
+  lines.push('GOALS');
+  state.goals.forEach(g=> lines.push(`  - ${g.text} [${g.category}]`));
+  lines.push('');
+  lines.push('HABITS');
+  state.habitsTracking.forEach(h=> lines.push(`  - ${h.name}: ${currentStreak(h.log||[])} day streak`));
+  lines.push('');
+  const {income,expense,net} = finTotals();
+  lines.push('FINANCE');
+  lines.push(`  Income: ${fmtMoney(income)}  Expenses: ${fmtMoney(expense)}  Net: ${fmtMoney(net)}`);
+  lines.push('');
+  lines.push('ACHIEVEMENTS');
+  state.achievements.forEach(a=> lines.push(`  - ${a.replace(/_/g,' ')}`));
+  const text = lines.join('\n');
+  document.getElementById('reportPreviewWrap').style.display='block';
+  document.getElementById('reportPreview').textContent = text;
+  const blob = new Blob([text], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `MAAR-LIFE-report-${todayKey()}.txt`;
+  document.body.appendChild(a); a.click(); a.remove();
+  showToast('Report downloaded');
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+VIEW_RENDERERS.settings = function(){
+  const view = document.getElementById('view-settings');
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Settings</h1><div class="vh-sub">Manage your profile and data.</div></div></div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Profile</h3></div>
+      <div class="field"><label>Name</label><input type="text" id="sName" value="${escapeHtml(state.profile.name)}"></div>
+      <div class="field-row">
+        <div class="field"><label>Age</label><input type="number" id="sAge" value="${state.profile.age}"></div>
+        <div class="field"><label>Country</label><input type="text" id="sCountry" value="${escapeHtml(state.profile.country)}"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="sSaveBtn">Save changes</button>
+    </div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Faith practice</h3></div>
+      <div class="religion-grid" id="sReligionGrid"></div>
+    </div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Install</h3></div>
+      <p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">Install MAAR LIFE on your phone or desktop for offline access, like a native app.</p>
+      <button class="btn btn-gold btn-sm hidden" id="sInstallBtn">Install MAAR LIFE</button>
+    </div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3>Data</h3></div>
+      <p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device. Nothing is sent anywhere.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" id="sExportBtn">Export data (JSON)</button>
+        <button class="btn btn-ghost btn-sm" id="sResetBtn" style="color:var(--danger);">Reset all data</button>
+      </div>
+    </div>
+  `;
+  const grid = document.getElementById('sReligionGrid');
+  grid.innerHTML = RELIGIONS.map(r=>`<div class="religion-card ${state.religion===r.id?'selected':''}" data-rel="${r.id}">${r.name}</div>`).join('');
+  grid.querySelectorAll('.religion-card').forEach(card=> card.addEventListener('click', ()=>{
+    state.religion = card.dataset.rel; saveState(); showToast('Updated'); VIEW_RENDERERS.settings();
+  }));
+  document.getElementById('sSaveBtn').addEventListener('click', ()=>{
+    state.profile.name = document.getElementById('sName').value.trim();
+    state.profile.age = document.getElementById('sAge').value;
+    state.profile.country = document.getElementById('sCountry').value;
+    saveState(); renderSidebarProfile(); showToast('Profile updated');
+  });
+  document.getElementById('sExportBtn').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'maarlife-data.json';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+  document.getElementById('sResetBtn').addEventListener('click', ()=>{
+    if(confirm('This will permanently delete all your MAAR LIFE data on this device. Continue?')){
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+  });
+  const installBtn = document.getElementById('sInstallBtn');
+  if(_deferredInstallPrompt) installBtn.classList.remove('hidden');
+  installBtn.addEventListener('click', async ()=>{
+    if(!_deferredInstallPrompt){ showToast('Your browser will show an install option in its menu.'); return; }
+    _deferredInstallPrompt.prompt();
+    await _deferredInstallPrompt.userChoice;
+    _deferredInstallPrompt = null;
+    installBtn.classList.add('hidden');
+  });
+};
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
