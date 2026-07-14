@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -380,7 +381,7 @@ svg.icon{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1
 /* ============================================================
    APP SHELL (post-onboarding)
    ============================================================ */
-.appshell{display:flex; min-height:100vh; position:relative; z-index:1;}
+.appshell{display:flex; min-height:100vh; position:relative;}
 
 .sidebar{
   width:240px; flex-shrink:0; border-right:1px solid var(--card-border);
@@ -588,6 +589,7 @@ svg.icon{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1
 .modal-backdrop.open{opacity:1; pointer-events:auto;}
 .modal-box{background:var(--card); border:1px solid var(--card-border); border-radius:22px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; padding:28px; transform:translateY(20px) scale(0.97); transition:transform 0.25s var(--ease); box-shadow:0 30px 80px rgba(0,0,0,0.6);}
 .modal-backdrop.open .modal-box{transform:translateY(0) scale(1);}
+.modal-box.modal-wide{max-width:760px;}
 .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
 .modal-head h3{font-size:18px;}
 .modal-close{width:32px; height:32px; border-radius:10px; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; color:var(--ink-dim); border:none;}
@@ -648,8 +650,61 @@ svg.icon{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1
   position:fixed; z-index:300; font-family:var(--font-mono); font-weight:700; color:var(--gold-bright); font-size:14px;
   pointer-events:none; animation:xpFloat 1.1s var(--ease) forwards;
 }
-.xp-float.xp-float-neg{color:var(--danger);}
 @keyframes xpFloat{0%{opacity:0; transform:translateY(0) scale(0.8);} 15%{opacity:1; transform:translateY(-8px) scale(1.1);} 100%{opacity:0; transform:translateY(-50px) scale(1);}}
+
+/* ============================================================
+   CALENDAR / TIMETABLE UPGRADE
+   ============================================================ */
+.cal-toolbar{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:18px;}
+.cal-toolbar-left{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.cal-nav-group{display:flex; align-items:center; gap:6px;}
+.cal-range-label{font-weight:700; font-size:14.5px; min-width:150px;}
+.cal-view-switch{display:flex; gap:4px; padding:4px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px;}
+.cal-view-switch button{padding:7px 14px; border-radius:7px; font-size:12.5px; font-weight:600; color:var(--ink-faint);}
+.cal-view-switch button.active{background:var(--emerald); color:#06140F;}
+
+.cal-grid-wrap{overflow-x:auto;}
+.cal-week-grid{display:grid; grid-template-columns:56px repeat(7,minmax(120px,1fr)); min-width:900px;}
+.cal-week-head{display:grid; grid-template-columns:56px repeat(7,minmax(120px,1fr)); min-width:900px; position:sticky; top:0; background:var(--card); z-index:5;}
+.cal-week-head-cell{padding:10px 6px; text-align:center; border-bottom:1px solid var(--card-border); border-left:1px solid var(--card-border);}
+.cal-week-head-cell:first-child{border-left:none;}
+.cal-week-head-cell .whd-dow{font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.04em;}
+.cal-week-head-cell .whd-date{font-family:var(--font-display); font-size:17px; font-weight:600; margin-top:2px;}
+.cal-week-head-cell.is-today .whd-date{color:var(--emerald-bright);}
+.cal-hour-col{border-right:1px solid var(--card-border);}
+.cal-hour-label{height:52px; font-size:10px; color:var(--ink-faint); font-family:var(--font-mono); text-align:right; padding-right:6px; transform:translateY(-6px);}
+.cal-day-col{position:relative; border-left:1px solid var(--card-border); background-image:repeating-linear-gradient(to bottom, rgba(255,255,255,0.035) 0, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 52px);}
+.cal-day-col.is-today{background-color:rgba(22,201,141,0.03);}
+.cal-event-block{
+  position:absolute; border-radius:8px; padding:5px 7px; overflow:hidden; cursor:pointer;
+  border:1px solid rgba(255,255,255,0.12); box-shadow:0 2px 8px rgba(0,0,0,0.3);
+  transition:filter 0.15s;
+}
+.cal-event-block:hover{filter:brightness(1.15);}
+.cal-event-block .ce-title{font-size:11.5px; font-weight:700; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.cal-event-block .ce-time{font-size:9.5px; opacity:0.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.cal-now-line{position:absolute; left:0; right:0; height:2px; background:var(--gold-bright); z-index:4; box-shadow:0 0 6px var(--gold-bright);}
+.cal-now-line::before{content:''; position:absolute; left:-4px; top:-3px; width:8px; height:8px; border-radius:50%; background:var(--gold-bright);}
+
+.day-list-view .dl-day{margin-bottom:22px;}
+.day-list-view .dl-day-title{font-size:13px; font-weight:700; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px;}
+
+.color-swatch-grid{display:flex; flex-wrap:wrap; gap:8px;}
+.color-swatch{width:30px; height:30px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:transform 0.15s;}
+.color-swatch:hover{transform:scale(1.1);}
+.color-swatch.selected{border-color:#fff; box-shadow:0 0 0 2px var(--void), 0 0 0 4px currentColor;}
+
+.repeat-days-grid{display:flex; gap:6px; flex-wrap:wrap;}
+.rd-chip{width:42px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); color:var(--ink-dim);}
+.rd-chip.selected{background:var(--emerald-dim); border-color:var(--emerald); color:var(--emerald-bright);}
+
+.import-preview-row{display:flex; align-items:flex-start; gap:12px; padding:12px; border-radius:12px; border:1px solid var(--card-border); margin-bottom:8px; background:rgba(255,255,255,0.02);}
+.import-preview-row input[type=checkbox]{margin-top:3px; width:16px; height:16px; accent-color:var(--emerald);}
+.import-preview-row .ipr-title{font-weight:600; font-size:13.5px;}
+.import-preview-row .ipr-sub{font-size:11.5px; color:var(--ink-faint); margin-top:2px; line-height:1.5;}
+.import-preview-row.duplicate{opacity:0.5;}
+
+.event-list-mini{max-height:340px; overflow-y:auto;}
 </style>
 </head>
 <body>
@@ -1039,12 +1094,10 @@ svg.icon{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1
 <div id="toast-root" aria-live="polite"></div>
 <script>
 window.ML = window.ML || {};
-
 /* ============================================================
    CONSTANTS & SEED DATA
    ============================================================ */
 const STORAGE_KEY = 'maarlife_state_v1';
-const TASK_COMPLETE_XP = 8; // XP awarded when a to-do item is checked off, and refunded when it's unchecked
 
 const DOMAIN_META = {
   health:    {label:'Health',     color:'#3FE8AC'},
@@ -1093,6 +1146,8 @@ const RANKS = (() => {
   return out;
 })();
 
+const TASK_COMPLETE_XP = 8;
+
 const QUOTES = [
   {q:"Discipline is choosing between what you want now and what you want most.", a:"Abraham Lincoln"},
   {q:"You do not rise to the level of your goals. You fall to the level of your systems.", a:"James Clear"},
@@ -1112,12 +1167,22 @@ const QUOTES = [
 
 const TT_CATEGORIES = ['School','Work','Study','Exercise','Sleep','Faith','Meals','Hobby','Personal','Other'];
 const TT_COLORS = {School:'#5B9EE8',Work:'#C9A24B',Study:'#9B8CF2',Exercise:'#E2654F',Sleep:'#6E6F66',Faith:'#E3C475',Meals:'#3FE8AC',Hobby:'#16C98D',Personal:'#A7A89E',Other:'#A7A89E'};
+const EVENT_COLOR_PALETTE = ['#16C98D','#3FE8AC','#5B9EE8','#C9A24B','#E3C475','#E2654F','#9B8CF2','#6E6F66','#A7A89E'];
+const REPEAT_OPTIONS = [
+  {value:'none', label:'Does not repeat'},
+  {value:'daily', label:'Every day'},
+  {value:'weekday', label:'Every weekday (Mon–Fri)'},
+  {value:'weekly', label:'Every week'},
+  {value:'monthly', label:'Every month'},
+  {value:'custom', label:'Custom…'},
+];
+const DOW_SHORT = ['S','M','T','W','T','F','S'];
 
 const DEFAULT_STATE = () => ({
   onboarded:false,
   onboardStep:0,
   profile:{name:'',age:'',country:'',occupation:'',education:'',income:''},
-  timetable:{has:null, mode:null, blocks:[]},
+  timetable:{has:null, mode:null, blocks:[], events:[], migrated:false},
   religion:null,
   assessment:{},
   habitsToImprove:[],
@@ -1146,7 +1211,9 @@ function loadState(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw){
       const parsed = JSON.parse(raw);
-      return Object.assign(DEFAULT_STATE(), parsed);
+      const merged = Object.assign(DEFAULT_STATE(), parsed);
+      merged.timetable = Object.assign({has:null, mode:null, blocks:[], events:[], migrated:false}, parsed.timetable||{});
+      return merged;
     }
   }catch(e){ console.warn('Could not load state', e); }
   return DEFAULT_STATE();
@@ -1158,7 +1225,12 @@ function saveState(){
 
 /* ---------- Utility helpers ---------- */
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
-function todayKey(d=new Date()){ return d.toISOString().slice(0,10); }
+function todayKey(d=new Date()){
+  // Local date key (Europe/London aware because we use the browser's local
+  // timezone consistently everywhere instead of mixing UTC and local time).
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 function fmtDate(d){ return d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'}); }
 function fmtMoney(n, currency=''){
   const v = Number(n)||0;
@@ -1172,11 +1244,67 @@ function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+/* ---------- Date/time helpers (UK format, 12-hour clock, local-time-safe) ---------- */
+function parseLocalDate(dateStr){
+  // 'YYYY-MM-DD' -> local Date at midnight, avoiding UTC-shift bugs that
+  // cause dates to jump a day around BST/GMT changes.
+  if(!dateStr) return null;
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function fmtDateUK(dateStr){
+  if(!dateStr) return '';
+  const d = parseLocalDate(dateStr);
+  if(!d || isNaN(d.getTime())) return '';
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+function fmtDateUKLong(dateStr){
+  const d = parseLocalDate(dateStr);
+  if(!d) return '';
+  return d.toLocaleDateString('en-GB',{weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+}
+function minutesFromTime(hhmm){
+  if(!hhmm) return 0;
+  const [h,m] = hhmm.split(':').map(Number);
+  return h*60+(m||0);
+}
+function timeFromMinutes(min){
+  min = ((min%1440)+1440)%1440;
+  const h = Math.floor(min/60), m = min%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+function fmtTimeAMPM(hhmm){
+  if(!hhmm) return '';
+  let [h,m] = hhmm.split(':').map(Number);
+  const ampm = h>=12 ? 'PM' : 'AM';
+  h = h%12; if(h===0) h=12;
+  return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+function addDaysStr(dateStr, n){
+  const d = parseLocalDate(dateStr);
+  d.setDate(d.getDate()+n);
+  return todayKey(d);
+}
+function compareDates(a,b){ return a<b?-1:a>b?1:0; }
+function mondayOf(dateStr){
+  const d = parseLocalDate(dateStr);
+  const dow = d.getDay(); // 0=Sun
+  const diff = dow===0 ? -6 : 1-dow;
+  d.setDate(d.getDate()+diff);
+  return todayKey(d);
+}
+function weekDates(mondayStr){
+  const out=[]; for(let i=0;i<7;i++) out.push(addDaysStr(mondayStr,i)); return out;
+}
+
 function showToast(msg, opts={}){
   let root = document.getElementById('toast-root');
   const el = document.createElement('div');
   el.className = 'toast';
-  el.innerHTML = `<span class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg></span><span>${escapeHtml(msg)}</span>`;
+  el.innerHTML = `<span class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg></span><span></span>`;
+  el.querySelector('span:last-child').textContent = msg; // safe: text, not HTML
   root.appendChild(el);
   requestAnimationFrame(()=> el.classList.add('show'));
   setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=> el.remove(), 350); }, 2600);
@@ -1184,8 +1312,8 @@ function showToast(msg, opts={}){
 
 function floatXp(amount, x, y){
   const el = document.createElement('div');
-  el.className = 'xp-float' + (amount<0 ? ' xp-float-neg' : '');
-  el.textContent = `${amount>=0?'+':''}${amount} XP`;
+  el.className = 'xp-float';
+  el.textContent = `+${amount} XP`;
   el.style.left = (x||window.innerWidth/2) + 'px';
   el.style.top = (y||window.innerHeight/2) + 'px';
   document.body.appendChild(el);
@@ -1193,7 +1321,7 @@ function floatXp(amount, x, y){
 }
 
 function addXp(amount, evt){
-  state.xp = Math.max(0, state.xp + amount);
+  state.xp += amount;
   saveState();
   let x = window.innerWidth/2, y = 100;
   if(evt && evt.clientX){ x = evt.clientX; y = evt.clientY; }
@@ -1304,6 +1432,7 @@ function showScreen(name){
 function boot(){
   setupPwa();
   setupInstallPrompt();
+  migrateLegacyTimetable();
   renderHeroDomains();
   const resumeLink = document.getElementById('resumeLink');
   if(state.onboardStep > 0 && !state.onboarded){
@@ -1332,7 +1461,7 @@ function boot(){
 function renderHeroDomains(){
   const items = [
     ['Health','M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z'],
-    ['Finance','M2 10h20M7 15h.01M2 6h20v13H2z'],
+    ['Finance','M2 10h20M7 15h.01'],
     ['Faith','M12 2v20M5 9l7-7 7 7M5 14h14'],
     ['Learning','M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'],
     ['Discipline','M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],
@@ -1543,16 +1672,24 @@ function onWizardNext(){
   window.scrollTo(0,0);
 }
 
-/* ---------- PDF / ICS import (lightweight parse, no backend) ---------- */
+/* ---------- PDF / ICS import (onboarding, lightweight) ---------- */
 function handlePdfUpload(e){
   const file = e.target.files[0];
   if(!file) return;
   state.timetable.importedFileName = file.name;
   state.timetable.importType = 'pdf';
   saveState();
-  document.getElementById('pdfUploadStatus').innerHTML = `<div class="upload-status"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> "${escapeHtml(file.name)}" saved. You can review and adjust your timetable any time from the Timetable section.</div>`;
-  // Seed a sensible default timetable so the app isn't empty even though we can't parse PDF content client-side reliably
-  if(state.timetable.blocks.length === 0) seedDefaultTimetable();
+  document.getElementById('pdfUploadStatus').innerHTML = '';
+  const statusEl = document.getElementById('pdfUploadStatus');
+  const row = document.createElement('div');
+  row.className = 'upload-status';
+  row.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> `;
+  const span = document.createElement('span');
+  span.textContent = `"${file.name}" saved. Use "Import PDF timetable" from the Timetable page after setup to extract and review its contents.`;
+  row.appendChild(span);
+  statusEl.appendChild(row);
+  // Seed a sensible default timetable so the app isn't empty even though we can't reliably parse PDF content client-side
+  if(state.timetable.events.length === 0 && state.timetable.blocks.length===0) seedDefaultTimetable();
 }
 
 function handleIcsUpload(e){
@@ -1561,13 +1698,24 @@ function handleIcsUpload(e){
   const reader = new FileReader();
   reader.onload = (ev) => {
     try{
-      const events = parseIcs(ev.target.result);
-      if(events.length){
-        state.timetable.blocks = events;
+      const parsed = parseIcsAdvanced(ev.target.result);
+      if(parsed.length){
+        parsed.forEach(p=>{
+          const existing = state.timetable.events.find(ex=>ex.uid && p.uid && ex.uid===p.uid);
+          if(!existing) state.timetable.events.push(icsParsedToEvent(p));
+        });
         state.timetable.importType = 'ics';
         state.timetable.importedFileName = file.name;
         saveState();
-        document.getElementById('icsUploadStatus').innerHTML = `<div class="upload-status"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> Imported ${events.length} events from "${escapeHtml(file.name)}".</div>`;
+        const statusEl = document.getElementById('icsUploadStatus');
+        statusEl.innerHTML = '';
+        const row = document.createElement('div');
+        row.className = 'upload-status';
+        row.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> `;
+        const span = document.createElement('span');
+        span.textContent = `Imported ${parsed.length} event(s) from "${file.name}".`;
+        row.appendChild(span);
+        statusEl.appendChild(row);
       } else {
         document.getElementById('icsUploadStatus').innerHTML = `<div class="upload-status" style="background:var(--danger-dim); color:var(--danger);">No recognisable events found in that file.</div>`;
       }
@@ -1578,50 +1726,258 @@ function handleIcsUpload(e){
   reader.readAsText(file);
 }
 
-function parseIcs(text){
-  const events = [];
-  const blocks = text.split('BEGIN:VEVENT').slice(1);
-  blocks.forEach(b=>{
-    const summaryMatch = b.match(/SUMMARY:(.*)/);
-    const dtStartMatch = b.match(/DTSTART[^:]*:(\d{8}T?\d{0,6})/);
-    const dtEndMatch = b.match(/DTEND[^:]*:(\d{8}T?\d{0,6})/);
-    if(summaryMatch && dtStartMatch){
-      const start = parseIcsDate(dtStartMatch[1]);
-      const end = dtEndMatch ? parseIcsDate(dtEndMatch[1]) : null;
-      events.push({
-        id:uid(),
-        title:summaryMatch[1].trim().slice(0,60),
-        day: start ? DOW_NAMES[start.getDay()] : 'Mon',
-        start: start ? `${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}` : '09:00',
-        end: end ? `${String(end.getHours()).padStart(2,'0')}:${String(end.getMinutes()).padStart(2,'0')}` : '10:00',
-        category:'Other'
-      });
-    }
-  });
-  return events.slice(0,80);
-}
-function parseIcsDate(raw){
-  if(!raw) return null;
-  const y=raw.slice(0,4), m=raw.slice(4,6), d=raw.slice(6,8);
-  let hh='09', mm='00';
-  if(raw.includes('T')){
-    const t = raw.split('T')[1];
-    hh = t.slice(0,2); mm = t.slice(2,4);
-  }
-  const dt = new Date(`${y}-${m}-${d}T${hh}:${mm}:00`);
-  return isNaN(dt.getTime()) ? null : dt;
+/* ============================================================
+   RECURRING EVENT ENGINE
+   ============================================================
+   Event shape:
+   {
+     id, uid(optional, for ICS de-duplication), title, description,
+     category, color, startDate('YYYY-MM-DD'), endDate('YYYY-MM-DD'|null),
+     startTime('HH:MM' 24h), endTime('HH:MM' 24h),
+     recurrence: { type:'none'|'daily'|'weekday'|'weekly'|'monthly'|'custom', days:[0-6] },
+     exceptions: ['YYYY-MM-DD', ...]
+   }
+   Occurrences are calculated on demand from this compact rule instead of
+   storing one row per day, so a "Does not repeat" college class over a full
+   academic year is still just one saved record.
+*/
+function newEmptyEvent(){
+  return {
+    id: uid(), uid:null, title:'', description:'',
+    category:'Other', color: TT_COLORS.Other,
+    startDate: todayKey(), endDate: todayKey(),
+    startTime:'09:00', endTime:'10:00',
+    recurrence:{type:'none', days:[]},
+    exceptions:[],
+  };
 }
 
-/* ---------- Timetable builder ---------- */
-function seedDefaultTimetable(){
-  state.timetable.blocks = [
-    {id:uid(), title:'Sleep', day:'Mon', start:'23:00', end:'07:00', category:'Sleep'},
-    {id:uid(), title:'Morning routine', day:'Mon', start:'07:00', end:'08:00', category:'Personal'},
-    {id:uid(), title:'Work / School', day:'Mon', start:'09:00', end:'17:00', category:'Work'},
-    {id:uid(), title:'Exercise', day:'Mon', start:'18:00', end:'19:00', category:'Exercise'},
-    {id:uid(), title:'Dinner', day:'Mon', start:'19:30', end:'20:00', category:'Meals'},
-  ];
+function eventOccursOnDate(ev, dateStr){
+  if(!ev.startDate) return false;
+  if(dateStr < ev.startDate) return false;
+  if(ev.endDate && dateStr > ev.endDate) return false;
+  if(ev.exceptions && ev.exceptions.includes(dateStr)) return false;
+  const d = parseLocalDate(dateStr);
+  const dow = d.getDay();
+  const startD = parseLocalDate(ev.startDate);
+  const type = ev.recurrence?.type || 'none';
+  switch(type){
+    case 'none': return dateStr === ev.startDate;
+    case 'daily': return true;
+    case 'weekday': return dow>=1 && dow<=5;
+    case 'weekly': return dow === startD.getDay();
+    case 'monthly': return d.getDate() === startD.getDate();
+    case 'custom': return (ev.recurrence.days||[]).includes(dow);
+    default: return false;
+  }
 }
+
+function getOccurrencesForDate(dateStr){
+  return state.timetable.events
+    .filter(ev=> eventOccursOnDate(ev, dateStr))
+    .map(ev=>({ev, date:dateStr}))
+    .sort((a,b)=> minutesFromTime(a.ev.startTime)-minutesFromTime(b.ev.startTime));
+}
+
+function getOccurrencesForRange(startStr, endStr){
+  const out = {};
+  let d = startStr;
+  let guard = 0;
+  while(d <= endStr && guard < 400){
+    out[d] = getOccurrencesForDate(d);
+    d = addDaysStr(d,1);
+    guard++;
+  }
+  return out;
+}
+
+/* ---------- Legacy block -> event migration (keeps old data working) ---------- */
+function migrateLegacyTimetable(){
+  if(state.timetable.migrated) return;
+  const blocks = state.timetable.blocks || [];
+  if(blocks.length){
+    blocks.forEach(b=>{
+      if(!b.day || !b.start || !b.end) return;
+      const dow = DOW_NAMES.indexOf(b.day);
+      if(dow < 0) return;
+      // Find/adjust a start date this week matching that weekday, then
+      // recur weekly on that day indefinitely — preserves old behaviour.
+      const base = mondayOf(todayKey());
+      const eventDate = addDaysStr(base, dow===0?6:dow-1);
+      state.timetable.events.push({
+        id: uid(), uid:null,
+        title: b.title || b.category || 'Untitled',
+        description:'',
+        category: b.category || 'Other',
+        color: TT_COLORS[b.category] || TT_COLORS.Other,
+        startDate: eventDate, endDate: null,
+        startTime: b.start, endTime: b.end,
+        recurrence:{type:'weekly', days:[]},
+        exceptions:[],
+      });
+    });
+  }
+  state.timetable.migrated = true;
+  saveState();
+}
+
+function seedDefaultTimetable(){
+  const base = mondayOf(todayKey());
+  const seedBlocks = [
+    {title:'Sleep', dow:1, start:'23:00', end:'23:59', category:'Sleep'},
+    {title:'Morning routine', dow:1, start:'07:00', end:'08:00', category:'Personal'},
+    {title:'Work / School', dow:1, start:'09:00', end:'17:00', category:'Work'},
+    {title:'Exercise', dow:1, start:'18:00', end:'19:00', category:'Exercise'},
+    {title:'Dinner', dow:1, start:'19:30', end:'20:00', category:'Meals'},
+  ];
+  seedBlocks.forEach(b=>{
+    state.timetable.events.push({
+      id:uid(), uid:null, title:b.title, description:'',
+      category:b.category, color:TT_COLORS[b.category]||TT_COLORS.Other,
+      startDate:base, endDate:null, startTime:b.start, endTime:b.end,
+      recurrence:{type:'weekly', days:[]}, exceptions:[],
+    });
+  });
+  saveState();
+}
+
+/* ---------- ICS parsing (advanced: RRULE, EXDATE, DESCRIPTION, UID) ---------- */
+function unfoldIcs(text){
+  // ICS lines can be folded with a leading space/tab on the continuation line.
+  return text.replace(/\r\n/g,'\n').split('\n').reduce((lines, line)=>{
+    if((line.startsWith(' ') || line.startsWith('\t')) && lines.length){
+      lines[lines.length-1] += line.slice(1);
+    } else {
+      lines.push(line);
+    }
+    return lines;
+  }, []);
+}
+function icsUnescape(str){
+  return (str||'').replace(/\\n/gi,'\n').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\\\/g,'\\');
+}
+function parseIcsDateVal(raw){
+  // raw like 20260901T090000Z or 20260901T090000 or 20260901
+  if(!raw) return null;
+  const isUtc = /Z$/.test(raw);
+  const y=raw.slice(0,4), mo=raw.slice(4,6), da=raw.slice(6,8);
+  let hh='00', mi='00';
+  const allDay = !raw.includes('T');
+  if(!allDay){
+    const t = raw.split('T')[1];
+    hh = t.slice(0,2); mi = t.slice(2,4);
+  }
+  let dt;
+  if(isUtc){
+    dt = new Date(Date.UTC(+y, +mo-1, +da, +hh, +mi));
+  } else {
+    dt = new Date(+y, +mo-1, +da, +hh, +mi);
+  }
+  if(isNaN(dt.getTime())) return null;
+  return {date: todayKey(dt), time: allDay ? null : `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`, allDay};
+}
+const ICS_BYDAY_MAP = {SU:0, MO:1, TU:2, WE:3, TH:4, FR:5, SA:6};
+function parseRRule(rruleStr, startDateStr){
+  // Returns {recurrence, endDate}
+  const parts = {};
+  rruleStr.split(';').forEach(p=>{
+    const [k,v] = p.split('=');
+    if(k) parts[k.toUpperCase()] = v;
+  });
+  const freq = (parts.FREQ||'').toUpperCase();
+  let endDate = null;
+  if(parts.UNTIL){
+    const parsed = parseIcsDateVal(parts.UNTIL);
+    if(parsed) endDate = parsed.date;
+  } else if(parts.COUNT){
+    // Approximate: extend a reasonable window forward since we don't store
+    // per-occurrence counts; this keeps the event visible without unbounded growth.
+    const n = parseInt(parts.COUNT)||10;
+    const stepDays = freq==='DAILY'?1:freq==='WEEKLY'?7:freq==='MONTHLY'?30:7;
+    endDate = addDaysStr(startDateStr, n*stepDays);
+  }
+  let recurrence = {type:'none', days:[]};
+  if(freq==='DAILY') recurrence = {type:'daily', days:[]};
+  else if(freq==='WEEKLY'){
+    if(parts.BYDAY){
+      const days = parts.BYDAY.split(',').map(code=>ICS_BYDAY_MAP[code]).filter(x=>x!==undefined);
+      if(days.length===5 && [1,2,3,4,5].every(d=>days.includes(d))) recurrence = {type:'weekday', days:[]};
+      else recurrence = {type:'custom', days};
+    } else {
+      recurrence = {type:'weekly', days:[]};
+    }
+  }
+  else if(freq==='MONTHLY') recurrence = {type:'monthly', days:[]};
+  return {recurrence, endDate};
+}
+function parseIcsAdvanced(text){
+  const lines = unfoldIcs(text);
+  const events = [];
+  let cur = null;
+  lines.forEach(line=>{
+    if(line.startsWith('BEGIN:VEVENT')){ cur = {}; return; }
+    if(line.startsWith('END:VEVENT')){ if(cur) events.push(cur); cur=null; return; }
+    if(!cur) return;
+    const idx = line.indexOf(':');
+    if(idx<0) return;
+    let key = line.slice(0,idx);
+    const value = line.slice(idx+1);
+    const baseKey = key.split(';')[0].toUpperCase();
+    if(baseKey==='SUMMARY') cur.summary = icsUnescape(value);
+    else if(baseKey==='DESCRIPTION') cur.description = icsUnescape(value);
+    else if(baseKey==='DTSTART') cur.dtstart = value;
+    else if(baseKey==='DTEND') cur.dtend = value;
+    else if(baseKey==='RRULE') cur.rrule = value;
+    else if(baseKey==='EXDATE') { cur.exdate = cur.exdate||[]; cur.exdate.push(value); }
+    else if(baseKey==='UID') cur.uid = value;
+  });
+
+  return events.map(ev=>{
+    if(!ev.summary || !ev.dtstart) return null;
+    const start = parseIcsDateVal(ev.dtstart);
+    if(!start) return null;
+    const end = ev.dtend ? parseIcsDateVal(ev.dtend) : null;
+    let startTime = start.allDay ? '00:00' : start.time;
+    let endTime = end && !end.allDay ? end.time : (start.allDay ? '23:59' : timeFromMinutes(minutesFromTime(startTime)+60));
+    let recurrence = {type:'none', days:[]};
+    let endDate = start.date; // single occurrence unless RRULE present
+    if(ev.rrule){
+      const parsedR = parseRRule(ev.rrule, start.date);
+      recurrence = parsedR.recurrence;
+      endDate = parsedR.endDate; // may be null (indefinite)
+    }
+    const exceptions = [];
+    (ev.exdate||[]).forEach(exRaw=>{
+      exRaw.split(',').forEach(single=>{
+        const p = parseIcsDateVal(single.trim());
+        if(p) exceptions.push(p.date);
+      });
+    });
+    return {
+      uid: ev.uid || null,
+      title: ev.summary.slice(0,120),
+      description: (ev.description||'').slice(0,400),
+      startDate: start.date,
+      endDate,
+      startTime, endTime,
+      recurrence,
+      exceptions,
+      allDay: !!start.allDay,
+    };
+  }).filter(Boolean);
+}
+function icsParsedToEvent(p){
+  return {
+    id: uid(), uid: p.uid || null,
+    title: p.title, description: p.description||'',
+    category:'Other', color: TT_COLORS.Other,
+    startDate: p.startDate, endDate: p.endDate,
+    startTime: p.startTime, endTime: p.endTime,
+    recurrence: p.recurrence, exceptions: p.exceptions||[],
+  };
+}
+
+/* ---------- Timetable builder (onboarding, simple weekly blocks) ---------- */
 function addTtRow(prefill){
   const row = prefill || {id:uid(), title:'', day:'Mon', start:'09:00', end:'10:00', category:'Work'};
   state.timetable.blocks.push(row);
@@ -1630,7 +1986,7 @@ function addTtRow(prefill){
 }
 function renderTtBuilder(){
   const wrap = document.getElementById('ttBuilderRows');
-  if(state.timetable.blocks.length === 0) addTtRow({id:uid(), title:'Sleep', day:'Mon', start:'23:00', end:'07:00', category:'Sleep'});
+  if(state.timetable.blocks.length === 0) addTtRow({id:uid(), title:'Sleep', day:'Mon', start:'23:00', end:'23:59', category:'Sleep'});
   wrap.innerHTML = state.timetable.blocks.map(b=>`
     <div class="tt-row" data-id="${b.id}">
       <select class="tt-day">${DOW_NAMES.map(d=>`<option ${b.day===d?'selected':''}>${d}</option>`).join('')}</select>
@@ -1796,9 +2152,10 @@ function renderWizardSummary(){
   document.getElementById('summaryName').textContent = state.profile.name || 'friend';
   const rel = RELIGIONS.find(r=>r.id===state.religion);
   const grid = document.getElementById('summaryGrid');
+  const eventCount = state.timetable.events.length + state.timetable.blocks.length;
   const items = [
     ['Name', state.profile.name || '—'],
-    ['Timetable', state.timetable.blocks.length ? `${state.timetable.blocks.length} blocks set` : 'Not yet set up'],
+    ['Timetable', eventCount ? `${eventCount} item(s) set` : 'Not yet set up'],
     ['Faith practice', rel && rel.id!=='none' ? rel.name : 'Not set'],
     ['Habits to improve', state.habitsToImprove.length ? state.habitsToImprove.join(', ') : 'None selected'],
     ['Top focus areas', state.improveAreas.length ? state.improveAreas.join(', ') : 'General improvement'],
@@ -1810,8 +2167,8 @@ function renderWizardSummary(){
 function finishOnboarding(){
   state.onboarded = true;
   state.createdAt = state.createdAt || new Date().toISOString();
-  if(state.timetable.blocks.length === 0 && state.timetable.mode !== 'later') seedDefaultTimetable();
-  HABIT_OPTIONS.forEach(()=>{});
+  migrateLegacyTimetable();
+  if(state.timetable.events.length === 0 && state.timetable.mode !== 'later') seedDefaultTimetable();
   saveState();
   showToast('Welcome to MAAR LIFE — your system is live.');
   enterApp();
@@ -1982,35 +2339,37 @@ function lastNDays(n){
    ============================================================ */
 function generateTodayTasks(){
   const tasks = [];
-  const today = new Date();
-  const dow = DOW_NAMES[today.getDay()];
+  const today = todayKey();
 
-  // From timetable
-  state.timetable.blocks.filter(b=>b.day===dow).forEach(b=>{
-    tasks.push({id:'tt_'+b.id, type:'timetable', title:b.title||b.category, sub:`${b.start} – ${b.end}`, time:b.start, category:b.category});
+  // From the recurring timetable/calendar engine. A non-repeating event can be
+  // removed with one click; a repeating series needs scope-aware handling
+  // (This event only / future / entire series), so send those to the
+  // Timetable page instead of exposing a quick-delete here.
+  getOccurrencesForDate(today).forEach(({ev})=>{
+    tasks.push({id:'tt_'+ev.id, type:'timetable', title:ev.title||ev.category, sub:`${fmtTimeAMPM(ev.startTime)} – ${fmtTimeAMPM(ev.endTime)}`, time:ev.startTime, category:ev.category, deletable: (ev.recurrence?.type||'none')==='none'});
   });
 
   // From habits to improve (reduce) -> reframed as positive micro-actions
   state.habitsToImprove.forEach(h=>{
     if(/pornography/i.test(h)) return; // handled via recovery banner, not a daily task tick
-    tasks.push({id:'hab_'+slug(h), type:'habit', title:microActionFor(h), sub:'Habit focus', time:'', category:'Habit'});
+    tasks.push({id:'hab_'+slug(h), type:'habit', title:microActionFor(h), sub:'Habit focus', time:'', category:'Habit', deletable:true});
   });
 
   // From custom habit tracking list
   state.habitsTracking.forEach(h=>{
-    tasks.push({id:'track_'+h.id, type:'habit', title:h.name, sub:`Streak: ${currentStreak(h.log||[])} days`, time:'', category:'Habit'});
+    tasks.push({id:'track_'+h.id, type:'habit', title:h.name, sub:`Streak: ${currentStreak(h.log||[])} days`, time:'', category:'Habit', deletable:true});
   });
 
   // From goals
   state.goals.forEach(g=>{
-    tasks.push({id:'goal_'+g.id, type:'goal', title:g.dailyAction?.label || `Step toward: ${g.text}`, sub:g.text, time:'', category:g.category});
+    tasks.push({id:'goal_'+g.id, type:'goal', title:g.dailyAction?.label || `Step toward: ${g.text}`, sub:g.text, time:'', category:g.category, deletable:true});
   });
 
   // Faith
   const rel = RELIGIONS.find(r=>r.id===state.religion);
   if(rel && rel.id!=='none' && rel.practices.length){
-    const practice = rel.practices[today.getDate() % rel.practices.length];
-    tasks.push({id:'faith_today', type:'faith', title:practice, sub:rel.name, time:'', category:'Faith'});
+    const practice = rel.practices[new Date().getDate() % rel.practices.length];
+    tasks.push({id:'faith_today', type:'faith', title:practice, sub:rel.name, time:'', category:'Faith', deletable:false});
   }
 
   // Sort by time if present
@@ -2067,19 +2426,29 @@ function toggleTaskComplete(taskId, evt){
     addXp(TASK_COMPLETE_XP, evt);
     checkAchievements();
   } else {
-    // Symmetric refund: unticking a task takes back the XP it earned
+    // Symmetric refund: unticking a task takes back the XP it earned, so
+    // toggling on/off repeatedly can't be used to farm free XP.
     addXp(-TASK_COMPLETE_XP, evt);
   }
   renderHome();
 }
 
-/* Deletes whatever generated a to-do item (timetable block, onboarding habit,
-   tracked habit, or goal) so it stops appearing on the list entirely — not just
-   for today. Faith practice isn't deletable this way; change it in Settings. */
+/* Deletes whatever generated a to-do item (timetable event, onboarding habit,
+   tracked habit, or goal) so it stops appearing on the list entirely — not
+   just for today. Faith practice isn't deletable this way; change it in
+   Settings. A repeating timetable event can't be removed from this quick
+   button since deleting it safely means choosing "this event only / this and
+   future / entire series" — that lives on the Timetable page. */
 function deleteGeneratedTask(taskId){
   if(taskId.startsWith('tt_')){
-    const blockId = taskId.slice(3);
-    state.timetable.blocks = state.timetable.blocks.filter(b=>b.id!==blockId);
+    const evId = taskId.slice(3);
+    const ev = state.timetable.events.find(e=>e.id===evId);
+    if(!ev) return false;
+    if(ev.recurrence && ev.recurrence.type !== 'none'){
+      showToast('This repeats — manage it from the Timetable page');
+      return false;
+    }
+    state.timetable.events = state.timetable.events.filter(e=>e.id!==evId);
   } else if(taskId.startsWith('hab_')){
     state.habitsToImprove = state.habitsToImprove.filter(h=> ('hab_'+slug(h)) !== taskId);
   } else if(taskId.startsWith('track_')){
@@ -2105,7 +2474,7 @@ function renderHome(){
   const greet = hour<12 ? 'Good morning' : hour<18 ? 'Good afternoon' : 'Good evening';
   document.getElementById('greetText').textContent = `${greet}, ${name}`;
   document.getElementById('greetSub').textContent = "Here's what matters today.";
-  document.getElementById('todayDatePill').textContent = fmtDate(new Date());
+  document.getElementById('todayDatePill').textContent = fmtDateUKLong(todayKey());
 
   renderRecoveryBanner();
   renderLifeScoreDial();
@@ -2218,21 +2587,20 @@ function renderTodayRail(){
     const done = completions.includes(t.id);
     let isNow = false;
     if(t.time){
-      const [h,m] = t.time.split(':').map(Number);
-      const tm = h*60+m;
+      const tm = minutesFromTime(t.time);
       isNow = !done && Math.abs(tm-nowMin) < 60;
     }
     return `
     <div class="rail-item ${done?'done':''} ${isNow?'now':''}">
       <div class="rail-card">
         <div class="rail-check" data-task="${t.id}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
-        ${t.time?`<span class="rc-time">${t.time}</span>`:''}
+        ${t.time?`<span class="rc-time">${escapeHtml(fmtTimeAMPM(t.time))}</span>`:''}
         <div style="flex:1; min-width:0;">
           <div class="rc-title">${escapeHtml(t.title)}</div>
           <div class="rc-sub">${escapeHtml(t.sub||'')}</div>
         </div>
-        <span class="rc-tag badge badge-emerald">${t.category}</span>
-        ${t.id!=='faith_today'?`<button class="lr-del" data-task-del="${t.id}" title="Remove from to-do list"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
+        <span class="rc-tag badge badge-emerald">${escapeHtml(t.category)}</span>
+        ${t.deletable?`<button class="lr-del" data-task-del="${t.id}" title="Remove from to-do list"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -2262,7 +2630,7 @@ function renderFaithTodayBlock(){
   block.innerHTML = `
     <div class="list-row" style="border:none; padding:6px 4px;">
       <div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M5 9l7-7 7 7M5 14h14"/></svg></div>
-      <div><div class="lr-title">${escapeHtml(practice)}</div><div class="lr-sub">${rel.name} · ${streak} day streak</div></div>
+      <div><div class="lr-title">${escapeHtml(practice)}</div><div class="lr-sub">${escapeHtml(rel.name)} · ${streak} day streak</div></div>
       <div class="rail-check ${done?'done':''}" style="margin-left:auto;" data-task="faith_today">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
     </div>`;
   block.querySelector('.rail-check').addEventListener('click', (e)=> toggleTaskComplete('faith_today', e));
@@ -2285,97 +2653,661 @@ function checkAchievements(){
 }
 
 /* ============================================================
-   TIMETABLE VIEW
+   TIMETABLE VIEW — Outlook/Google-style weekly calendar
    ============================================================ */
+let calWeekStart = mondayOf(todayKey());
+let calViewMode = 'week'; // 'week' | 'day' | 'list'
+let calSelectedDay = todayKey();
+
 VIEW_RENDERERS.timetable = function(){
   const view = document.getElementById('view-timetable');
   view.innerHTML = `
     <div class="view-head">
-      <div><h1>Timetable</h1><div class="vh-sub">The backbone of your daily plan. Edit any block, any day.</div></div>
-      <button class="btn btn-primary btn-sm" id="ttAddBtn">+ Add block</button>
+      <div><h1>Timetable</h1><div class="vh-sub">Dates in DD/MM/YYYY, times in 12-hour format. Europe/London time.</div></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" id="ttImportIcsBtn">Import calendar (.ics)</button>
+        <button class="btn btn-ghost btn-sm" id="ttImportPdfBtn">Import PDF timetable</button>
+        <button class="btn btn-primary btn-sm" id="ttAddBtn">+ New event</button>
+      </div>
     </div>
-    <div class="glass panel" style="overflow-x:auto;">
-      <div id="ttWeekGrid" style="display:grid; grid-template-columns:repeat(7,minmax(120px,1fr)); gap:10px; min-width:760px;"></div>
+
+    <div class="cal-toolbar">
+      <div class="cal-toolbar-left">
+        <div class="cal-nav-group">
+          <button class="btn btn-ghost btn-icon" id="calPrevBtn"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="btn btn-ghost btn-sm" id="calTodayBtn">Today</button>
+          <button class="btn btn-ghost btn-icon" id="calNextBtn"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div class="cal-range-label" id="calRangeLabel">—</div>
+      </div>
+      <div class="cal-view-switch">
+        <button data-mode="day">Day</button>
+        <button data-mode="week">Week</button>
+        <button data-mode="list">List</button>
+      </div>
     </div>
-    <div class="glass panel" style="margin-top:20px;">
-      <div class="section-title-row"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/></svg> All blocks</h3></div>
-      <div id="ttListAll"></div>
+
+    <div class="glass panel" id="calBodyWrap" style="padding:0; overflow:hidden;">
+      <div id="calBody"></div>
     </div>
   `;
-  renderTtWeekGrid();
-  renderTtListAll();
-  document.getElementById('ttAddBtn').addEventListener('click', ()=> openTtModal());
+  document.getElementById('ttAddBtn').addEventListener('click', ()=> openEventModal());
+  document.getElementById('ttImportIcsBtn').addEventListener('click', ()=> openIcsImportModal());
+  document.getElementById('ttImportPdfBtn').addEventListener('click', ()=> openPdfImportModal());
+  document.getElementById('calPrevBtn').addEventListener('click', ()=> calNav(-1));
+  document.getElementById('calNextBtn').addEventListener('click', ()=> calNav(1));
+  document.getElementById('calTodayBtn').addEventListener('click', ()=>{
+    calWeekStart = mondayOf(todayKey()); calSelectedDay = todayKey(); renderCalendar();
+  });
+  view.querySelectorAll('.cal-view-switch button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ calViewMode = btn.dataset.mode; renderCalendar(); });
+  });
+  renderCalendar();
 };
 
-function renderTtWeekGrid(){
-  const grid = document.getElementById('ttWeekGrid');
-  grid.innerHTML = DOW_NAMES.map(day=>{
-    const blocks = state.timetable.blocks.filter(b=>b.day===day).sort((a,b)=>a.start.localeCompare(b.start));
-    return `<div>
-      <div style="font-size:11.5px; font-weight:700; color:var(--ink-faint); text-transform:uppercase; margin-bottom:10px; text-align:center;">${day}</div>
-      ${blocks.map(b=>`
-        <div class="list-row" style="flex-direction:column; align-items:flex-start; gap:2px; padding:10px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); margin-bottom:8px; cursor:pointer;" data-edit="${b.id}">
-          <span style="font-size:10px; font-family:var(--font-mono); color:${TT_COLORS[b.category]||'var(--ink-faint)'}">${b.start}–${b.end}</span>
-          <span style="font-size:12.5px; font-weight:600;">${escapeHtml(b.title||b.category)}</span>
-        </div>
-      `).join('') || `<div style="font-size:11.5px; color:var(--ink-faint); text-align:center; padding:14px 0;">—</div>`}
+function calNav(dir){
+  if(calViewMode==='day'){ calSelectedDay = addDaysStr(calSelectedDay, dir); calWeekStart = mondayOf(calSelectedDay); }
+  else { calWeekStart = addDaysStr(calWeekStart, dir*7); }
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const view = document.getElementById('view-timetable');
+  if(!view || !view.classList.contains('active')) { /* still safe to render into detached-ish DOM */ }
+  view.querySelectorAll('.cal-view-switch button').forEach(b=> b.classList.toggle('active', b.dataset.mode===calViewMode));
+
+  const label = document.getElementById('calRangeLabel');
+  if(calViewMode==='day'){
+    label.textContent = fmtDateUKLong(calSelectedDay);
+  } else if(calViewMode==='week'){
+    const dates = weekDates(calWeekStart);
+    label.textContent = `${fmtDateUK(dates[0])} – ${fmtDateUK(dates[6])}`;
+  } else {
+    label.textContent = 'Upcoming';
+  }
+
+  const body = document.getElementById('calBody');
+  if(calViewMode==='list') { renderCalListView(body); return; }
+  if(calViewMode==='day') { renderCalGridView(body, [calSelectedDay]); return; }
+  renderCalGridView(body, weekDates(calWeekStart));
+}
+
+function renderCalGridView(body, dates){
+  const HOUR_H = 52;
+  const startHour = 0, endHour = 24;
+  const todayStr = todayKey();
+  const nowMin = new Date().getHours()*60+new Date().getMinutes();
+
+  let headHtml = `<div class="cal-week-head" style="grid-template-columns:56px repeat(${dates.length},minmax(120px,1fr));">`;
+  headHtml += `<div></div>`;
+  dates.forEach(d=>{
+    const dt = parseLocalDate(d);
+    headHtml += `<div class="cal-week-head-cell ${d===todayStr?'is-today':''}">
+      <div class="whd-dow">${dt.toLocaleDateString('en-GB',{weekday:'short'})}</div>
+      <div class="whd-date">${dt.getDate()}</div>
     </div>`;
-  }).join('');
-  grid.querySelectorAll('[data-edit]').forEach(el=> el.addEventListener('click', ()=> openTtModal(el.dataset.edit)));
+  });
+  headHtml += `</div>`;
+
+  let gridHtml = `<div class="cal-grid-wrap"><div class="cal-week-grid" style="grid-template-columns:56px repeat(${dates.length},minmax(120px,1fr));">`;
+  gridHtml += `<div class="cal-hour-col">${Array.from({length:endHour-startHour},(_,i)=>`<div class="cal-hour-label">${fmtTimeAMPM(String(startHour+i).padStart(2,'0')+':00')}</div>`).join('')}</div>`;
+
+  dates.forEach(d=>{
+    const occs = getOccurrencesForDate(d).map(o=>({...o, startMin:minutesFromTime(o.ev.startTime), endMin:Math.max(minutesFromTime(o.ev.endTime), minutesFromTime(o.ev.startTime)+15)}));
+    // Clip overnight events (end <= start) to the end of the visible day — a
+    // known simplification noted in the project write-up.
+    occs.forEach(o=>{ if(o.endMin <= o.startMin) o.endMin = 24*60; });
+    layoutDayEvents(occs);
+    const totalH = (endHour-startHour)*HOUR_H;
+    let colHtml = `<div class="cal-day-col ${d===todayStr?'is-today':''}" style="height:${totalH}px;" data-date="${d}">`;
+    occs.forEach(o=>{
+      const top = (o.startMin/60)*HOUR_H;
+      const height = Math.max(((o.endMin-o.startMin)/60)*HOUR_H - 2, 16);
+      const widthPct = 100/o.totalCols;
+      const leftPct = o.col*widthPct;
+      const color = o.ev.color || TT_COLORS[o.ev.category] || TT_COLORS.Other;
+      colHtml += `<div class="cal-event-block" data-ev="${o.ev.id}" data-date="${d}"
+        style="top:${top}px; height:${height}px; left:calc(${leftPct}% + 2px); width:calc(${widthPct}% - 4px); background:${color}33; border-left:3px solid ${color};">
+        <div class="ce-title" style="color:${color};"></div>
+        <div class="ce-time"></div>
+      </div>`;
+    });
+    if(d===todayStr){
+      colHtml += `<div class="cal-now-line" style="top:${(nowMin/60)*HOUR_H}px;"></div>`;
+    }
+    colHtml += `</div>`;
+    gridHtml += colHtml;
+  });
+  gridHtml += `</div></div>`;
+
+  body.innerHTML = headHtml + gridHtml;
+
+  // Fill titles/times as text (not innerHTML) to keep imported content XSS-safe.
+  body.querySelectorAll('.cal-event-block').forEach(block=>{
+    const evId = block.dataset.ev;
+    const ev = state.timetable.events.find(x=>x.id===evId);
+    if(!ev) return;
+    block.querySelector('.ce-title').textContent = ev.title;
+    block.querySelector('.ce-time').textContent = `${fmtTimeAMPM(ev.startTime)}–${fmtTimeAMPM(ev.endTime)}`;
+    block.style.color = 'var(--ink)';
+    block.addEventListener('click', ()=> openEventActionModal(ev.id, block.dataset.date));
+  });
+
+  // scroll to a sensible default hour (7am) on first render of the day/week
+  const wrap = body.querySelector('.cal-grid-wrap');
+  if(wrap) wrap.scrollTop = 6*HOUR_H;
 }
 
-function renderTtListAll(){
-  const wrap = document.getElementById('ttListAll');
-  if(!state.timetable.blocks.length){ wrap.innerHTML = emptyState('No blocks yet','Add your first time block to build your day.'); return; }
-  const sorted = [...state.timetable.blocks].sort((a,b)=> DOW_NAMES.indexOf(a.day)-DOW_NAMES.indexOf(b.day) || a.start.localeCompare(b.start));
-  wrap.innerHTML = sorted.map(b=>`
-    <div class="list-row">
-      <div class="lr-icon" style="color:${TT_COLORS[b.category]}"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
-      <div><div class="lr-title">${escapeHtml(b.title||b.category)}</div><div class="lr-sub">${b.day} · ${b.start}–${b.end} · ${b.category}</div></div>
-      <button class="lr-del" data-del="${b.id}"><svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-    </div>
-  `).join('');
-  wrap.querySelectorAll('[data-del]').forEach(btn=> btn.addEventListener('click', ()=>{
-    state.timetable.blocks = state.timetable.blocks.filter(b=>b.id!==btn.dataset.del);
-    saveState(); VIEW_RENDERERS.timetable();
-  }));
+function layoutDayEvents(events){
+  events.sort((a,b)=> a.startMin-b.startMin || a.endMin-b.endMin);
+  let clusters = [];
+  let current = [];
+  let currentEnd = -1;
+  events.forEach(ev=>{
+    if(current.length && ev.startMin >= currentEnd){
+      clusters.push(current); current=[]; currentEnd=-1;
+    }
+    current.push(ev);
+    currentEnd = Math.max(currentEnd, ev.endMin);
+  });
+  if(current.length) clusters.push(current);
+  clusters.forEach(cluster=>{
+    const columns=[];
+    cluster.forEach(ev=>{
+      let placed=false;
+      for(let i=0;i<columns.length;i++){
+        if(columns[i]<=ev.startMin){ ev.col=i; columns[i]=ev.endMin; placed=true; break; }
+      }
+      if(!placed){ ev.col=columns.length; columns.push(ev.endMin); }
+    });
+    cluster.forEach(ev=> ev.totalCols = columns.length);
+  });
 }
 
-function openTtModal(id){
-  const existing = id ? state.timetable.blocks.find(b=>b.id===id) : null;
-  const m = openModal('Time block', `
-    <div class="field"><label>Activity</label><input type="text" id="mTtTitle" value="${existing?escapeHtml(existing.title):''}" placeholder="e.g. Study session"></div>
+function renderCalListView(body){
+  const today = todayKey();
+  const endWindow = addDaysStr(today, 30);
+  const byDate = getOccurrencesForRange(today, endWindow);
+  const daysWithEvents = Object.keys(byDate).filter(d=>byDate[d].length);
+  if(!daysWithEvents.length){
+    body.innerHTML = `<div style="padding:24px;">${emptyState('No upcoming events','Add an event or import a calendar to see it here.')}</div>`;
+    return;
+  }
+  body.innerHTML = `<div class="day-list-view" style="padding:20px;">` + daysWithEvents.map(d=>`
+    <div class="dl-day">
+      <div class="dl-day-title">${escapeHtml(fmtDateUKLong(d))}</div>
+      ${byDate[d].map(o=>`
+        <div class="list-row" data-ev="${o.ev.id}" data-date="${d}" style="cursor:pointer;">
+          <div class="lr-icon" style="color:${o.ev.color||TT_COLORS[o.ev.category]||TT_COLORS.Other}"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
+          <div class="lr-eventtext"></div>
+          <span class="badge" style="background:${(o.ev.color||TT_COLORS.Other)}22; color:${o.ev.color||TT_COLORS.Other};">${escapeHtml(o.ev.category)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `).join('') + `</div>`;
+  body.querySelectorAll('.list-row[data-ev]').forEach(row=>{
+    const ev = state.timetable.events.find(x=>x.id===row.dataset.ev);
+    if(!ev) return;
+    const textWrap = row.querySelector('.lr-eventtext');
+    const titleDiv = document.createElement('div'); titleDiv.className='lr-title'; titleDiv.textContent = ev.title;
+    const subDiv = document.createElement('div'); subDiv.className='lr-sub'; subDiv.textContent = `${fmtTimeAMPM(ev.startTime)} – ${fmtTimeAMPM(ev.endTime)}`;
+    textWrap.appendChild(titleDiv); textWrap.appendChild(subDiv);
+    row.addEventListener('click', ()=> openEventActionModal(ev.id, row.dataset.date));
+  });
+}
+
+/* ---------- Event create/edit modal ---------- */
+function openEventModal(existingEvent, occurrenceDate, editScope){
+  const isEdit = !!existingEvent;
+  const ev = existingEvent ? JSON.parse(JSON.stringify(existingEvent)) : newEmptyEvent();
+  if(!isEdit && occurrenceDate) { ev.startDate = occurrenceDate; ev.endDate = occurrenceDate; }
+
+  const m = openModal(isEdit ? 'Edit event' : 'New event', `
+    <div class="field"><label>Event title</label><input type="text" id="evTitle" placeholder="e.g. Go to Work" value="${escapeHtml(ev.title)}"></div>
+    <div class="field"><label>Description / notes (optional)</label><textarea id="evDesc" placeholder="Any extra details">${escapeHtml(ev.description||'')}</textarea></div>
     <div class="field-row">
-      <div class="field"><label>Day</label><select id="mTtDay">${DOW_NAMES.map(d=>`<option ${existing?.day===d?'selected':''}>${d}</option>`).join('')}</select></div>
-      <div class="field"><label>Category</label><select id="mTtCat">${TT_CATEGORIES.map(c=>`<option ${existing?.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Start date (DD/MM/YYYY)</label><input type="date" id="evStartDate" value="${ev.startDate}"></div>
+      <div class="field"><label>End date (DD/MM/YYYY)</label><input type="date" id="evEndDate" value="${ev.endDate||''}"><div class="field-hint">Leave blank for no end date (repeats indefinitely).</div></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Start</label><input type="time" id="mTtStart" value="${existing?.start||'09:00'}"></div>
-      <div class="field"><label>End</label><input type="time" id="mTtEnd" value="${existing?.end||'10:00'}"></div>
+      <div class="field"><label>Start time</label><input type="time" id="evStartTime" value="${ev.startTime}"></div>
+      <div class="field"><label>End time</label><input type="time" id="evEndTime" value="${ev.endTime}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Category</label><select id="evCategory">${TT_CATEGORIES.map(c=>`<option ${ev.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Repeat</label><select id="evRepeat">${REPEAT_OPTIONS.map(r=>`<option value="${r.value}" ${ (ev.recurrence?.type||'none')===r.value?'selected':''}>${r.label}</option>`).join('')}</select></div>
+    </div>
+    <div class="field" id="evCustomDaysField" style="${(ev.recurrence?.type)==='custom'?'':'display:none;'}">
+      <label>Repeat on</label>
+      <div class="repeat-days-grid" id="evCustomDaysGrid">
+        ${DOW_NAMES.map((d,i)=>`<div class="rd-chip ${ (ev.recurrence?.days||[]).includes(i)?'selected':''}" data-dow="${i}">${DOW_SHORT[i]}</div>`).join('')}
+      </div>
+    </div>
+    <div class="field"><label>Colour</label>
+      <div class="color-swatch-grid" id="evColorGrid">
+        ${EVENT_COLOR_PALETTE.map(c=>`<div class="color-swatch ${ev.color===c?'selected':''}" data-color="${c}" style="background:${c}; color:${c};"></div>`).join('')}
+      </div>
     </div>
     <div class="modal-actions">
-      ${existing?'<button class="btn btn-ghost" id="mTtDelete">Delete</button>':''}
-      <button class="btn btn-primary" id="mTtSave">Save</button>
+      ${isEdit?'<button class="btn btn-ghost" id="evDeleteBtn" style="color:var(--danger);">Delete</button>':''}
+      <button class="btn btn-primary" id="evSaveBtn">${isEdit?'Save changes':'Create event'}</button>
     </div>
   `);
-  document.getElementById('mTtSave').addEventListener('click', ()=>{
-    const data = {
-      title: document.getElementById('mTtTitle').value.trim(),
-      day: document.getElementById('mTtDay').value,
-      category: document.getElementById('mTtCat').value,
-      start: document.getElementById('mTtStart').value,
-      end: document.getElementById('mTtEnd').value,
-    };
-    if(existing) Object.assign(existing, data);
-    else state.timetable.blocks.push({id:uid(), ...data});
-    saveState(); closeModal(); VIEW_RENDERERS.timetable();
+  m.querySelector('.modal-box').classList.add('modal-wide');
+
+  const catSel = document.getElementById('evCategory');
+  const colorGrid = document.getElementById('evColorGrid');
+  let selectedColor = ev.color || TT_COLORS[ev.category] || TT_COLORS.Other;
+  catSel.addEventListener('change', ()=>{
+    // Only auto-suggest a colour if the user hasn't manually picked one this session
   });
-  if(existing){
-    document.getElementById('mTtDelete').addEventListener('click', ()=>{
-      state.timetable.blocks = state.timetable.blocks.filter(b=>b.id!==existing.id);
-      saveState(); closeModal(); VIEW_RENDERERS.timetable();
+  colorGrid.querySelectorAll('.color-swatch').forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      colorGrid.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+      sw.classList.add('selected');
+      selectedColor = sw.dataset.color;
+    });
+  });
+
+  const repeatSel = document.getElementById('evRepeat');
+  const customField = document.getElementById('evCustomDaysField');
+  repeatSel.addEventListener('change', ()=>{
+    customField.style.display = repeatSel.value==='custom' ? '' : 'none';
+  });
+  document.getElementById('evCustomDaysGrid').querySelectorAll('.rd-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=> chip.classList.toggle('selected'));
+  });
+
+  document.getElementById('evSaveBtn').addEventListener('click', ()=>{
+    const title = document.getElementById('evTitle').value.trim();
+    if(!title){ showToast('Please enter an event title'); return; }
+    const startDate = document.getElementById('evStartDate').value;
+    let endDate = document.getElementById('evEndDate').value || null;
+    const startTime = document.getElementById('evStartTime').value || '00:00';
+    const endTime = document.getElementById('evEndTime').value || '01:00';
+    if(!startDate){ showToast('Please choose a start date'); return; }
+    if(endDate && endDate < startDate){ showToast('End date cannot be before start date'); return; }
+    const repeatType = repeatSel.value;
+    let days = [];
+    if(repeatType==='custom'){
+      days = Array.from(document.getElementById('evCustomDaysGrid').querySelectorAll('.rd-chip.selected')).map(c=>Number(c.dataset.dow));
+      if(!days.length){ showToast('Pick at least one day for a custom repeat'); return; }
+    }
+    if(repeatType==='none') endDate = endDate || startDate;
+
+    const newFields = {
+      title, description: document.getElementById('evDesc').value.trim(),
+      category: catSel.value, color: selectedColor,
+      startDate, endDate, startTime, endTime,
+      recurrence: {type:repeatType, days},
+    };
+
+    if(!isEdit){
+      const created = Object.assign(newEmptyEvent(), newFields);
+      state.timetable.events.push(created);
+      saveState(); addXp(6); showToast('Event created');
+      closeModal(); renderCalendar(); if(document.getElementById('view-home').classList.contains('active')) renderHome();
+      return;
+    }
+
+    // Editing an existing (possibly recurring) event
+    applyEventEdit(existingEvent, newFields, occurrenceDate, editScope);
+    closeModal(); renderCalendar(); if(document.getElementById('view-home').classList.contains('active')) renderHome();
+  });
+
+  if(isEdit){
+    document.getElementById('evDeleteBtn').addEventListener('click', ()=>{
+      applyEventDelete(existingEvent, occurrenceDate, editScope);
+      closeModal(); renderCalendar(); if(document.getElementById('view-home').classList.contains('active')) renderHome();
     });
   }
+}
+
+function applyEventEdit(originalEvent, newFields, occurrenceDate, scope){
+  const original = state.timetable.events.find(e=>e.id===originalEvent.id);
+  if(!original) return;
+  const isRecurring = original.recurrence && original.recurrence.type !== 'none';
+  if(!isRecurring || !scope || scope==='series'){
+    Object.assign(original, newFields);
+    saveState();
+    showToast('Event updated');
+    return;
+  }
+  if(scope==='only'){
+    original.exceptions = original.exceptions || [];
+    if(!original.exceptions.includes(occurrenceDate)) original.exceptions.push(occurrenceDate);
+    const single = Object.assign(newEmptyEvent(), newFields, {startDate:occurrenceDate, endDate:occurrenceDate, recurrence:{type:'none',days:[]}});
+    state.timetable.events.push(single);
+    saveState();
+    showToast('This occurrence updated');
+    return;
+  }
+  if(scope==='future'){
+    if(occurrenceDate <= original.startDate){
+      // editing from the very first occurrence — same as editing the whole series
+      Object.assign(original, newFields);
+      saveState(); showToast('Event updated'); return;
+    }
+    original.endDate = addDaysStr(occurrenceDate, -1);
+    const newSeries = Object.assign(newEmptyEvent(), newFields, {startDate:occurrenceDate, recurrence: newFields.recurrence});
+    state.timetable.events.push(newSeries);
+    saveState();
+    showToast('This and future events updated');
+  }
+}
+
+function applyEventDelete(originalEvent, occurrenceDate, scope){
+  const original = state.timetable.events.find(e=>e.id===originalEvent.id);
+  if(!original) return;
+  const isRecurring = original.recurrence && original.recurrence.type !== 'none';
+  if(!isRecurring || !scope || scope==='series'){
+    state.timetable.events = state.timetable.events.filter(e=>e.id!==original.id);
+    saveState(); showToast('Event deleted');
+    return;
+  }
+  if(scope==='only'){
+    original.exceptions = original.exceptions || [];
+    if(!original.exceptions.includes(occurrenceDate)) original.exceptions.push(occurrenceDate);
+    saveState(); showToast('This occurrence removed');
+    return;
+  }
+  if(scope==='future'){
+    if(occurrenceDate <= original.startDate){
+      state.timetable.events = state.timetable.events.filter(e=>e.id!==original.id);
+    } else {
+      original.endDate = addDaysStr(occurrenceDate, -1);
+    }
+    saveState(); showToast('Future events removed');
+  }
+}
+
+/* ---------- Click-on-event action modal: view / edit / delete (+ scope) ---------- */
+function openEventActionModal(eventId, occurrenceDate){
+  const ev = state.timetable.events.find(e=>e.id===eventId);
+  if(!ev) return;
+  const isRecurring = ev.recurrence && ev.recurrence.type !== 'none';
+  const m = openModal('Event details', `
+    <div class="field"><label>Title</label><div class="si-value" style="font-size:16px;"></div></div>
+    <div id="eaMeta" style="font-size:13px; color:var(--ink-dim); line-height:1.8; margin-bottom:18px;"></div>
+    <div class="modal-actions" style="flex-direction:column;">
+      <button class="btn btn-primary btn-block" id="eaEditBtn">Edit</button>
+      <button class="btn btn-ghost btn-block" id="eaDeleteBtn" style="color:var(--danger);">Delete</button>
+    </div>
+  `);
+  m.querySelector('.field .si-value').textContent = ev.title;
+  const meta = document.getElementById('eaMeta');
+  const metaLines = [
+    `${fmtDateUK(occurrenceDate)} · ${fmtTimeAMPM(ev.startTime)} – ${fmtTimeAMPM(ev.endTime)}`,
+    `Category: ${ev.category}`,
+    `Repeats: ${REPEAT_OPTIONS.find(r=>r.value===(ev.recurrence?.type||'none'))?.label || 'Does not repeat'}`,
+    ev.description ? ev.description : null,
+  ].filter(Boolean);
+  metaLines.forEach(line=>{ const d=document.createElement('div'); d.textContent=line; meta.appendChild(d); });
+
+  document.getElementById('eaEditBtn').addEventListener('click', ()=>{
+    closeModal();
+    if(!isRecurring){ openEventModal(ev, occurrenceDate, 'series'); return; }
+    openScopeModal('edit', ev, occurrenceDate);
+  });
+  document.getElementById('eaDeleteBtn').addEventListener('click', ()=>{
+    closeModal();
+    if(!isRecurring){ applyEventDelete(ev, occurrenceDate, 'series'); renderCalendar(); if(document.getElementById('view-home').classList.contains('active')) renderHome(); return; }
+    openScopeModal('delete', ev, occurrenceDate);
+  });
+}
+
+function openScopeModal(action, ev, occurrenceDate){
+  const m = openModal(action==='edit' ? 'Edit recurring event' : 'Delete recurring event', `
+    <p style="color:var(--ink-dim); font-size:13.5px; margin-bottom:18px;">This is part of a repeating series. What would you like to ${action}?</p>
+    <div class="modal-actions" style="flex-direction:column;">
+      <button class="btn btn-ghost btn-block" data-scope="only">This event only</button>
+      <button class="btn btn-ghost btn-block" data-scope="future">This and future events</button>
+      <button class="btn btn-ghost btn-block" data-scope="series">Entire series</button>
+    </div>
+  `);
+  m.querySelectorAll('[data-scope]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const scope = btn.dataset.scope;
+      closeModal();
+      if(action==='edit'){
+        openEventModal(ev, occurrenceDate, scope);
+      } else {
+        applyEventDelete(ev, occurrenceDate, scope);
+        renderCalendar();
+        if(document.getElementById('view-home').classList.contains('active')) renderHome();
+      }
+    });
+  });
+}
+
+/* ---------- ICS import (main app): parse -> preview -> confirm ---------- */
+function openIcsImportModal(){
+  const m = openModal('Import calendar (.ics)', `
+    <div class="upload-zone" id="icsMainUz">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <div class="uz-title">Choose an .ics file</div>
+      <div class="uz-sub">Exported from Outlook, Google Calendar, Apple Calendar, or your college system</div>
+      <input type="file" id="icsMainFile" accept=".ics" class="hidden">
+    </div>
+    <div id="icsMainPreviewWrap"></div>
+  `);
+  m.querySelector('.modal-box').classList.add('modal-wide');
+  document.getElementById('icsMainUz').addEventListener('click', ()=> document.getElementById('icsMainFile').click());
+  document.getElementById('icsMainFile').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      let parsed = [];
+      try{ parsed = parseIcsAdvanced(ev.target.result); }
+      catch(err){ showToast('Could not read that .ics file'); return; }
+      renderIcsPreview(parsed, file.name);
+    };
+    reader.readAsText(file);
+  });
+}
+
+function renderIcsPreview(parsed, fileName){
+  const wrap = document.getElementById('icsMainPreviewWrap');
+  if(!parsed.length){
+    wrap.innerHTML = `<div style="margin-top:16px;">${emptyState('No events found', `"${fileName}" did not contain any recognisable VEVENT entries.`)}</div>`;
+    return;
+  }
+  wrap.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:18px 0 10px;">
+      <div style="font-size:13px; color:var(--ink-dim);">${parsed.length} event(s) found — review before importing</div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost btn-sm" id="icsSelectAllBtn">Select all</button>
+        <button class="btn btn-ghost btn-sm" id="icsSelectNoneBtn">Select none</button>
+      </div>
+    </div>
+    <div class="event-list-mini" id="icsPreviewList"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="icsCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="icsConfirmBtn">Import selected</button>
+    </div>
+  `;
+  const list = document.getElementById('icsPreviewList');
+  parsed.forEach((p, i)=>{
+    const dup = p.uid && state.timetable.events.some(ex=>ex.uid && ex.uid===p.uid);
+    const row = document.createElement('div');
+    row.className = 'import-preview-row' + (dup ? ' duplicate' : '');
+    const cb = document.createElement('input');
+    cb.type='checkbox'; cb.checked = !dup; cb.dataset.idx = i;
+    row.appendChild(cb);
+    const textWrap = document.createElement('div');
+    const titleDiv = document.createElement('div'); titleDiv.className='ipr-title'; titleDiv.textContent = p.title;
+    const dateStr = p.endDate && p.endDate!==p.startDate ? `${fmtDateUK(p.startDate)} – ${fmtDateUK(p.endDate)}` : fmtDateUK(p.startDate);
+    const repeatLabel = REPEAT_OPTIONS.find(r=>r.value===p.recurrence.type)?.label || 'Does not repeat';
+    const subDiv = document.createElement('div'); subDiv.className='ipr-sub';
+    subDiv.textContent = `${dateStr} · ${fmtTimeAMPM(p.startTime)}–${fmtTimeAMPM(p.endTime)} · ${repeatLabel}${dup?' · Already imported (skipped by default)':''}`;
+    textWrap.appendChild(titleDiv); textWrap.appendChild(subDiv);
+    row.appendChild(textWrap);
+    list.appendChild(row);
+  });
+  document.getElementById('icsSelectAllBtn').addEventListener('click', ()=> list.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=true));
+  document.getElementById('icsSelectNoneBtn').addEventListener('click', ()=> list.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false));
+  document.getElementById('icsCancelBtn').addEventListener('click', closeModal);
+  document.getElementById('icsConfirmBtn').addEventListener('click', ()=>{
+    let count = 0;
+    list.querySelectorAll('input[type=checkbox]:checked').forEach(cb=>{
+      const p = parsed[Number(cb.dataset.idx)];
+      state.timetable.events.push(icsParsedToEvent(p));
+      count++;
+    });
+    saveState();
+    closeModal();
+    showToast(`Imported ${count} event(s)`);
+    renderCalendar();
+  });
+}
+
+/* ---------- PDF import (main app): best-effort text extraction -> preview only ---------- */
+let _pdfJsLoading = null;
+function ensurePdfJs(){
+  if(window.pdfjsLib) return Promise.resolve();
+  if(_pdfJsLoading) return _pdfJsLoading;
+  _pdfJsLoading = new Promise((resolve, reject)=>{
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.onload = ()=>{
+      try{
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        resolve();
+      }catch(e){ reject(e); }
+    };
+    script.onerror = ()=> reject(new Error('Failed to load PDF reader'));
+    document.head.appendChild(script);
+  });
+  return _pdfJsLoading;
+}
+
+function openPdfImportModal(){
+  const m = openModal('Import PDF timetable', `
+    <p style="color:var(--ink-dim); font-size:13px; line-height:1.6; margin-bottom:16px;">
+      MAAR LIFE will try to read day names and time ranges (e.g. "Mon 09:00–10:00 Maths") out of the PDF text automatically.
+      This is a best-effort text scan, not true document understanding — PDFs with scanned images, tables, or unusual layouts
+      may need manual entry instead. Nothing is saved until you check and confirm it below.
+    </p>
+    <div class="upload-zone" id="pdfMainUz">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      <div class="uz-title">Choose a PDF timetable</div>
+      <div class="uz-sub">Click to choose a file</div>
+      <input type="file" id="pdfMainFile" accept="application/pdf" class="hidden">
+    </div>
+    <div id="pdfMainStatus"></div>
+    <div id="pdfMainPreviewWrap"></div>
+  `);
+  m.querySelector('.modal-box').classList.add('modal-wide');
+  document.getElementById('pdfMainUz').addEventListener('click', ()=> document.getElementById('pdfMainFile').click());
+  document.getElementById('pdfMainFile').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const statusEl = document.getElementById('pdfMainStatus');
+    statusEl.innerHTML = `<div class="upload-status">Reading PDF…</div>`;
+    try{
+      await ensurePdfJs();
+      const buf = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({data:buf}).promise;
+      let fullText = '';
+      for(let p=1;p<=pdf.numPages;p++){
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        fullText += content.items.map(it=>it.str).join(' ') + '\n';
+      }
+      statusEl.innerHTML = '';
+      const candidates = extractTimetableCandidates(fullText);
+      renderPdfPreview(candidates, file.name);
+    }catch(err){
+      console.warn('PDF read failed', err);
+      statusEl.innerHTML = `<div class="upload-status" style="background:var(--danger-dim); color:var(--danger);">Couldn't read this PDF automatically (it may be a scanned image or need OCR). Please add these events manually with "+ New event" instead.</div>`;
+    }
+  });
+}
+
+function extractTimetableCandidates(text){
+  // Heuristic, best-effort scan for lines like: "Mon 09:00-10:00 Maths Room 4"
+  const dayRe = /\b(mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun)[a-z]*\b/i;
+  const timeRe = /(\d{1,2})[:.]?(\d{2})?\s*(am|pm)?\s*(?:-|–|to)\s*(\d{1,2})[:.]?(\d{2})?\s*(am|pm)?/i;
+  const DOW_MAP = {mon:1,tue:2,tues:2,wed:3,thu:4,thur:4,thurs:4,fri:5,sat:6,sun:0};
+  const lines = text.split(/\n|(?=\b(?:mon|tue|wed|thu|fri|sat|sun)[a-z]*\b)/i).map(l=>l.trim()).filter(Boolean);
+  const out = [];
+  lines.forEach(line=>{
+    const dayMatch = line.match(dayRe);
+    const timeMatch = line.match(timeRe);
+    if(!dayMatch || !timeMatch) return;
+    const dow = DOW_MAP[dayMatch[1].toLowerCase()];
+    if(dow===undefined) return;
+    const to24 = (h,m,ampm)=>{
+      h = parseInt(h,10); m = m?parseInt(m,10):0;
+      if(ampm){ ampm=ampm.toLowerCase(); if(ampm==='pm' && h<12) h+=12; if(ampm==='am' && h===12) h=0; }
+      if(h>23) h=23;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+    };
+    const startTime = to24(timeMatch[1], timeMatch[2], timeMatch[3]);
+    const endTime = to24(timeMatch[4], timeMatch[5], timeMatch[6]||timeMatch[3]);
+    let title = line.replace(dayRe,'').replace(timeRe,'').replace(/[-–:.,]+/g,' ').trim();
+    if(title.length>60) title = title.slice(0,60);
+    if(!title) title = 'Untitled class';
+    out.push({dow, startTime, endTime, title});
+  });
+  return out.slice(0,60);
+}
+
+function renderPdfPreview(candidates, fileName){
+  const wrap = document.getElementById('pdfMainPreviewWrap');
+  if(!candidates.length){
+    wrap.innerHTML = `<div style="margin-top:16px;">${emptyState('Nothing recognised', `MAAR LIFE couldn't confidently detect day/time patterns in "${fileName}". Please add events manually, or try a text-based (not scanned) PDF export.`)}</div>`;
+    return;
+  }
+  wrap.innerHTML = `
+    <div style="margin:16px 0 10px; font-size:13px; color:var(--ink-dim);">${candidates.length} possible event(s) detected. Check and edit each title before confirming — nothing is saved yet.</div>
+    <div class="event-list-mini" id="pdfPreviewList"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="pdfCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="pdfConfirmBtn">Add checked events</button>
+    </div>
+  `;
+  const list = document.getElementById('pdfPreviewList');
+  candidates.forEach((c,i)=>{
+    const row = document.createElement('div');
+    row.className = 'import-preview-row';
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=true; cb.dataset.idx=i;
+    row.appendChild(cb);
+    const textWrap = document.createElement('div'); textWrap.style.flex='1';
+    const titleInput = document.createElement('input');
+    titleInput.type='text'; titleInput.value = c.title; titleInput.style.cssText='width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:8px 10px; color:var(--ink); font-size:13px; margin-bottom:6px;';
+    titleInput.dataset.idx = i;
+    const sub = document.createElement('div'); sub.className='ipr-sub';
+    sub.textContent = `${DOW_NAMES[c.dow]} · ${fmtTimeAMPM(c.startTime)} – ${fmtTimeAMPM(c.endTime)} (repeats weekly on ${DOW_NAMES[c.dow]})`;
+    textWrap.appendChild(titleInput); textWrap.appendChild(sub);
+    row.appendChild(textWrap);
+    list.appendChild(row);
+  });
+  document.getElementById('pdfCancelBtn').addEventListener('click', closeModal);
+  document.getElementById('pdfConfirmBtn').addEventListener('click', ()=>{
+    let count = 0;
+    const base = mondayOf(todayKey());
+    list.querySelectorAll('.import-preview-row').forEach(row=>{
+      const cb = row.querySelector('input[type=checkbox]');
+      if(!cb.checked) return;
+      const idx = Number(cb.dataset.idx);
+      const c = candidates[idx];
+      const titleVal = row.querySelector('input[type=text]').value.trim() || 'Untitled class';
+      const eventDate = addDaysStr(base, c.dow===0?6:c.dow-1);
+      state.timetable.events.push({
+        id:uid(), uid:null, title:titleVal, description:'PDF import (unverified — please double-check times)',
+        category:'Other', color:TT_COLORS.Other,
+        startDate:eventDate, endDate:null, startTime:c.startTime, endTime:c.endTime,
+        recurrence:{type:'weekly', days:[]}, exceptions:[],
+      });
+      count++;
+    });
+    saveState();
+    closeModal();
+    showToast(`Added ${count} event(s) from PDF`);
+    renderCalendar();
+  });
 }
 
 /* ============================================================
@@ -2432,10 +3364,10 @@ function renderGoalsDaily(){
     return `<div class="rail-item ${done?'done':''}">
       <div class="rail-card">
         <div class="rail-check" data-task="${t.id}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
-        ${t.time?`<span class="rc-time">${t.time}</span>`:''}
+        ${t.time?`<span class="rc-time">${escapeHtml(fmtTimeAMPM(t.time))}</span>`:''}
         <div style="flex:1;min-width:0;"><div class="rc-title">${escapeHtml(t.title)}</div><div class="rc-sub">${escapeHtml(t.sub||'')}</div></div>
-        <span class="rc-tag badge badge-emerald">${t.category}</span>
-        ${t.id!=='faith_today'?`<button class="lr-del" data-task-del="${t.id}" title="Remove from to-do list"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
+        <span class="rc-tag badge badge-emerald">${escapeHtml(t.category)}</span>
+        ${t.deletable?`<button class="lr-del" data-task-del="${t.id}" title="Remove from to-do list"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
       </div></div>`;
   }).join('');
   rail.querySelectorAll('.rail-check').forEach(chk=> chk.addEventListener('click', (e)=>{ toggleTaskComplete(chk.dataset.task, e); renderGoalsDaily(); }));
@@ -2458,7 +3390,7 @@ function renderGoalsWeekly(){
   wrap.innerHTML = `
     <div class="glass panel">
       <div class="section-title-row"><h3>This week's consistency</h3></div>
-      <div class="day-checklist">${days.reverse().map(d=>`<div class="day-dot ${state.taskCompletions[d]?.length?'filled':''}" title="${d}">${new Date(d).getDate()}</div>`).join('')}</div>
+      <div class="day-checklist">${days.reverse().map(d=>`<div class="day-dot ${state.taskCompletions[d]?.length?'filled':''}" title="${fmtDateUK(d)}">${parseLocalDate(d).getDate()}</div>`).join('')}</div>
       <div style="height:20px;"></div>
       <div class="section-title-row"><h3>Active goals — weekly milestones</h3></div>
       ${state.goals.length ? state.goals.map(g=> renderGoalCard(g)).join('') : emptyState('No goals yet','Add one and we\'ll auto-build daily, weekly and monthly steps.')}
@@ -2482,7 +3414,7 @@ function renderGoalsLongterm(){
       <div class="section-title-row"><h3>Long-term vision</h3></div>
       ${state.goals.length ? state.goals.map(g=>`
         <div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
-        <div><div class="lr-title">${escapeHtml(g.text)}</div><div class="lr-sub">${g.deadline?('Target: '+new Date(g.deadline).toLocaleDateString()):'No deadline set'} · ${g.category}</div></div></div>
+        <div><div class="lr-title">${escapeHtml(g.text)}</div><div class="lr-sub">${g.deadline?('Target: '+fmtDateUK(g.deadline)):'No deadline set'} · ${escapeHtml(g.category)}</div></div></div>
       `).join('') : emptyState('No long-term goals yet','Big goals belong here — we\'ll still give you something small to do today.')}
     </div>`;
 }
@@ -2492,7 +3424,7 @@ function renderGoalCard(g){
   const doneToday = (state.taskCompletions[today]||[]).includes('goal_'+g.id);
   return `<div class="goal-card glass-tight" style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border);">
     <div class="gc-top">
-      <div><div class="gc-title">${escapeHtml(g.text)}</div><div class="gc-meta">${g.category}${g.deadline?(' · due '+new Date(g.deadline).toLocaleDateString()):''}</div></div>
+      <div><div class="gc-title">${escapeHtml(g.text)}</div><div class="gc-meta">${escapeHtml(g.category)}${g.deadline?(' · due '+fmtDateUK(g.deadline)):''}</div></div>
       <button class="lr-del" data-goal-del="${g.id}"><svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="gc-today-action">
@@ -2569,7 +3501,7 @@ function renderHabitsList(){
       const taskId = 'hab_'+slug(h);
       const done = (state.taskCompletions[today]||[]).includes(taskId);
       return `<div class="habit-card glass-tight" style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border);">
-        <div class="hc-streak"><span class="num">${currentStreak((state.taskCompletions._derived?.[taskId])||[])||'–'}</span><span class="lbl">streak</span></div>
+        <div class="hc-streak"><span class="num">${done?'✓':'–'}</span><span class="lbl">today</span></div>
         <div class="hc-info"><div class="hc-title">${escapeHtml(microActionFor(h))}</div><div class="hc-sub">Working on: ${escapeHtml(h)}</div></div>
         <button class="lr-del" data-task-del="${taskId}" style="margin-right:2px;" title="Remove"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
         <div class="rail-check hc-check ${done?'done':''}" data-task="${taskId}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
@@ -2626,7 +3558,7 @@ function openHabitModal(){
 /* ---------- shared small helpers ---------- */
 function emptyState(title, sub){
   return `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 9h.01M15 9h.01M8 15s1.5-2 4-2 4 2 4 2"/></svg>
-    <div class="es-title">${title}</div><div class="es-sub">${sub}</div></div>`;
+    <div class="es-title">${escapeHtml(title)}</div><div class="es-sub">${escapeHtml(sub)}</div></div>`;
 }
 
 /* ---------- Modal system ---------- */
@@ -2636,9 +3568,11 @@ function openModal(title, bodyHtml){
   backdrop.className = 'modal-backdrop';
   backdrop.id = 'activeModal';
   backdrop.innerHTML = `<div class="modal-box">
-    <div class="modal-head"><h3>${title}</h3><button class="modal-close" id="modalCloseBtn"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
-    ${bodyHtml}
+    <div class="modal-head"><h3></h3><button class="modal-close" id="modalCloseBtn"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+    <div class="modal-body-slot"></div>
   </div>`;
+  backdrop.querySelector('.modal-head h3').textContent = title;
+  backdrop.querySelector('.modal-body-slot').innerHTML = bodyHtml;
   document.body.appendChild(backdrop);
   requestAnimationFrame(()=> backdrop.classList.add('open'));
   document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
@@ -2786,7 +3720,7 @@ function renderFinTxList(){
       <div class="lr-icon" style="color:${t.type==='income'?'var(--emerald-bright)':'var(--danger)'}">
         <svg class="icon" viewBox="0 0 24 24">${t.type==='income'?'<path d="M12 19V5M5 12l7-7 7 7"/>':'<path d="M12 5v14M5 12l7 7 7-7"/>'}</svg>
       </div>
-      <div><div class="lr-title">${escapeHtml(t.label)}</div><div class="lr-sub">${t.date} · ${t.category}</div></div>
+      <div><div class="lr-title">${escapeHtml(t.label)}</div><div class="lr-sub">${fmtDateUK(t.date)} · ${escapeHtml(t.category)}</div></div>
       <div class="lr-amt ${t.type==='income'?'pos':'neg'}">${t.type==='income'?'+':'-'}${fmtMoney(t.amount)}</div>
       <button class="lr-del" data-tx-del="${t.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
@@ -2803,7 +3737,7 @@ function renderFinSubList(){
   wrap.innerHTML = state.finance.subscriptions.map(s=>`
     <div class="list-row">
       <div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
-      <div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">Renews on day ${s.renewDay||'1'}</div></div>
+      <div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">Renews on day ${escapeHtml(String(s.renewDay||'1'))}</div></div>
       <div class="lr-amt neg">${fmtMoney(s.amount)}/mo</div>
       <button class="lr-del" data-sub-del="${s.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
@@ -2990,7 +3924,7 @@ function renderHExerciseList(){
   const wrap = document.getElementById('hExerciseList');
   const recent = [...state.health.exerciseLog].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
   if(!recent.length){ wrap.innerHTML=''; return; }
-  wrap.innerHTML = recent.map(e=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 3l3 3-3 3M6 18l-3 3 3 3M9.5 6.5L3 13l1.5 1.5L11 8M14.5 17.5L21 11l-1.5-1.5L13 16"/></svg></div><div><div class="lr-title">${escapeHtml(e.type)}</div><div class="lr-sub">${e.date}</div></div><div class="lr-amt pos">${e.minutes}m</div></div>`).join('');
+  wrap.innerHTML = recent.map(e=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 3l3 3-3 3M6 18l-3 3 3 3M9.5 6.5L3 13l1.5 1.5L11 8M14.5 17.5L21 11l-1.5-1.5L13 16"/></svg></div><div><div class="lr-title">${escapeHtml(e.type)}</div><div class="lr-sub">${fmtDateUK(e.date)}</div></div><div class="lr-amt pos">${e.minutes}m</div></div>`).join('');
 }
 
 /* ============================================================
@@ -3071,7 +4005,7 @@ function renderDietMealList(){
   wrap.innerHTML = recent.map(m=>`
     <div class="list-row">
       <div class="lr-icon" style="color:${qColor[m.quality]}"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/></svg></div>
-      <div><div class="lr-title">${escapeHtml(m.name)}</div><div class="lr-sub">${m.date} · ${m.time}</div></div>
+      <div><div class="lr-title">${escapeHtml(m.name)}</div><div class="lr-sub">${fmtDateUK(m.date)} · ${m.time}</div></div>
       <span class="badge" style="background:rgba(255,255,255,0.06); color:${qColor[m.quality]}">${m.quality}</span>
       <button class="lr-del" data-meal-del="${m.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
@@ -3176,9 +4110,9 @@ function renderStudyExams(){
   if(!state.study.exams.length){ wrap.innerHTML = emptyState('No exams scheduled',''); return; }
   const sorted = [...state.study.exams].sort((a,b)=>a.date.localeCompare(b.date));
   wrap.innerHTML = sorted.map(ex=>{
-    const days = Math.ceil((new Date(ex.date)-new Date())/86400000);
+    const days = Math.ceil((parseLocalDate(ex.date)-new Date())/86400000);
     return `<div class="list-row"><div class="lr-icon" style="color:var(--gold-bright)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-    <div><div class="lr-title">${escapeHtml(ex.name)}</div><div class="lr-sub">${ex.date}</div></div>
+    <div><div class="lr-title">${escapeHtml(ex.name)}</div><div class="lr-sub">${fmtDateUK(ex.date)}</div></div>
     <span class="badge ${days<=3?'badge-danger':'badge-gold'}">${days>=0?days+'d left':'past'}</span>
     <button class="lr-del" data-exam-del="${ex.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`;
   }).join('');
@@ -3191,7 +4125,7 @@ function renderStudySessions(){
   const wrap = document.getElementById('studySessionList');
   const recent = [...state.study.sessions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
   if(!recent.length){ wrap.innerHTML = emptyState('No focus sessions yet',''); return; }
-  wrap.innerHTML = recent.map(s=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><div class="lr-title">Focus session</div><div class="lr-sub">${s.date}</div></div><div class="lr-amt pos">${s.minutes}m</div></div>`).join('');
+  wrap.innerHTML = recent.map(s=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><div class="lr-title">Focus session</div><div class="lr-sub">${fmtDateUK(s.date)}</div></div><div class="lr-amt pos">${s.minutes}m</div></div>`).join('');
 }
 function openSubjectModal(){
   const m = openModal('Add subject', `<div class="field"><label>Subject name</label><input type="text" id="mSubjName" placeholder="e.g. Mathematics"></div><div class="modal-actions"><button class="btn btn-primary btn-block" id="mSubjSave">Add</button></div>`);
@@ -3231,7 +4165,7 @@ VIEW_RENDERERS.faith = function(){
   const streak = currentStreak(state.faithLog);
   const last30 = lastNDays(30).reverse();
   view.innerHTML = `
-    <div class="view-head"><div><h1>Faith</h1><div class="vh-sub">${rel.name} · small, consistent practice.</div></div>
+    <div class="view-head"><div><h1>Faith</h1><div class="vh-sub">${escapeHtml(rel.name)} · small, consistent practice.</div></div>
       <button class="btn btn-ghost btn-sm" id="faithChangeBtn">Change faith</button>
     </div>
     <div class="cards-row">
@@ -3240,7 +4174,7 @@ VIEW_RENDERERS.faith = function(){
     </div>
     <div class="glass panel">
       <div class="section-title-row"><h3>This month</h3></div>
-      <div class="day-checklist" style="flex-wrap:wrap;">${last30.map(d=>`<div class="day-dot ${state.faithLog.includes(d)?'filled':''}" title="${d}">${new Date(d).getDate()}</div>`).join('')}</div>
+      <div class="day-checklist" style="flex-wrap:wrap;">${last30.map(d=>`<div class="day-dot ${state.faithLog.includes(d)?'filled':''}" title="${fmtDateUK(d)}">${parseLocalDate(d).getDate()}</div>`).join('')}</div>
     </div>
     <div class="glass panel">
       <div class="section-title-row"><h3>Daily practices</h3></div>
@@ -3294,9 +4228,9 @@ function renderJournalList(){
   if(!state.journal.length){ wrap.innerHTML = emptyState('No entries yet','Your reflections will appear here.'); return; }
   wrap.innerHTML = state.journal.map(j=>`
     <div class="glass journal-entry">
-      <div class="je-date">${new Date(j.date).toLocaleString(undefined,{dateStyle:'medium', timeStyle:'short'})}</div>
+      <div class="je-date">${new Date(j.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'})}</div>
       <div class="je-text">${escapeHtml(j.text)}</div>
-      <div class="je-tags">${j.tags.map(t=>`<span class="badge badge-emerald">${t}</span>`).join('')}</div>
+      <div class="je-tags">${j.tags.map(t=>`<span class="badge badge-emerald">${escapeHtml(t)}</span>`).join('')}</div>
     </div>
   `).join('');
 }
@@ -3435,15 +4369,14 @@ function renderAnaStudyChart(){
 }
 function renderAnaAdherence(){
   const wrap = document.getElementById('anaAdherence');
-  const dow = DOW_NAMES[new Date().getDay()];
-  const blocksToday = state.timetable.blocks.filter(b=>b.day===dow);
   const today = todayKey();
+  const occs = getOccurrencesForDate(today);
   const completions = state.taskCompletions[today] || [];
-  const done = blocksToday.filter(b=> completions.includes('tt_'+b.id)).length;
-  const pct = blocksToday.length ? Math.round(done/blocksToday.length*100) : 0;
+  const done = occs.filter(o=> completions.includes('tt_'+o.ev.id)).length;
+  const pct = occs.length ? Math.round(done/occs.length*100) : 0;
   wrap.innerHTML = `<div style="display:flex; align-items:center; gap:16px;">
     <div style="font-family:var(--font-display); font-size:36px; font-weight:600; color:var(--emerald-bright);">${pct}%</div>
-    <div style="flex:1;"><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><div style="font-size:12px; color:var(--ink-faint); margin-top:6px;">${done} of ${blocksToday.length} timetable blocks completed today</div></div>
+    <div style="flex:1;"><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><div style="font-size:12px; color:var(--ink-faint); margin-top:6px;">${done} of ${occs.length} timetable events completed today</div></div>
   </div>`;
 }
 
@@ -3509,9 +4442,9 @@ VIEW_RENDERERS.milestones = function(){
     <div class="glass panel">
       <div class="today-rail">${events.length ? events.map(ev=>`
         <div class="rail-item done"><div class="rail-card">
-          <span class="rc-time">${ev.date}</span>
+          <span class="rc-time">${escapeHtml(ev.date)}</span>
           <div style="flex:1;"><div class="rc-title">${escapeHtml(ev.title)}</div><div class="rc-sub">${escapeHtml(ev.sub)}</div></div>
-          <span class="rc-tag badge badge-gold">${ev.type}</span>
+          <span class="rc-tag badge badge-gold">${escapeHtml(ev.type)}</span>
         </div></div>
       `).join('') : emptyState('Your timeline starts now','Complete tasks, hit streaks and reach goals to fill this in.')}</div>
     </div>
@@ -3519,8 +4452,8 @@ VIEW_RENDERERS.milestones = function(){
 };
 function buildMilestoneTimeline(){
   const events = [];
-  if(state.createdAt) events.push({date:new Date(state.createdAt).toLocaleDateString(), title:'Joined MAAR LIFE', sub:'System activated', type:'Start'});
-  state.goals.forEach(g=> events.push({date:new Date(g.createdAt).toLocaleDateString(), title:`Goal set: ${g.text}`, sub:g.category, type:'Goal'}));
+  if(state.createdAt) events.push({date:new Date(state.createdAt).toLocaleDateString('en-GB'), title:'Joined MAAR LIFE', sub:'System activated', type:'Start'});
+  state.goals.forEach(g=> events.push({date:fmtDateUK(g.createdAt), title:`Goal set: ${g.text}`, sub:g.category, type:'Goal'}));
   state.achievements.forEach(a=> events.push({date:'—', title:'Achievement unlocked', sub:a.replace(/_/g,' '), type:'Achievement'}));
   const info = getRankInfo(state.xp);
   events.push({date:'Current', title:`Reached ${info.rank.name}`, sub:`${state.xp} total XP`, type:'Rank'});
@@ -3551,7 +4484,7 @@ function generateReport(){
   const info = getRankInfo(state.xp);
   const lines = [];
   lines.push('MAAR LIFE — PROGRESS REPORT');
-  lines.push('Generated: '+new Date().toLocaleString());
+  lines.push('Generated: '+new Date().toLocaleString('en-GB'));
   lines.push('='.repeat(40));
   lines.push(`Name: ${state.profile.name||'—'}`);
   lines.push(`Life Score: ${overall}/100`);
@@ -3608,7 +4541,7 @@ VIEW_RENDERERS.settings = function(){
     </div>
     <div class="glass panel">
       <div class="section-title-row"><h3>Data</h3></div>
-      <p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device. Nothing is sent anywhere.</p>
+      <p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device, in this browser. Nothing is sent anywhere. This means it is not currently shared or synced between devices or browsers — see the note in chat about accounts and multi-device sync if you'd like that added.</p>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn btn-ghost btn-sm" id="sExportBtn">Export data (JSON)</button>
         <button class="btn btn-ghost btn-sm" id="sResetBtn" style="color:var(--danger);">Reset all data</button>
@@ -3652,6 +4585,7 @@ VIEW_RENDERERS.settings = function(){
    BOOT
    ============================================================ */
 document.addEventListener('DOMContentLoaded', boot);
+
 </script>
 </body>
 </html>
