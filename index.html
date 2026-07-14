@@ -648,6 +648,7 @@ svg.icon{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1
   position:fixed; z-index:300; font-family:var(--font-mono); font-weight:700; color:var(--gold-bright); font-size:14px;
   pointer-events:none; animation:xpFloat 1.1s var(--ease) forwards;
 }
+.xp-float.xp-float-neg{color:var(--danger);}
 @keyframes xpFloat{0%{opacity:0; transform:translateY(0) scale(0.8);} 15%{opacity:1; transform:translateY(-8px) scale(1.1);} 100%{opacity:0; transform:translateY(-50px) scale(1);}}
 </style>
 </head>
@@ -1043,6 +1044,7 @@ window.ML = window.ML || {};
    CONSTANTS & SEED DATA
    ============================================================ */
 const STORAGE_KEY = 'maarlife_state_v1';
+const TASK_COMPLETE_XP = 8; // XP awarded when a to-do item is checked off, and refunded when it's unchecked
 
 const DOMAIN_META = {
   health:    {label:'Health',     color:'#3FE8AC'},
@@ -1182,8 +1184,8 @@ function showToast(msg, opts={}){
 
 function floatXp(amount, x, y){
   const el = document.createElement('div');
-  el.className = 'xp-float';
-  el.textContent = `+${amount} XP`;
+  el.className = 'xp-float' + (amount<0 ? ' xp-float-neg' : '');
+  el.textContent = `${amount>=0?'+':''}${amount} XP`;
   el.style.left = (x||window.innerWidth/2) + 'px';
   el.style.top = (y||window.innerHeight/2) + 'px';
   document.body.appendChild(el);
@@ -1191,7 +1193,7 @@ function floatXp(amount, x, y){
 }
 
 function addXp(amount, evt){
-  state.xp += amount;
+  state.xp = Math.max(0, state.xp + amount);
   saveState();
   let x = window.innerWidth/2, y = 100;
   if(evt && evt.clientX){ x = evt.clientX; y = evt.clientY; }
@@ -2062,10 +2064,36 @@ function toggleTaskComplete(taskId, evt){
   }
 
   if(justCompleted){
-    addXp(8, evt);
+    addXp(TASK_COMPLETE_XP, evt);
     checkAchievements();
+  } else {
+    // Symmetric refund: unticking a task takes back the XP it earned
+    addXp(-TASK_COMPLETE_XP, evt);
   }
   renderHome();
+}
+
+/* Deletes whatever generated a to-do item (timetable block, onboarding habit,
+   tracked habit, or goal) so it stops appearing on the list entirely — not just
+   for today. Faith practice isn't deletable this way; change it in Settings. */
+function deleteGeneratedTask(taskId){
+  if(taskId.startsWith('tt_')){
+    const blockId = taskId.slice(3);
+    state.timetable.blocks = state.timetable.blocks.filter(b=>b.id!==blockId);
+  } else if(taskId.startsWith('hab_')){
+    state.habitsToImprove = state.habitsToImprove.filter(h=> ('hab_'+slug(h)) !== taskId);
+  } else if(taskId.startsWith('track_')){
+    const habitId = taskId.slice(6);
+    state.habitsTracking = state.habitsTracking.filter(h=>h.id!==habitId);
+  } else if(taskId.startsWith('goal_')){
+    const goalId = taskId.slice(5);
+    state.goals = state.goals.filter(g=>g.id!==goalId);
+  } else {
+    return false;
+  }
+  saveState();
+  showToast('Removed from your to-do list');
+  return true;
 }
 
 /* ============================================================
@@ -2204,11 +2232,19 @@ function renderTodayRail(){
           <div class="rc-sub">${escapeHtml(t.sub||'')}</div>
         </div>
         <span class="rc-tag badge badge-emerald">${t.category}</span>
+        ${t.id!=='faith_today'?`<button class="lr-del" data-task-del="${t.id}" title="Remove from to-do list"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
       </div>
     </div>`;
   }).join('');
   rail.querySelectorAll('.rail-check').forEach(chk=>{
     chk.addEventListener('click', (e)=> toggleTaskComplete(chk.dataset.task, e));
+  });
+  rail.querySelectorAll('[data-task-del]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      deleteGeneratedTask(btn.dataset.taskDel);
+      renderHome();
+    });
   });
 }
 
@@ -2399,9 +2435,15 @@ function renderGoalsDaily(){
         ${t.time?`<span class="rc-time">${t.time}</span>`:''}
         <div style="flex:1;min-width:0;"><div class="rc-title">${escapeHtml(t.title)}</div><div class="rc-sub">${escapeHtml(t.sub||'')}</div></div>
         <span class="rc-tag badge badge-emerald">${t.category}</span>
+        ${t.id!=='faith_today'?`<button class="lr-del" data-task-del="${t.id}" title="Remove from to-do list"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`:''}
       </div></div>`;
   }).join('');
   rail.querySelectorAll('.rail-check').forEach(chk=> chk.addEventListener('click', (e)=>{ toggleTaskComplete(chk.dataset.task, e); renderGoalsDaily(); }));
+  rail.querySelectorAll('[data-task-del]').forEach(btn=> btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    deleteGeneratedTask(btn.dataset.taskDel);
+    renderGoalsDaily();
+  }));
 }
 
 function renderGoalsWeekly(){
@@ -2529,6 +2571,7 @@ function renderHabitsList(){
       return `<div class="habit-card glass-tight" style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border);">
         <div class="hc-streak"><span class="num">${currentStreak((state.taskCompletions._derived?.[taskId])||[])||'–'}</span><span class="lbl">streak</span></div>
         <div class="hc-info"><div class="hc-title">${escapeHtml(microActionFor(h))}</div><div class="hc-sub">Working on: ${escapeHtml(h)}</div></div>
+        <button class="lr-del" data-task-del="${taskId}" style="margin-right:2px;" title="Remove"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
         <div class="rail-check hc-check ${done?'done':''}" data-task="${taskId}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div>
       </div>`;
     }).join('');
@@ -2555,6 +2598,11 @@ function renderHabitsList(){
   }
   wrap.innerHTML = html;
   wrap.querySelectorAll('.hc-check').forEach(chk=> chk.addEventListener('click', (e)=>{ toggleTaskComplete(chk.dataset.task, e); renderHabitsList(); renderHabitStatsRow(); }));
+  wrap.querySelectorAll('[data-task-del]').forEach(btn=> btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    deleteGeneratedTask(btn.dataset.taskDel);
+    renderHabitsList(); renderHabitStatsRow();
+  }));
   wrap.querySelectorAll('[data-habit-del]').forEach(btn=> btn.addEventListener('click', ()=>{
     state.habitsTracking = state.habitsTracking.filter(h=>h.id!==btn.dataset.habitDel);
     saveState(); renderHabitsList(); renderHabitStatsRow();
