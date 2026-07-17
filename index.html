@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+con you re wite it <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3060,11 +3060,14 @@ function renderCareerCv(){
       </div>
     </div>
   `;
-  const fieldMap = {cvFullName:'fullName', cvLocation:'location', cvEmail:'email', cvPhone:'phone', cvSummary:'summary', cvExperience:'experience', cvEducation:'education', cvSkillsList:'skillsList', cvCoverGreeting:'coverGreeting', cvCoverBody:'coverBody', cvCoverClosing:'coverClosing'};
+const fieldMap = {cvFullName:'fullName', cvLocation:'location', cvEmail:'email', cvPhone:'phone', cvSummary:'summary', cvExperience:'experience', cvEducation:'education', cvSkillsList:'skillsList', cvCoverGreeting:'coverGreeting', cvCoverBody:'coverBody', cvCoverClosing:'coverClosing'};
+  let cvPreviewTimeout = null;
   Object.entries(fieldMap).forEach(([id,key])=>{
     const wasFilled = (cv[key]||'').trim().length>0;
     document.getElementById(id).addEventListener('input', (e)=>{
-      cv[key] = e.target.value; saveState(); renderCvPreview();
+      cv[key] = e.target.value; saveState();
+      clearTimeout(cvPreviewTimeout);
+      cvPreviewTimeout = setTimeout(renderCvPreview, 300);
       if(!wasFilled && e.target.value.trim().length>0 && key==='fullName'){ pushCareerTimeline('Started building your CV',''); }
     });
   });
