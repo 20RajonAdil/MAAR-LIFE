@@ -500,6 +500,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
           <a href="#" class="nav-item" data-view="health"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg> Health</a>
           <a href="#" class="nav-item" data-view="diet"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg> Diet</a>
           <a href="#" class="nav-item" data-view="study"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Study</a>
+          <a href="#" class="nav-item" data-view="career"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Career Hub</a>
           <a href="#" class="nav-item" data-view="faith"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M5 9l7-7 7 7M5 14h14"/></svg> Faith</a>
           <a href="#" class="nav-item" data-view="journal"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Journal</a>
           <a href="#" class="nav-item" data-view="mood"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg> Mood</a>
@@ -589,6 +590,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
         <div class="view" id="view-health"></div>
         <div class="view" id="view-diet"></div>
         <div class="view" id="view-study"></div>
+        <div class="view" id="view-career"></div>
         <div class="view" id="view-faith"></div>
         <div class="view" id="view-journal"></div>
         <div class="view" id="view-mood"></div>
@@ -675,6 +677,7 @@ const DEFAULT_STATE = () => ({
   diet:{meals:[]}, study:{subjects:[], sessions:[], exams:[]},
   habitsTracking:[], journal:[], mood:[], faithLog:[], taskCompletions:{}, achievements:[], lastVisit:null,
   energyToday:{date:null, level:'normal'},
+  career: null,
 });
 
 let state = loadState();
@@ -779,7 +782,7 @@ function boot(){
   if(state.onboarded) enterApp(); else showScreen('landing');
 }
 function renderHeroDomains(){
-  const items = [['Health','M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z'],['Finance','M2 10h20M7 15h.01'],['Faith','M12 2v20M5 9l7-7 7 7M5 14h14'],['Learning','M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'],['Discipline','M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],['Habits','M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83'],['Goals','M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2'],['Growth','M3 3v18h18M7 14l4-4 4 4 5-6'],['Productivity','M12 8v4l3 3M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z']];
+  const items = [['Health','M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z'],['Finance','M2 10h20M7 15h.01'],['Faith','M12 2v20M5 9l7-7 7 7M5 14h14'],['Learning','M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'],['Discipline','M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],['Habits','M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83'],['Goals','M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2'],['Growth','M3 3v18h18M7 14l4-4 4 4 5-6'],['Productivity','M12 8v4l3 3M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z'],['Career','M2 7h20v14H2zM16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16']];
   const wrap = document.getElementById('heroDomains');
   wrap.innerHTML = items.map(([label,path])=>`<span class="hero-domain-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="${path}"/></svg>${label}</span>`).join('');
 }
@@ -1132,7 +1135,7 @@ function finishOnboarding(){
   if(state.timetable.events.length === 0 && state.timetable.mode !== 'later') seedDefaultTimetable();
   saveState(); showToast('Welcome to MAAR LIFE — your system is live.'); enterApp();
 }
-const VIEW_TITLES = { home:'Dashboard', timetable:'Timetable', focus:'Focus Room', goals:'Goals & Planning', habits:'Habits', finance:'Finance Center', health:'Health Center', diet:'Diet Center', study:'Study Center', faith:'Faith', journal:'Journal', mood:'Mood & Wellbeing', analytics:'Analytics', rank:'Rank & XP', milestones:'Milestones', reports:'Reports', settings:'Settings' };
+const VIEW_TITLES = { home:'Dashboard', timetable:'Timetable', focus:'Focus Room', goals:'Goals & Planning', habits:'Habits', finance:'Finance Center', health:'Health Center', diet:'Diet Center', study:'Study Center', career:'Career Hub', faith:'Faith', journal:'Journal', mood:'Mood & Wellbeing', analytics:'Analytics', rank:'Rank & XP', milestones:'Milestones', reports:'Reports', settings:'Settings' };
 function enterApp(){
   showScreen('app'); _lastRankIdx = getRankInfo(state.xp).index; bindAppNav(); renderSidebarProfile(); updateXpPill(); navigateTo('home'); checkDailyReset();
   recoverFocusOnLoad();
@@ -2391,6 +2394,7 @@ function buildMilestoneTimeline(){
   state.goals.forEach(g=> events.push({date:fmtDateUK(g.createdAt), title:`Goal set: ${g.text}`, sub:g.category, type:'Goal'}));
   state.achievements.forEach(a=> events.push({date:'—', title:'Achievement unlocked', sub:a.replace(/_/g,' '), type:'Achievement'}));
   const info = getRankInfo(state.xp); events.push({date:'Current', title:`Reached ${info.rank.name}`, sub:`${state.xp} total XP`, type:'Rank'});
+  if(state.career) buildCareerMilestones().forEach(ev=> events.push(ev));
   return events.reverse();
 }
 
@@ -2411,6 +2415,7 @@ function generateReport(){
   state.habitsTracking.forEach(h=> lines.push(`  - ${h.name}: ${currentStreak(h.log||[])} day streak`)); lines.push('');
   const {income,expense,net} = finTotals(); lines.push('FINANCE'); lines.push(`  Income: ${fmtMoney(income)}  Expenses: ${fmtMoney(expense)}  Net: ${fmtMoney(net)}`); lines.push('');
   lines.push('ACHIEVEMENTS'); state.achievements.forEach(a=> lines.push(`  - ${a.replace(/_/g,' ')}`));
+  if(state.career){ lines.push(''); lines.push('CAREER HUB'); lines.push(`  Target career: ${state.career.careerName||'—'}`); lines.push(`  Career Readiness Score: ${computeCareerScore().overall}/100`); }
   const text = lines.join('\n');
   document.getElementById('reportPreviewWrap').style.display='block'; document.getElementById('reportPreview').textContent = text;
   const blob = new Blob([text], {type:'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `MAAR-LIFE-report-${todayKey()}.txt`;
@@ -2433,6 +2438,808 @@ VIEW_RENDERERS.settings = function(){
   const installBtn = document.getElementById('sInstallBtn'); if(_deferredInstallPrompt) installBtn.classList.remove('hidden');
   installBtn.addEventListener('click', async ()=>{ if(!_deferredInstallPrompt){ showToast('Your browser will show an install option in its menu.'); return; } _deferredInstallPrompt.prompt(); await _deferredInstallPrompt.userChoice; _deferredInstallPrompt = null; installBtn.classList.add('hidden'); });
 };
+
+
+/* ============================================================
+   CAREER HUB
+   Fully offline career development centre: readiness score,
+   career roadmaps, interview practice bank, CV/cover letter
+   workspace, career journal, weekly missions, resource library
+   and an auto-built career timeline. Everything is stored in
+   the same localStorage-backed `state` object as the rest of
+   MAAR LIFE (state.career), no network calls, no AI APIs.
+============================================================ */
+
+const CAREER_LIST = [
+  {id:'software_developer', name:'Software Developer', category:'Technology',
+    skills:['Understand variables, loops & functions','Build a small project with HTML/CSS/JS','Learn Git & version control basics','Understand how APIs work','Practice debugging & reading error messages','Learn one backend basics concept (databases or servers)'],
+    knowledge:['How the web works (client vs server)','Basic command line usage','What "clean code" means and why it matters'],
+    projects:['Build a personal portfolio website','Build a simple to-do list app','Recreate a small game like tic-tac-toe'],
+    estWeeks:16},
+  {id:'business_owner', name:'Business Owner', category:'Business',
+    skills:['Write a one-page business plan','Understand basic bookkeeping','Learn how to price a product or service','Understand your target customer','Learn the basics of marketing on a budget','Understand simple cash flow'],
+    knowledge:['Difference between profit and revenue','What a business model is','Basic legal structures (sole trader, limited company)'],
+    projects:['Draft a one-page business plan for an idea you have','Create a simple budget spreadsheet','Design a basic logo or brand name'],
+    estWeeks:14},
+  {id:'accountant', name:'Accountant', category:'Finance',
+    skills:['Learn double-entry bookkeeping basics','Get comfortable with spreadsheets & formulas','Understand what a balance sheet is','Understand what a profit & loss statement is','Learn the basics of tax concepts','Practice reconciling numbers accurately'],
+    knowledge:['Assets vs liabilities','What an audit is','Common accounting software used by businesses'],
+    projects:['Build a simple household budget in a spreadsheet','Track a month of spending and categorise it','Create a mock profit & loss statement'],
+    estWeeks:18},
+  {id:'teacher', name:'Teacher', category:'Education',
+    skills:['Practice explaining a topic simply to someone else','Learn basic lesson planning','Understand different learning styles','Practice classroom management scenarios','Build public speaking confidence','Learn how to give constructive feedback'],
+    knowledge:['What a curriculum is','Safeguarding basics','Difference between formative and summative assessment'],
+    projects:['Plan a 15-minute lesson on a topic you know well','Create a simple worksheet or quiz','Record yourself explaining a concept and review it'],
+    estWeeks:16},
+  {id:'doctor', name:'Doctor', category:'Healthcare',
+    skills:['Build strong study habits for sciences','Practice active listening & empathy','Learn basic first aid','Understand medical ethics basics','Build resilience & stress management habits','Practice clear, calm communication under pressure'],
+    knowledge:['The typical path to becoming a doctor in your country','What a GP does day to day','Basic human anatomy overview'],
+    projects:['Complete a basic first aid course','Shadow or research a healthcare professional\'s day','Write a reflection on why you want this career'],
+    estWeeks:24},
+  {id:'nurse', name:'Nurse', category:'Healthcare',
+    skills:['Learn basic first aid & emergency response','Practice empathetic, clear communication','Understand hygiene & infection control basics','Build stamina and stress management habits','Practice teamwork under pressure','Learn to follow instructions precisely'],
+    knowledge:['What different nursing specialities involve','Patient confidentiality basics','The general training pathway to become a nurse'],
+    projects:['Complete a basic first aid course','Volunteer or research in a care setting','Write a reflection on a time you helped someone under pressure'],
+    estWeeks:20},
+  {id:'police_officer', name:'Police Officer', category:'Public Service',
+    skills:['Build physical fitness consistently','Practice de-escalation & communication skills','Learn basic report writing','Understand the law at a general level','Build decision-making under pressure','Practice teamwork and community awareness'],
+    knowledge:['What the recruitment process usually involves','The role of community policing','Basic understanding of use-of-force principles'],
+    projects:['Follow a structured fitness plan for one month','Write a mock incident report','Research your local police force\'s entry requirements'],
+    estWeeks:16},
+  {id:'electrician', name:'Electrician', category:'Trades',
+    skills:['Learn basic electrical safety rules','Understand simple circuits','Get comfortable using basic hand tools','Learn to read simple wiring diagrams','Practice measuring and precision','Understand relevant safety regulations basics'],
+    knowledge:['Difference between AC and DC current','What an apprenticeship pathway looks like','Basic tools every electrician uses'],
+    projects:['Learn to safely wire a simple practice circuit (with supervision)','Research local apprenticeship providers','Create a tool checklist for beginners'],
+    estWeeks:20},
+  {id:'graphic_designer', name:'Graphic Designer', category:'Creative',
+    skills:['Learn design fundamentals: colour, type, layout','Get comfortable with one design tool (e.g. free tools like Canva or GIMP)','Practice recreating designs you admire','Build a small portfolio','Learn to give and receive design feedback','Practice working to a brief'],
+    knowledge:['What a design brief is','Basics of branding','File formats and when to use them'],
+    projects:['Design a logo for a fictional brand','Redesign a poster or flyer','Build a simple 3-piece portfolio'],
+    estWeeks:14},
+  {id:'customer_service', name:'Customer Service Assistant', category:'Service',
+    skills:['Practice active listening','Learn to stay calm with difficult customers','Practice clear, friendly communication','Learn basic complaint-handling steps','Build product/service knowledge habits','Practice multitasking under pressure'],
+    knowledge:['What "first call resolution" means','Why tone of voice matters in service roles','Basic company policies customers usually ask about'],
+    projects:['Role-play 5 common customer scenarios','Write example responses to 3 complaint emails','Practice a mock phone call script'],
+    estWeeks:8},
+  {id:'retail_worker', name:'Retail Worker', category:'Service',
+    skills:['Practice friendly greetings & customer approach','Learn basic till/POS operation concepts','Understand stock and merchandising basics','Practice handling queues calmly','Learn basic upselling without being pushy','Build reliability and punctuality habits'],
+    knowledge:['What a shift handover usually involves','Basic loss-prevention awareness','Seasonal retail patterns'],
+    projects:['Practice a mock till transaction script','Plan a simple product display','Write a short "why hire me" pitch for a retail role'],
+    estWeeks:6},
+  {id:'office_admin', name:'Office Administrator', category:'Office',
+    skills:['Get comfortable with word processing & spreadsheets','Learn professional email etiquette','Practice organising files & schedules','Learn basic data entry accuracy habits','Practice phone & reception etiquette','Build strong time management habits'],
+    knowledge:['What GDPR/data protection basics mean at work','Common office software used day to day','Basics of minute-taking in meetings'],
+    projects:['Create a mock filing system','Draft 3 professional emails for common scenarios','Build a simple weekly office task tracker'],
+    estWeeks:8},
+  {id:'marketing_assistant', name:'Marketing Assistant', category:'Marketing',
+    skills:['Learn the marketing mix basics (product, price, place, promotion)','Get comfortable writing short marketing copy','Learn social media scheduling basics','Understand what a target audience is','Practice basic analytics reading','Learn simple content planning'],
+    knowledge:['Difference between organic and paid marketing','What a brand voice is','Basic SEO concepts'],
+    projects:['Write a week of social media captions for a fictional brand','Create a simple content calendar','Design a basic marketing flyer'],
+    estWeeks:10},
+  {id:'chef', name:'Chef', category:'Hospitality',
+    skills:['Learn basic knife skills & kitchen safety','Practice food hygiene standards','Build speed and consistency in simple recipes','Learn basic recipe costing','Practice working calmly under time pressure','Learn to plate and present food well'],
+    knowledge:['Food hygiene certificate basics','Common kitchen brigade roles','Allergen awareness basics'],
+    projects:['Cook the same simple dish 5 times and track improvement','Design a 3-course menu on a budget','Complete a basic food hygiene course'],
+    estWeeks:12},
+  {id:'mechanical_engineer', name:'Mechanical Engineer', category:'Engineering',
+    skills:['Strengthen maths & physics fundamentals','Learn basic CAD software concepts','Understand simple mechanics & forces','Practice technical problem solving','Learn to read technical drawings','Build habits of precise measurement'],
+    knowledge:['What different engineering disciplines involve','Common engineering career pathways','Basics of health & safety in engineering settings'],
+    projects:['Sketch and label a simple mechanical design','Try a free beginner CAD tutorial','Solve 5 basic physics/mechanics problems'],
+    estWeeks:20},
+  {id:'lawyer', name:'Lawyer', category:'Law',
+    skills:['Build strong reading comprehension habits','Practice structured, persuasive writing','Learn to summarise complex information simply','Practice public speaking & debate','Build strong research habits','Learn basic legal terminology'],
+    knowledge:['Different areas of law (criminal, civil, corporate)','Typical routes into the legal profession','What "case law" means'],
+    projects:['Write a one-page argument for or against a topic','Summarise a real (public) court case in your own words','Research two different legal career pathways'],
+    estWeeks:24},
+  {id:'social_worker', name:'Social Worker', category:'Public Service',
+    skills:['Practice empathetic, non-judgemental listening','Learn safeguarding basics','Build resilience & emotional regulation habits','Practice clear case-note writing','Understand confidentiality principles','Practice calm communication in difficult situations'],
+    knowledge:['What a social worker\'s day-to-day involves','Basic safeguarding frameworks','The general training pathway'],
+    projects:['Write a reflection on a time you supported someone through difficulty','Research local social work training routes','Practice writing an anonymised case summary'],
+    estWeeks:18},
+  {id:'personal_trainer', name:'Personal Trainer', category:'Fitness',
+    skills:['Learn basic anatomy & how muscles work','Practice designing a simple workout plan','Learn basic nutrition principles','Practice motivating & coaching others','Learn safe exercise form basics','Build your own consistent training habit'],
+    knowledge:['What a PT qualification pathway looks like','Basic injury-prevention principles','Different training goals (strength, endurance, weight loss)'],
+    projects:['Design a 4-week beginner workout plan','Track your own training for 2 weeks','Write 5 form-check cues for common exercises'],
+    estWeeks:12},
+];
+
+const INTERVIEW_CATEGORIES = ['General Interviews','Customer Service','Retail','Business','Hospitality','Office Jobs','Technology','Leadership','Teamwork','Problem Solving','Behavioural Questions'];
+const INTERVIEW_QUESTIONS = [
+  {c:'General Interviews', q:'Tell me about yourself.'},
+  {c:'General Interviews', q:'Why do you want this job?'},
+  {c:'General Interviews', q:'What are your biggest strengths?'},
+  {c:'General Interviews', q:'What is an area you\'re working on improving?'},
+  {c:'General Interviews', q:'Where do you see yourself in five years?'},
+  {c:'General Interviews', q:'Why should we hire you over other candidates?'},
+  {c:'General Interviews', q:'What do you know about our company or organisation?'},
+  {c:'General Interviews', q:'Do you have any questions for us?'},
+  {c:'Customer Service', q:'How would you handle an angry customer?'},
+  {c:'Customer Service', q:'Tell me about a time you went above and beyond for someone.'},
+  {c:'Customer Service', q:'How do you stay patient when someone is being unreasonable?'},
+  {c:'Customer Service', q:'What does great customer service mean to you?'},
+  {c:'Customer Service', q:'How would you handle a customer who wants a refund you can\'t give?'},
+  {c:'Retail', q:'How would you approach a customer who seems unsure what they want?'},
+  {c:'Retail', q:'What would you do if you noticed a colleague being dishonest?'},
+  {c:'Retail', q:'How do you stay motivated during a quiet shift?'},
+  {c:'Retail', q:'Describe how you would handle a long queue during a busy period.'},
+  {c:'Business', q:'How would you prioritise tasks when everything feels urgent?'},
+  {c:'Business', q:'Describe a time you had to make a decision with incomplete information.'},
+  {c:'Business', q:'How do you approach negotiating with someone who disagrees with you?'},
+  {c:'Business', q:'What would you do if a project was falling behind schedule?'},
+  {c:'Hospitality', q:'How would you handle a guest complaint about their room or table?'},
+  {c:'Hospitality', q:'Describe how you stay calm during a very busy service.'},
+  {c:'Hospitality', q:'How do you make someone feel welcome the moment they arrive?'},
+  {c:'Office Jobs', q:'How do you stay organised when juggling multiple tasks?'},
+  {c:'Office Jobs', q:'Describe your experience with spreadsheets or office software.'},
+  {c:'Office Jobs', q:'How would you handle a confidential document sent to you by mistake?'},
+  {c:'Office Jobs', q:'Tell me about a time you had to meet a tight deadline.'},
+  {c:'Technology', q:'Walk me through how you would approach debugging a problem you\'ve never seen before.'},
+  {c:'Technology', q:'How do you keep your technical skills up to date?'},
+  {c:'Technology', q:'Describe a project you\'re proud of and what you learned building it.'},
+  {c:'Technology', q:'How would you explain a technical concept to someone non-technical?'},
+  {c:'Leadership', q:'Describe a time you led a group, even informally.'},
+  {c:'Leadership', q:'How do you motivate someone who has lost confidence?'},
+  {c:'Leadership', q:'How would you handle two team members who disagree?'},
+  {c:'Leadership', q:'What does good leadership look like to you?'},
+  {c:'Teamwork', q:'Describe a time you worked in a team to reach a goal.'},
+  {c:'Teamwork', q:'How do you handle a team member who isn\'t pulling their weight?'},
+  {c:'Teamwork', q:'What role do you naturally take on in a group?'},
+  {c:'Teamwork', q:'Tell me about a disagreement you had with a teammate and how it was resolved.'},
+  {c:'Problem Solving', q:'Describe a difficult problem you solved and how you approached it.'},
+  {c:'Problem Solving', q:'What do you do when you\'re stuck and don\'t know the next step?'},
+  {c:'Problem Solving', q:'Tell me about a time a plan didn\'t work and what you did next.'},
+  {c:'Behavioural Questions', q:'Tell me about a time you made a mistake. What happened next?'},
+  {c:'Behavioural Questions', q:'Describe a time you received difficult feedback. How did you respond?'},
+  {c:'Behavioural Questions', q:'Tell me about a time you had to adapt to a big change.'},
+  {c:'Behavioural Questions', q:'Describe a time you went out of your comfort zone.'},
+  {c:'Behavioural Questions', q:'Tell me about a goal you set for yourself and how you achieved it.'},
+].map((x,i)=>({id:'iq'+i, category:x.c, question:x.q}));
+
+const RESOURCE_LIBRARY = [
+  {cat:'Communication', title:'Active Listening Basics', desc:'Core techniques for listening well and responding thoughtfully.', hours:1, level:'Beginner'},
+  {cat:'Communication', title:'Writing Clear, Professional Emails', desc:'Structure, tone and etiquette for everyday workplace email.', hours:1, level:'Beginner'},
+  {cat:'Microsoft Office', title:'Word Essentials', desc:'Formatting, styles and templates for professional documents.', hours:2, level:'Beginner'},
+  {cat:'Microsoft Office', title:'PowerPoint Essentials', desc:'Building clean, effective slide decks quickly.', hours:2, level:'Beginner'},
+  {cat:'Excel', title:'Excel Formulas for Beginners', desc:'SUM, IF, VLOOKUP and everyday formulas explained simply.', hours:3, level:'Beginner'},
+  {cat:'Excel', title:'Excel for Budgeting', desc:'Build a personal or small-business budget from scratch.', hours:2, level:'Beginner'},
+  {cat:'Programming', title:'Intro to HTML & CSS', desc:'The building blocks of every website, from scratch.', hours:6, level:'Beginner'},
+  {cat:'Programming', title:'JavaScript Fundamentals', desc:'Variables, functions, loops and logic for beginners.', hours:8, level:'Intermediate'},
+  {cat:'Business', title:'How to Write a One-Page Business Plan', desc:'A simple framework for planning any small business idea.', hours:2, level:'Beginner'},
+  {cat:'Business', title:'Understanding Profit & Loss', desc:'Reading and building a basic P&L statement.', hours:2, level:'Intermediate'},
+  {cat:'Marketing', title:'Marketing Basics: The 4 Ps', desc:'Product, price, place and promotion explained with examples.', hours:2, level:'Beginner'},
+  {cat:'Marketing', title:'Social Media Content Planning', desc:'Planning a month of content without burning out.', hours:2, level:'Beginner'},
+  {cat:'Finance', title:'Personal Finance Basics', desc:'Budgeting, saving and understanding your payslip.', hours:2, level:'Beginner'},
+  {cat:'Finance', title:'Intro to Bookkeeping', desc:'Double-entry basics for small businesses.', hours:3, level:'Intermediate'},
+  {cat:'Customer Service', title:'Handling Difficult Customers', desc:'De-escalation techniques that actually work.', hours:1, level:'Beginner'},
+  {cat:'Customer Service', title:'First Call Resolution Skills', desc:'Solving customer problems efficiently and kindly.', hours:1, level:'Intermediate'},
+  {cat:'Leadership', title:'Leading Without Authority', desc:'Influencing and motivating a team when you\'re not "the boss".', hours:2, level:'Intermediate'},
+  {cat:'Leadership', title:'Giving Constructive Feedback', desc:'A simple framework for feedback that helps rather than hurts.', hours:1, level:'Beginner'},
+  {cat:'Public Speaking', title:'Overcoming Public Speaking Nerves', desc:'Practical techniques to calm nerves before speaking.', hours:1, level:'Beginner'},
+  {cat:'Public Speaking', title:'Structuring a Short Presentation', desc:'A simple 3-part structure for any presentation.', hours:1, level:'Beginner'},
+  {cat:'Time Management', title:'The Eisenhower Matrix', desc:'A simple way to prioritise urgent vs important tasks.', hours:1, level:'Beginner'},
+  {cat:'Time Management', title:'Beating Procrastination', desc:'Practical, non-judgemental techniques to get started.', hours:1, level:'Beginner'},
+  {cat:'Productivity', title:'Building a Weekly Planning Habit', desc:'A simple weekly review system that actually sticks.', hours:1, level:'Beginner'},
+  {cat:'Productivity', title:'Deep Work Basics', desc:'How to protect focus time in a distracting world.', hours:2, level:'Intermediate'},
+  {cat:'Entrepreneurship', title:'Validating a Business Idea', desc:'Testing whether people actually want what you\'re building.', hours:2, level:'Intermediate'},
+  {cat:'Entrepreneurship', title:'Pricing Your First Product', desc:'Simple frameworks for pricing without guesswork.', hours:1, level:'Intermediate'},
+].map((r,i)=>({id:'res'+i, ...r}));
+
+const MISSION_POOL = [
+  {id:'m_update_cv', title:'Update or refine your CV', xp:20, cat:'CV'},
+  {id:'m_research_company', title:'Research a company or organisation you\'d like to work for', xp:15, cat:'Research'},
+  {id:'m_practice_interview', title:'Practise 3 interview questions in the Interview Prep tab', xp:20, cat:'Interview'},
+  {id:'m_learn_skill', title:'Mark progress on one skill in your career roadmap', xp:15, cat:'Skill'},
+  {id:'m_complete_project', title:'Make progress on a roadmap project', xp:20, cat:'Project'},
+  {id:'m_improve_comm', title:'Practise a communication resource from the Resource Library', xp:15, cat:'Communication'},
+  {id:'m_read_career', title:'Spend 15 minutes reading about your chosen career', xp:10, cat:'Research'},
+  {id:'m_review_apps', title:'Review your applications in the Career Journal', xp:10, cat:'Journal'},
+  {id:'m_cover_letter', title:'Draft or refine a cover letter', xp:20, cat:'CV'},
+  {id:'m_mock_interview', title:'Complete a Random Interview Mode session', xp:25, cat:'Interview'},
+];
+function weeklyMissionSet(){
+  const wk = mondayOf(todayKey());
+  const seed = wk.split('-').join('')|0;
+  const picks = [...MISSION_POOL].sort((a,b)=> ((seed+a.id.length)%7) - ((seed+b.id.length)%7));
+  return {weekStart: wk, missions: picks.slice(0,5)};
+}
+
+function defaultCareerState(){
+  return {
+    careerId: null, customCareerName:'', careerName:'',
+    skillsDone: {}, // careerId -> [skillIndex]
+    projectsDone: {}, // careerId -> [projectIndex]
+    interview: {}, // questionId -> {rating, notes, confidence, practicedAt}
+    cv: { fullName:'', email:'', phone:'', location:'', summary:'', experience:'', education:'', skillsList:'', coverLetter:'', coverGreeting:'', coverBody:'', coverClosing:'' },
+    journal: [], // {id, date, type, text}
+    missions: { weekStart:null, completedIds:[] },
+    resources: {}, // resourceId -> {status:'not_started'|'in_progress'|'done', notes:''}
+    timeline: [], // {date, title, sub}
+    certificates: [], // resourceIds marked as certificate earned
+    lastVisit: null,
+  };
+}
+function ensureCareerState(){
+  if(!state.career) state.career = defaultCareerState();
+  const d = defaultCareerState();
+  state.career = Object.assign(d, state.career, {
+    skillsDone: Object.assign({}, state.career.skillsDone||{}),
+    projectsDone: Object.assign({}, state.career.projectsDone||{}),
+    interview: Object.assign({}, state.career.interview||{}),
+    cv: Object.assign(d.cv, state.career.cv||{}),
+    journal: state.career.journal||[],
+    missions: Object.assign({weekStart:null, completedIds:[]}, state.career.missions||{}),
+    resources: Object.assign({}, state.career.resources||{}),
+    timeline: state.career.timeline||[],
+    certificates: state.career.certificates||[],
+  });
+  const ms = weeklyMissionSet();
+  if(state.career.missions.weekStart !== ms.weekStart){ state.career.missions = {weekStart: ms.weekStart, completedIds:[]}; }
+  saveState();
+}
+function pushCareerTimeline(title, sub){
+  ensureCareerState();
+  state.career.timeline.push({date: todayKey(), title, sub: sub||''});
+  saveState();
+}
+function getCareerDef(){
+  if(!state.career || !state.career.careerId) return null;
+  return CAREER_LIST.find(c=>c.id===state.career.careerId) || null;
+}
+function careerDisplayName(){
+  if(!state.career) return '';
+  if(state.career.careerId==='custom') return state.career.customCareerName || 'Custom career';
+  const def = getCareerDef(); return def ? def.name : '';
+}
+function buildCareerMilestones(){
+  ensureCareerState();
+  return state.career.timeline.map(ev=>({date: fmtDateUK(ev.date), title: ev.title, sub: ev.sub, type:'Career'}));
+}
+
+/* ---------- Career Readiness Score ---------- */
+function computeCareerScore(){
+  ensureCareerState();
+  const cs = state.career;
+  const def = getCareerDef();
+  const isCustom = cs.careerId==='custom';
+
+  // 1. Profile / target career chosen
+  const careerChosen = !!(cs.careerId && (isCustom ? cs.customCareerName.trim() : def));
+  const careerPct = careerChosen ? 100 : 0;
+
+  // 2. Skills completed
+  let skillsPct = 0;
+  if(def){ const done = (cs.skillsDone[cs.careerId]||[]).length; skillsPct = clamp(Math.round((done/def.skills.length)*100),0,100); }
+  else if(isCustom){ skillsPct = careerChosen ? 20 : 0; }
+
+  // 3. Interview practice — breadth across categories + volume
+  const practicedIds = Object.keys(cs.interview);
+  const practicedCats = new Set(practicedIds.map(id=>{ const q = INTERVIEW_QUESTIONS.find(x=>x.id===id); return q?q.category:null; }).filter(Boolean));
+  const interviewPct = clamp(Math.round((practicedIds.length/15)*60 + (practicedCats.size/INTERVIEW_CATEGORIES.length)*40), 0, 100);
+
+  // 4. CV completion
+  const cvFields = ['fullName','email','summary','experience','education','skillsList'];
+  const cvFilled = cvFields.filter(f=> (cs.cv[f]||'').trim().length>4).length;
+  const cvPct = clamp(Math.round((cvFilled/cvFields.length)*100),0,100);
+
+  // 5. Projects completed
+  let projectsPct = 0;
+  if(def){ const done = (cs.projectsDone[cs.careerId]||[]).length; projectsPct = clamp(Math.round((done/def.projects.length)*100),0,100); }
+
+  // 6. Consistency — missions completed over recent weeks + journal activity
+  const missionsPct = clamp(Math.round((cs.missions.completedIds.length/5)*100),0,100);
+  const journalPct = clamp(cs.journal.length*10, 0, 100);
+  const consistencyPct = Math.round((missionsPct*0.6) + (journalPct*0.4));
+
+  const weights = { career:0.10, skills:0.25, interview:0.20, cv:0.20, projects:0.10, consistency:0.15 };
+  const overall = Math.round(careerPct*weights.career + skillsPct*weights.skills + interviewPct*weights.interview + cvPct*weights.cv + projectsPct*weights.projects + consistencyPct*weights.consistency);
+
+  const tips = [];
+  if(!careerChosen) tips.push('Choose a target career to unlock your personal roadmap.');
+  if(skillsPct<50) tips.push('Mark more roadmap skills as complete as you learn them.');
+  if(interviewPct<50) tips.push('Practise a few more interview questions across different categories.');
+  if(cvPct<70) tips.push('Fill in more sections of your CV — summary, experience and skills matter most.');
+  if(def && projectsPct<50) tips.push('Start one of the suggested beginner projects for your career.');
+  if(consistencyPct<40) tips.push('Complete a weekly mission or add a Career Journal entry to build consistency.');
+  if(!tips.length) tips.push('Great progress — keep your CV and interview practice fresh as you go.');
+
+  return { overall, breakdown:{career:careerPct, skills:skillsPct, interview:interviewPct, cv:cvPct, projects:projectsPct, consistency:consistencyPct}, tips };
+}
+
+/* ---------- Main renderer ---------- */
+let careerActiveTab = 'dashboard';
+VIEW_RENDERERS.career = function(){
+  ensureCareerState();
+  const view = document.getElementById('view-career');
+  view.innerHTML = `
+    <div class="view-head"><div><h1>Career Hub</h1><div class="vh-sub">Build skills, prepare for interviews, and track your journey to your first (or next) job.</div></div></div>
+    <div class="tabs" id="careerTabs">
+      <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="roadmap">Roadmap</button>
+      <button class="tab-btn" data-tab="interview">Interview Prep</button>
+      <button class="tab-btn" data-tab="cv">CV & Cover Letter</button>
+      <button class="tab-btn" data-tab="journal">Career Journal</button>
+      <button class="tab-btn" data-tab="missions">Weekly Missions</button>
+      <button class="tab-btn" data-tab="resources">Resource Library</button>
+      <button class="tab-btn" data-tab="timeline">Career Timeline</button>
+    </div>
+    <div class="tab-panel" data-panel="dashboard" id="careerPanelDashboard"></div>
+    <div class="tab-panel" data-panel="roadmap" id="careerPanelRoadmap"></div>
+    <div class="tab-panel" data-panel="interview" id="careerPanelInterview"></div>
+    <div class="tab-panel" data-panel="cv" id="careerPanelCv"></div>
+    <div class="tab-panel" data-panel="journal" id="careerPanelJournal"></div>
+    <div class="tab-panel" data-panel="missions" id="careerPanelMissions"></div>
+    <div class="tab-panel" data-panel="resources" id="careerPanelResources"></div>
+    <div class="tab-panel" data-panel="timeline" id="careerPanelTimeline"></div>
+  `;
+  const group = document.getElementById('careerTabs');
+  group.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.tab===careerActiveTab);
+    btn.addEventListener('click', ()=>{
+      careerActiveTab = btn.dataset.tab;
+      group.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+      view.querySelectorAll('.tab-panel').forEach(p=> p.classList.toggle('active', p.dataset.panel===careerActiveTab));
+      renderCareerActiveTab();
+    });
+  });
+  view.querySelectorAll('.tab-panel').forEach(p=> p.classList.toggle('active', p.dataset.panel===careerActiveTab));
+  renderCareerActiveTab();
+};
+function renderCareerActiveTab(){
+  const fns = { dashboard:renderCareerDashboard, roadmap:renderCareerRoadmap, interview:renderCareerInterview, cv:renderCareerCv, journal:renderCareerJournal, missions:renderCareerMissions, resources:renderCareerResources, timeline:renderCareerTimelineTab };
+  (fns[careerActiveTab]||renderCareerDashboard)();
+}
+
+/* ---------- Dashboard ---------- */
+function renderCareerDashboard(){
+  const wrap = document.getElementById('careerPanelDashboard');
+  const score = computeCareerScore();
+  const name = careerDisplayName();
+  const def = getCareerDef();
+  const skillsDoneCount = def ? (state.career.skillsDone[state.career.careerId]||[]).length : 0;
+  const interviewCount = Object.keys(state.career.interview).length;
+  const appsCount = state.career.journal.filter(j=>j.type==='Application').length;
+  const certsCount = state.career.certificates.length;
+  const missionsDone = state.career.missions.completedIds.length;
+
+  wrap.innerHTML = `
+    <div class="dash-grid">
+      <div>
+        <div class="glass panel">
+          <div class="panel-head"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Career Readiness Score</h3></div>
+          <div class="score-dial-wrap">
+            <div class="score-dial"><svg viewBox="0 0 220 220" id="careerScoreDialSvg"></svg>
+              <div class="score-dial-center"><div class="score-dial-num">${score.overall}<span>/100</span></div><div class="score-dial-lbl">${score.overall>=80?'Ready':score.overall>=55?'Building':'Just starting'}</div></div>
+            </div>
+            <div class="score-legend">
+              ${Object.entries(score.breakdown).map(([k,v])=>{ const labels={career:'Career chosen',skills:'Skills',interview:'Interview',cv:'CV',projects:'Projects',consistency:'Consistency'};
+                return `<div class="score-legend-item"><span class="score-legend-dot" style="background:var(--emerald-bright)"></span>${labels[k]} <span class="sl-val">${v}</span></div>`; }).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="glass panel">
+          <div class="panel-head"><h3>What to improve next</h3></div>
+          <ul style="padding-left:18px; color:var(--ink-dim); font-size:13.5px; line-height:1.9;">${score.tips.map(t=>`<li>${escapeHtml(t)}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <div>
+        <div class="cards-row">
+          <div class="glass metric-card"><div class="mc-lbl">Target career</div><div class="mc-val small">${name?escapeHtml(name):'Not set'}</div></div>
+          <div class="glass metric-card"><div class="mc-lbl">Skills completed</div><div class="mc-val">${skillsDoneCount}${def?'/'+def.skills.length:''}</div></div>
+          <div class="glass metric-card"><div class="mc-lbl">Interview Qs practised</div><div class="mc-val">${interviewCount}</div></div>
+          <div class="glass metric-card"><div class="mc-lbl">Applications tracked</div><div class="mc-val">${appsCount}</div></div>
+          <div class="glass metric-card"><div class="mc-lbl">Certificates earned</div><div class="mc-val">${certsCount}</div></div>
+          <div class="glass metric-card"><div class="mc-lbl">Missions this week</div><div class="mc-val">${missionsDone}/5</div></div>
+        </div>
+        <div class="glass panel">
+          <div class="panel-head"><h3>Your career milestones</h3></div>
+          <div class="today-rail">${state.career.timeline.slice(-5).reverse().map(ev=>`<div class="rail-item done"><div class="rail-card"><span class="rc-time">${escapeHtml(fmtDateUK(ev.date))}</span><div style="flex:1;"><div class="rc-title">${escapeHtml(ev.title)}</div><div class="rc-sub">${escapeHtml(ev.sub||'')}</div></div></div></div>`).join('') || emptyState('No milestones yet','Choose a career, complete a skill, or log your first application to get started.')}</div>
+        </div>
+      </div>
+    </div>
+  `;
+  // draw dial
+  const r=95, cx=110, cy=110, circ=2*Math.PI*r;
+  const pct = clamp(score.overall,0,100)/100;
+  document.getElementById('careerScoreDialSvg').innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#16C98D" stroke-width="10" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}"/>`;
+  if(!state.career.careerId){
+    wrap.querySelector('.dash-grid').insertAdjacentHTML('afterbegin', `<div class="glass panel" style="grid-column:1/-1; text-align:center;"><div class="panel-head" style="justify-content:center;"><h3>Choose your dream career to get started</h3></div><button class="btn btn-primary" id="careerChooseBtnDash">Choose a career</button></div>`);
+    document.getElementById('careerChooseBtnDash').addEventListener('click', ()=>{ careerActiveTab='roadmap'; document.querySelector('#careerTabs .tab-btn[data-tab="roadmap"]').click(); });
+  }
+}
+
+/* ---------- Roadmap ---------- */
+function renderCareerRoadmap(){
+  const wrap = document.getElementById('careerPanelRoadmap');
+  const def = getCareerDef();
+  const isCustom = state.career.careerId==='custom';
+  wrap.innerHTML = `
+    <div class="glass panel">
+      <div class="panel-head"><h3>Your target career</h3></div>
+      <div class="field"><label>Choose from the list, or create your own</label>
+        <select id="careerSelect"><option value="">Select a career…</option>${CAREER_LIST.map(c=>`<option value="${c.id}" ${state.career.careerId===c.id?'selected':''}>${c.name} (${c.category})</option>`).join('')}<option value="custom" ${isCustom?'selected':''}>Custom career…</option></select>
+      </div>
+      <div class="field" id="customCareerField" style="${isCustom?'':'display:none;'}"><label>Custom career name</label><input type="text" id="customCareerName" value="${escapeHtml(state.career.customCareerName||'')}" placeholder="e.g. Sound Engineer"></div>
+    </div>
+    <div id="roadmapContent"></div>
+  `;
+  const sel = document.getElementById('careerSelect');
+  const customField = document.getElementById('customCareerField');
+  sel.addEventListener('change', ()=>{
+    customField.style.display = sel.value==='custom' ? '' : 'none';
+    const wasSet = !!state.career.careerId;
+    state.career.careerId = sel.value || null;
+    if(sel.value !== 'custom') state.career.customCareerName = '';
+    state.career.careerName = careerDisplayName();
+    saveState();
+    if(!wasSet && sel.value){ pushCareerTimeline('Chose a career path', careerDisplayName()); addXp(20); showToast('Career path set — your roadmap is ready'); }
+    renderCareerRoadmap();
+  });
+  document.getElementById('customCareerName')?.addEventListener('input', (e)=>{ state.career.customCareerName = e.target.value; state.career.careerName = careerDisplayName(); saveState(); });
+
+  const content = document.getElementById('roadmapContent');
+  if(!def && !isCustom){ content.innerHTML = `<div class="glass panel">${emptyState('No career chosen yet','Pick one above to see recommended skills, projects and resources.')}</div>`; return; }
+  if(isCustom){
+    content.innerHTML = `<div class="glass panel">${emptyState('Custom career roadmap', 'Custom careers don\'t have a pre-built roadmap yet — use the Resource Library and your own research to build your skills, and track applications in the Career Journal. We still count your CV, interview practice and consistency toward your Readiness Score.')}</div>`;
+    return;
+  }
+  const doneSkills = state.career.skillsDone[def.id]||[];
+  const doneProjects = state.career.projectsDone[def.id]||[];
+  content.innerHTML = `
+    <div class="cards-row">
+      <div class="glass metric-card"><div class="mc-lbl">Estimated learning time</div><div class="mc-val small">${def.estWeeks} weeks</div></div>
+      <div class="glass metric-card"><div class="mc-lbl">Skills complete</div><div class="mc-val">${doneSkills.length}/${def.skills.length}</div></div>
+      <div class="glass metric-card"><div class="mc-lbl">Projects complete</div><div class="mc-val">${doneProjects.length}/${def.projects.length}</div></div>
+    </div>
+    <div class="glass panel"><div class="section-title-row"><h3>Recommended skills</h3></div>
+      ${def.skills.map((s,i)=>{ const done = doneSkills.includes(i);
+        return `<div class="list-row"><div class="rail-check ${done?'done':''}" data-skill-idx="${i}" style="cursor:pointer;">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div><div class="lr-title" style="${done?'text-decoration:line-through; color:var(--ink-faint);':''}">${escapeHtml(s)}</div></div>`; }).join('')}
+    </div>
+    <div class="glass panel"><div class="section-title-row"><h3>Useful knowledge</h3></div>
+      ${def.knowledge.map(k=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div><div class="lr-title">${escapeHtml(k)}</div></div>`).join('')}
+    </div>
+    <div class="glass panel"><div class="section-title-row"><h3>Beginner projects</h3></div>
+      ${def.projects.map((p,i)=>{ const done = doneProjects.includes(i);
+        return `<div class="list-row"><div class="rail-check ${done?'done':''}" data-project-idx="${i}" style="cursor:pointer;">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div><div class="lr-title" style="${done?'text-decoration:line-through; color:var(--ink-faint);':''}">${escapeHtml(p)}</div></div>`; }).join('')}
+    </div>
+  `;
+  content.querySelectorAll('[data-skill-idx]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = Number(el.dataset.skillIdx); const arr = state.career.skillsDone[def.id] = state.career.skillsDone[def.id]||[];
+      const i2 = arr.indexOf(idx); const wasEmpty = arr.length===0;
+      if(i2>-1){ arr.splice(i2,1); } else { arr.push(idx); addXp(10);
+        if(wasEmpty) pushCareerTimeline('Completed your first skill', def.name);
+        if(arr.length===def.skills.length) pushCareerTimeline('Completed every roadmap skill', def.name);
+      }
+      saveState(); renderCareerRoadmap();
+    });
+  });
+  content.querySelectorAll('[data-project-idx]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = Number(el.dataset.projectIdx); const arr = state.career.projectsDone[def.id] = state.career.projectsDone[def.id]||[];
+      const i2 = arr.indexOf(idx);
+      if(i2>-1){ arr.splice(i2,1); } else { arr.push(idx); addXp(15); pushCareerTimeline('Completed a beginner project', def.projects[idx]); }
+      saveState(); renderCareerRoadmap();
+    });
+  });
+}
+
+/* ---------- Interview Prep ---------- */
+let interviewActiveCategory = 'All';
+let randomInterviewQueue = [];
+function renderCareerInterview(){
+  const wrap = document.getElementById('careerPanelInterview');
+  wrap.innerHTML = `
+    <div class="glass panel" style="text-align:center;">
+      <div class="panel-head" style="justify-content:center;"><h3>Random Interview Mode</h3></div>
+      <p style="color:var(--ink-dim); font-size:13.5px; margin-bottom:16px;">Simulates a real interview with questions pulled from different categories. Fully offline — no AI needed.</p>
+      <button class="btn btn-primary" id="startRandomInterviewBtn">Start random interview (5 questions)</button>
+    </div>
+    <div class="tabs" id="interviewCatTabs" style="overflow-x:auto;">
+      <button class="tab-btn ${interviewActiveCategory==='All'?'active':''}" data-cat="All">All</button>
+      ${INTERVIEW_CATEGORIES.map(c=>`<button class="tab-btn ${interviewActiveCategory===c?'active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}
+    </div>
+    <div id="interviewQList"></div>
+  `;
+  document.getElementById('startRandomInterviewBtn').addEventListener('click', startRandomInterview);
+  wrap.querySelectorAll('#interviewCatTabs .tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ interviewActiveCategory = btn.dataset.cat; renderCareerInterview(); });
+  });
+  renderInterviewQList();
+}
+function renderInterviewQList(){
+  const list = document.getElementById('interviewQList');
+  const qs = INTERVIEW_QUESTIONS.filter(q=> interviewActiveCategory==='All' || q.category===interviewActiveCategory);
+  list.innerHTML = qs.map(q=>{
+    const rec = state.career.interview[q.id];
+    return `<div class="glass panel" style="padding:18px 20px; margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;">
+        <div><div style="font-weight:600; font-size:14px;">${escapeHtml(q.question)}</div><div style="font-size:11.5px; color:var(--ink-faint); margin-top:3px;">${escapeHtml(q.category)}</div></div>
+        ${rec?`<span class="badge badge-emerald">Practised</span>`:''}
+      </div>
+      <div class="field" style="margin-bottom:10px;"><label>Your notes / practice answer</label><textarea data-note="${q.id}" placeholder="Jot down how you'd answer this...">${escapeHtml(rec?.notes||'')}</textarea></div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div style="font-size:12.5px; color:var(--ink-dim);">Confidence:</div>
+        <div class="chip-grid" data-conf-group="${q.id}">
+          ${[1,2,3,4,5].map(n=>`<div class="chip ${rec?.confidence===n?'selected':''}" data-conf="${n}" data-qid="${q.id}">${n}</div>`).join('')}
+        </div>
+        <button class="btn btn-ghost btn-sm" data-save-q="${q.id}" style="margin-left:auto;">Save practice</button>
+      </div>
+    </div>`;
+  }).join('') || emptyState('No questions in this category','');
+  list.querySelectorAll('[data-conf]').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const group = list.querySelector(`[data-conf-group="${chip.dataset.qid}"]`);
+      group.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected')); chip.classList.add('selected');
+    });
+  });
+  list.querySelectorAll('[data-save-q]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qid = btn.dataset.saveQ;
+      const notes = list.querySelector(`[data-note="${qid}"]`).value.trim();
+      const confEl = list.querySelector(`[data-conf-group="${qid}"] .chip.selected`);
+      const confidence = confEl ? Number(confEl.dataset.conf) : null;
+      const wasEmpty = Object.keys(state.career.interview).length===0;
+      state.career.interview[qid] = { notes, confidence, practicedAt: todayKey() };
+      saveState(); addXp(8);
+      if(wasEmpty) pushCareerTimeline('Practised your first interview question','');
+      showToast('Practice saved'); renderInterviewQList();
+    });
+  });
+}
+function startRandomInterview(){
+  const shuffled = [...INTERVIEW_QUESTIONS].sort(()=>Math.random()-0.5);
+  randomInterviewQueue = shuffled.slice(0,5);
+  openRandomInterviewModal(0);
+}
+function openRandomInterviewModal(idx){
+  if(idx>=randomInterviewQueue.length){
+    closeModal(); addXp(25); showToast('Mock interview complete — nice work!');
+    pushCareerTimeline('Completed a random mock interview','5 questions');
+    if(document.getElementById('view-career')?.classList.contains('active')) renderCareerActiveTab();
+    return;
+  }
+  const q = randomInterviewQueue[idx];
+  const m = openModal(`Mock Interview — Question ${idx+1} of ${randomInterviewQueue.length}`, `
+    <div class="badge badge-gold" style="margin-bottom:10px;">${escapeHtml(q.category)}</div>
+    <div style="font-family:var(--font-display); font-size:19px; margin-bottom:18px; line-height:1.4;">${escapeHtml(q.question)}</div>
+    <div class="field"><label>Your answer / notes</label><textarea id="riNotes" placeholder="Practice your answer here...">${escapeHtml(state.career.interview[q.id]?.notes||'')}</textarea></div>
+    <div class="modal-actions"><button class="btn btn-primary btn-block" id="riNextBtn">${idx===randomInterviewQueue.length-1?'Finish':'Next question'}</button></div>
+  `);
+  document.getElementById('riNextBtn').addEventListener('click', ()=>{
+    const notes = document.getElementById('riNotes').value.trim();
+    const wasEmpty = Object.keys(state.career.interview).length===0;
+    state.career.interview[q.id] = Object.assign(state.career.interview[q.id]||{}, {notes, practicedAt: todayKey()});
+    saveState(); if(wasEmpty) pushCareerTimeline('Practised your first interview question','');
+    openRandomInterviewModal(idx+1);
+  });
+}
+
+/* ---------- CV & Cover Letter ---------- */
+function renderCareerCv(){
+  const wrap = document.getElementById('careerPanelCv');
+  const cv = state.career.cv;
+  wrap.innerHTML = `
+    <div class="two-col">
+      <div>
+        <div class="glass panel"><div class="section-title-row"><h3>Personal details</h3></div>
+          <div class="field-row"><div class="field"><label>Full name</label><input type="text" id="cvFullName" value="${escapeHtml(cv.fullName)}"></div><div class="field"><label>Location</label><input type="text" id="cvLocation" value="${escapeHtml(cv.location)}" placeholder="City, Country"></div></div>
+          <div class="field-row"><div class="field"><label>Email</label><input type="text" id="cvEmail" value="${escapeHtml(cv.email)}"></div><div class="field"><label>Phone</label><input type="text" id="cvPhone" value="${escapeHtml(cv.phone)}"></div></div>
+        </div>
+        <div class="glass panel"><div class="section-title-row"><h3>Personal summary</h3></div>
+          <p style="font-size:12.5px; color:var(--ink-faint); margin-bottom:10px;">Write 2–3 honest sentences about who you are and what you're looking for. Avoid exaggerated claims — a clear, natural summary is far stronger than an inflated one.</p>
+          <div class="field"><textarea id="cvSummary" style="min-height:100px;" placeholder="e.g. A motivated and reliable individual looking to start a career in...">${escapeHtml(cv.summary)}</textarea></div>
+        </div>
+        <div class="glass panel"><div class="section-title-row"><h3>Experience</h3></div>
+          <p style="font-size:12.5px; color:var(--ink-faint); margin-bottom:10px;">List jobs, volunteering or relevant projects — one per line works well. Include what you actually did, in your own words.</p>
+          <div class="field"><textarea id="cvExperience" style="min-height:120px;" placeholder="e.g. Volunteer, Local Foodbank (2023) — sorted donations and assisted visitors">${escapeHtml(cv.experience)}</textarea></div>
+        </div>
+        <div class="glass panel"><div class="section-title-row"><h3>Education</h3></div>
+          <div class="field"><textarea id="cvEducation" style="min-height:90px;" placeholder="e.g. GCSEs, [School name] (2022)">${escapeHtml(cv.education)}</textarea></div>
+        </div>
+        <div class="glass panel"><div class="section-title-row"><h3>Skills</h3></div>
+          <div class="field"><textarea id="cvSkillsList" style="min-height:80px;" placeholder="e.g. Teamwork, Microsoft Excel, Customer service">${escapeHtml(cv.skillsList)}</textarea></div>
+        </div>
+        <div class="glass panel"><div class="section-title-row"><h3>Cover letter</h3></div>
+          <p style="font-size:12.5px; color:var(--ink-faint); margin-bottom:10px;">Write naturally — say why you want the role and what you bring. Keep it to a few honest paragraphs.</p>
+          <div class="field"><label>Greeting</label><input type="text" id="cvCoverGreeting" value="${escapeHtml(cv.coverGreeting)}" placeholder="Dear Hiring Manager,"></div>
+          <div class="field"><label>Main body</label><textarea id="cvCoverBody" style="min-height:140px;" placeholder="Write why you're a good fit for this role...">${escapeHtml(cv.coverBody)}</textarea></div>
+          <div class="field"><label>Closing</label><input type="text" id="cvCoverClosing" value="${escapeHtml(cv.coverClosing)}" placeholder="Kind regards, [Your name]"></div>
+        </div>
+      </div>
+      <div>
+        <div class="glass panel" style="position:sticky; top:90px;">
+          <div class="section-title-row"><h3>Live preview</h3></div>
+          <div id="cvPreviewBox" style="background:#fff; color:#111; border-radius:12px; padding:24px; font-family:Georgia, serif; font-size:13px; line-height:1.5; max-height:520px; overflow-y:auto;"></div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn btn-primary btn-sm" id="cvExportBtn" style="flex:1;">Export CV as PDF</button>
+            <button class="btn btn-ghost btn-sm" id="coverExportBtn" style="flex:1;">Export Cover Letter as PDF</button>
+          </div>
+          <div style="font-size:11px; color:var(--ink-faint); margin-top:10px;">Export opens your browser's print dialog — choose "Save as PDF" as the destination.</div>
+        </div>
+      </div>
+    </div>
+  `;
+  const fieldMap = {cvFullName:'fullName', cvLocation:'location', cvEmail:'email', cvPhone:'phone', cvSummary:'summary', cvExperience:'experience', cvEducation:'education', cvSkillsList:'skillsList', cvCoverGreeting:'coverGreeting', cvCoverBody:'coverBody', cvCoverClosing:'coverClosing'};
+  Object.entries(fieldMap).forEach(([id,key])=>{
+    const wasFilled = (cv[key]||'').trim().length>0;
+    document.getElementById(id).addEventListener('input', (e)=>{
+      cv[key] = e.target.value; saveState(); renderCvPreview();
+      if(!wasFilled && e.target.value.trim().length>0 && key==='fullName'){ pushCareerTimeline('Started building your CV',''); }
+    });
+  });
+  document.getElementById('cvExportBtn').addEventListener('click', ()=> exportCareerDoc('cv'));
+  document.getElementById('coverExportBtn').addEventListener('click', ()=> exportCareerDoc('cover'));
+  renderCvPreview();
+}
+function renderCvPreview(){
+  const cv = state.career.cv; const box = document.getElementById('cvPreviewBox'); if(!box) return;
+  const expLines = (cv.experience||'').split('\n').filter(Boolean);
+  const skillsLines = (cv.skillsList||'').split(',').map(s=>s.trim()).filter(Boolean);
+  box.innerHTML = `
+    <div style="font-size:20px; font-weight:700; margin-bottom:2px;">${escapeHtml(cv.fullName||'Your Name')}</div>
+    <div style="font-size:11.5px; color:#555; margin-bottom:14px;">${[cv.location,cv.email,cv.phone].filter(Boolean).map(escapeHtml).join(' · ')||'Location · Email · Phone'}</div>
+    ${cv.summary?`<div style="font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid #ddd; margin-bottom:6px; padding-bottom:3px;">Summary</div><div style="margin-bottom:14px;">${escapeHtml(cv.summary)}</div>`:''}
+    ${expLines.length?`<div style="font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid #ddd; margin-bottom:6px; padding-bottom:3px;">Experience</div><ul style="margin:0 0 14px 18px; padding:0;">${expLines.map(l=>`<li>${escapeHtml(l)}</li>`).join('')}</ul>`:''}
+    ${cv.education?`<div style="font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid #ddd; margin-bottom:6px; padding-bottom:3px;">Education</div><div style="margin-bottom:14px; white-space:pre-wrap;">${escapeHtml(cv.education)}</div>`:''}
+    ${skillsLines.length?`<div style="font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid #ddd; margin-bottom:6px; padding-bottom:3px;">Skills</div><div>${skillsLines.map(escapeHtml).join(' · ')}</div>`:''}
+    ${(!cv.summary && !expLines.length && !cv.education && !skillsLines.length) ? `<div style="color:#999; font-style:italic;">Fill in the fields on the left to build your CV preview.</div>` : ''}
+  `;
+}
+function exportCareerDoc(kind){
+  const cv = state.career.cv;
+  let title, bodyHtml;
+  if(kind==='cv'){
+    title = `${cv.fullName||'CV'} — CV`;
+    bodyHtml = document.getElementById('cvPreviewBox').innerHTML;
+  } else {
+    title = `${cv.fullName||'Cover Letter'} — Cover Letter`;
+    bodyHtml = `<div style="margin-bottom:14px;">${escapeHtml(cv.fullName||'')}</div>
+      <div style="margin-bottom:18px;">${escapeHtml(cv.coverGreeting||'Dear Hiring Manager,')}</div>
+      <div style="white-space:pre-wrap; margin-bottom:18px;">${escapeHtml(cv.coverBody||'')}</div>
+      <div style="white-space:pre-wrap;">${escapeHtml(cv.coverClosing||'Kind regards,')}</div>`;
+    if(!cv.coverBody.trim()){ showToast('Write your cover letter first'); return; }
+  }
+  const win = window.open('', '_blank');
+  if(!win){ showToast('Please allow pop-ups to export as PDF'); return; }
+  win.document.write(`<html><head><title>${escapeHtml(title)}</title><style>body{font-family:Georgia,serif; padding:40px; color:#111;} @media print{body{padding:0;}}</style></head><body>${bodyHtml}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{ win.print(); }, 300);
+  if(kind==='cv' && !state.career.timeline.some(t=>t.title==='Created your first CV')) pushCareerTimeline('Created your first CV','');
+  addXp(15);
+}
+
+/* ---------- Career Journal ---------- */
+function renderCareerJournal(){
+  const wrap = document.getElementById('careerPanelJournal');
+  wrap.innerHTML = `
+    <div class="glass panel">
+      <div class="field"><label>Entry type</label>
+        <div class="chip-grid" id="journalTypeChips">
+          ${['Application','Interview','Lesson','Mistake','Goal','Reflection'].map(t=>`<div class="chip" data-jctype="${t}">${t}</div>`).join('')}
+        </div>
+      </div>
+      <div class="field"><label>What happened?</label><textarea id="careerJournalText" placeholder="e.g. Applied to Tesco for a Customer Assistant role. Felt good about the CV I sent."></textarea></div>
+      <button class="btn btn-primary btn-sm" id="careerJournalSaveBtn">Save entry</button>
+    </div>
+    <div id="careerJournalList"></div>
+  `;
+  let selectedType = 'Application';
+  const chips = wrap.querySelectorAll('#journalTypeChips .chip');
+  chips.forEach(c=> c.classList.toggle('selected', c.dataset.jctype===selectedType));
+  chips.forEach(c=> c.addEventListener('click', ()=>{ chips.forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); selectedType = c.dataset.jctype; }));
+  document.getElementById('careerJournalSaveBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('careerJournalText').value.trim(); if(!text){ showToast('Write something first'); return; }
+    const wasFirstApp = selectedType==='Application' && !state.career.journal.some(j=>j.type==='Application');
+    const wasFirstInterview = selectedType==='Interview' && !state.career.journal.some(j=>j.type==='Interview');
+    state.career.journal.unshift({id:uid(), date:new Date().toISOString(), type:selectedType, text});
+    saveState(); addXp(10);
+    if(wasFirstApp) pushCareerTimeline('Submitted your first tracked application','');
+    if(wasFirstInterview) pushCareerTimeline('Attended your first tracked interview','');
+    showToast('Journal entry saved'); renderCareerJournal();
+  });
+  renderCareerJournalList();
+}
+function renderCareerJournalList(){
+  const wrap = document.getElementById('careerJournalList');
+  if(!state.career.journal.length){ wrap.innerHTML = emptyState('No entries yet','Log applications, interviews and lessons here to build your career history.'); return; }
+  wrap.innerHTML = state.career.journal.map(j=>`<div class="glass journal-entry"><div class="je-date">${new Date(j.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'})}</div><div class="je-text">${escapeHtml(j.text)}</div><div class="je-tags"><span class="badge badge-emerald">${escapeHtml(j.type)}</span></div></div>`).join('');
+}
+
+/* ---------- Weekly Missions ---------- */
+function renderCareerMissions(){
+  const wrap = document.getElementById('careerPanelMissions');
+  const ms = state.career.missions;
+  wrap.innerHTML = `
+    <div class="glass panel">
+      <div class="panel-head"><h3>This week's career missions</h3></div>
+      <p style="color:var(--ink-dim); font-size:13px; margin-bottom:16px;">Complete these to build steady momentum — each contributes to your Career Readiness Score.</p>
+      <div class="today-rail" id="careerMissionsRail"></div>
+    </div>
+  `;
+  const rail = document.getElementById('careerMissionsRail');
+  const missions = MISSION_POOL.filter(m=> weeklyMissionSet().missions.some(w=>w.id===m.id));
+  rail.innerHTML = missions.map(m=>{ const done = ms.completedIds.includes(m.id);
+    return `<div class="rail-item ${done?'done':''}"><div class="rail-card"><div class="rail-check" data-mission="${m.id}">${done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg>':''}</div><div style="flex:1;"><div class="rc-title">${escapeHtml(m.title)}</div><div class="rc-sub">${escapeHtml(m.cat)}</div></div><span class="rc-tag badge badge-gold">+${m.xp} XP</span></div></div>`;
+  }).join('');
+  rail.querySelectorAll('.rail-check').forEach(chk=>{
+    chk.addEventListener('click', ()=>{
+      const id = chk.dataset.mission; const idx = ms.completedIds.indexOf(id); const mission = MISSION_POOL.find(m=>m.id===id);
+      if(idx>-1){ ms.completedIds.splice(idx,1); addXp(-mission.xp); } else { ms.completedIds.push(id); addXp(mission.xp);
+        if(ms.completedIds.length===missions.length) pushCareerTimeline('Completed all weekly career missions',''); }
+      saveState(); renderCareerMissions();
+    });
+  });
+}
+
+/* ---------- Resource Library ---------- */
+let resourceActiveCategory = 'All';
+const RESOURCE_CATEGORIES = ['Communication','Microsoft Office','Excel','Programming','Business','Marketing','Finance','Customer Service','Leadership','Public Speaking','Time Management','Productivity','Entrepreneurship'];
+function renderCareerResources(){
+  const wrap = document.getElementById('careerPanelResources');
+  wrap.innerHTML = `
+    <div class="tabs" id="resourceCatTabs" style="overflow-x:auto;">
+      <button class="tab-btn ${resourceActiveCategory==='All'?'active':''}" data-cat="All">All</button>
+      ${RESOURCE_CATEGORIES.map(c=>`<button class="tab-btn ${resourceActiveCategory===c?'active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}
+    </div>
+    <div id="resourceList"></div>
+  `;
+  wrap.querySelectorAll('#resourceCatTabs .tab-btn').forEach(btn=> btn.addEventListener('click', ()=>{ resourceActiveCategory = btn.dataset.cat; renderCareerResources(); }));
+  renderResourceList();
+}
+function renderResourceList(){
+  const list = document.getElementById('resourceList');
+  const items = RESOURCE_LIBRARY.filter(r=> resourceActiveCategory==='All' || r.cat===resourceActiveCategory);
+  list.innerHTML = items.map(r=>{
+    const prog = state.career.resources[r.id] || {status:'not_started', notes:'', link:''};
+    const isCert = state.career.certificates.includes(r.id);
+    return `<div class="glass panel" style="padding:18px 20px; margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:8px;">
+        <div><div style="font-weight:700; font-size:14.5px;">${escapeHtml(r.title)}</div><div style="font-size:12px; color:var(--ink-faint); margin-top:2px;">${escapeHtml(r.cat)} · ~${r.hours}h · ${escapeHtml(r.level)}</div></div>
+        <select data-res-status="${r.id}" style="width:auto; padding:6px 10px; font-size:12px;">
+          <option value="not_started" ${prog.status==='not_started'?'selected':''}>Not started</option>
+          <option value="in_progress" ${prog.status==='in_progress'?'selected':''}>In progress</option>
+          <option value="done" ${prog.status==='done'?'selected':''}>Done</option>
+        </select>
+      </div>
+      <div style="font-size:12.5px; color:var(--ink-dim); margin-bottom:10px;">${escapeHtml(r.desc)}</div>
+      <div class="field-row" style="margin-bottom:0;">
+        <div class="field" style="margin-bottom:8px;"><label style="font-size:11px;">Your link (editable — paste a course/article you found)</label><input type="text" data-res-link="${r.id}" value="${escapeHtml(prog.link||'')}" placeholder="https://..."></div>
+        <div class="field" style="margin-bottom:8px;"><label style="font-size:11px;">Notes</label><input type="text" data-res-notes="${r.id}" value="${escapeHtml(prog.notes||'')}" placeholder="Key takeaway..."></div>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-dim); cursor:pointer;"><input type="checkbox" data-res-cert="${r.id}" ${isCert?'checked':''} style="accent-color:var(--emerald); width:15px; height:15px;"> Mark as certificate/course completed</label>
+    </div>`;
+  }).join('') || emptyState('No resources in this category','');
+  list.querySelectorAll('[data-res-status]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const id = sel.dataset.resStatus; const prog = state.career.resources[id] = state.career.resources[id]||{status:'not_started', notes:'', link:''};
+      prog.status = sel.value; saveState(); if(sel.value==='done') addXp(10);
+    });
+  });
+  list.querySelectorAll('[data-res-link]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ const id = inp.dataset.resLink; const prog = state.career.resources[id] = state.career.resources[id]||{status:'not_started', notes:'', link:''}; prog.link = inp.value; saveState(); });
+  });
+  list.querySelectorAll('[data-res-notes]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ const id = inp.dataset.resNotes; const prog = state.career.resources[id] = state.career.resources[id]||{status:'not_started', notes:'', link:''}; prog.notes = inp.value; saveState(); });
+  });
+  list.querySelectorAll('[data-res-cert]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const id = cb.dataset.resCert; const idx = state.career.certificates.indexOf(id);
+      if(cb.checked && idx===-1){ state.career.certificates.push(id); addXp(20); pushCareerTimeline('Earned a certificate', RESOURCE_LIBRARY.find(r=>r.id===id)?.title||''); }
+      if(!cb.checked && idx>-1){ state.career.certificates.splice(idx,1); }
+      saveState();
+    });
+  });
+}
+
+/* ---------- Career Timeline tab ---------- */
+function renderCareerTimelineTab(){
+  const wrap = document.getElementById('careerPanelTimeline');
+  const events = [...state.career.timeline].reverse();
+  wrap.innerHTML = `<div class="glass panel"><div class="panel-head"><h3>Your career journey</h3></div>
+    <div class="today-rail">${events.length ? events.map(ev=>`<div class="rail-item done"><div class="rail-card"><span class="rc-time">${escapeHtml(fmtDateUK(ev.date))}</span><div style="flex:1;"><div class="rc-title">${escapeHtml(ev.title)}</div><div class="rc-sub">${escapeHtml(ev.sub||'')}</div></div></div></div>`).join('') : emptyState('Your career timeline starts now','Choose a career, complete a skill, build your CV or log an application to begin.')}</div>
+  </div>`;
+}
 
 document.addEventListener('DOMContentLoaded', boot);
 </script>
