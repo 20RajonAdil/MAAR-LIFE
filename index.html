@@ -293,6 +293,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .focus-state-lbl{font-size:12px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;}
 .freewindow-row{display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); margin-bottom:8px; font-size:13px;}
 .freewindow-row .fw-dot{width:8px; height:8px; border-radius:50%; background:var(--emerald); flex-shrink:0;}
+
+/* ===== Career Hub — polished toggle controls to match app design ===== */
+.chub-toggle-row{display:flex; gap:8px; flex-wrap:wrap;}
+.chub-toggle{padding:9px 16px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); color:var(--ink-dim); font-size:12.5px; font-weight:600; transition:all 0.2s var(--ease); cursor:pointer;}
+.chub-toggle:hover{background:rgba(255,255,255,0.06); border-color:rgba(232,230,222,0.16);}
+.chub-toggle.active{background:var(--emerald-dim); border-color:var(--emerald); color:var(--emerald-bright);}
+.chub-toggle.active.gold{background:var(--gold-dim); border-color:var(--gold); color:var(--gold-bright);}
+.chub-cert-btn{display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); color:var(--ink-dim); font-size:12.5px; font-weight:600; transition:all 0.2s var(--ease); cursor:pointer;}
+.chub-cert-btn:hover{background:rgba(255,255,255,0.06);}
+.chub-cert-btn.active{background:var(--gold-dim); border-color:var(--gold); color:var(--gold-bright);}
+.chub-cert-btn .cc-dot{width:16px; height:16px; border-radius:50%; border:2px solid var(--card-border); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.2s;}
+.chub-cert-btn.active .cc-dot{background:var(--gold); border-color:var(--gold);}
+.chub-cert-btn .cc-dot svg{width:10px;height:10px; stroke:#241C0A; stroke-width:3.5; opacity:0;}
+.chub-cert-btn.active .cc-dot svg{opacity:1;}
 </style>
 </head>
 <body>
@@ -723,12 +737,13 @@ function showToast(msg){
   setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=> el.remove(), 350); }, 2600);
 }
 function floatXp(amount, x, y){
-  const el = document.createElement('div'); el.className = 'xp-float'; el.textContent = `+${amount} XP`;
+  const el = document.createElement('div'); el.className = 'xp-float'; el.textContent = `${amount>=0?'+':''}${amount} XP`;
+  if(amount<0) el.style.color = 'var(--danger)';
   el.style.left = (x||window.innerWidth/2) + 'px'; el.style.top = (y||window.innerHeight/2) + 'px';
   document.body.appendChild(el); setTimeout(()=> el.remove(), 1200);
 }
 function addXp(amount, evt){
-  state.xp += amount; saveState();
+  state.xp = Math.max(0, state.xp + amount); saveState();
   let x = window.innerWidth/2, y = 100;
   if(evt && evt.clientX){ x = evt.clientX; y = evt.clientY; }
   floatXp(amount, x, y); updateXpPill(); checkRankUp();
@@ -2904,10 +2919,11 @@ function renderCareerRoadmap(){
     </div>
   `;
   content.querySelectorAll('[data-skill-idx]').forEach(el=>{
-    el.addEventListener('click', ()=>{
+    el.addEventListener('click', (e)=>{
       const idx = Number(el.dataset.skillIdx); const arr = state.career.skillsDone[def.id] = state.career.skillsDone[def.id]||[];
       const i2 = arr.indexOf(idx); const wasEmpty = arr.length===0;
-      if(i2>-1){ arr.splice(i2,1); } else { arr.push(idx); addXp(10);
+      if(i2>-1){ arr.splice(i2,1); addXp(-10, e); }
+      else { arr.push(idx); addXp(10, e);
         if(wasEmpty) pushCareerTimeline('Completed your first skill', def.name);
         if(arr.length===def.skills.length) pushCareerTimeline('Completed every roadmap skill', def.name);
       }
@@ -2915,10 +2931,11 @@ function renderCareerRoadmap(){
     });
   });
   content.querySelectorAll('[data-project-idx]').forEach(el=>{
-    el.addEventListener('click', ()=>{
+    el.addEventListener('click', (e)=>{
       const idx = Number(el.dataset.projectIdx); const arr = state.career.projectsDone[def.id] = state.career.projectsDone[def.id]||[];
       const i2 = arr.indexOf(idx);
-      if(i2>-1){ arr.splice(i2,1); } else { arr.push(idx); addXp(15); pushCareerTimeline('Completed a beginner project', def.projects[idx]); }
+      if(i2>-1){ arr.splice(i2,1); addXp(-15, e); }
+      else { arr.push(idx); addXp(15, e); pushCareerTimeline('Completed a beginner project', def.projects[idx]); }
       saveState(); renderCareerRoadmap();
     });
   });
@@ -3043,8 +3060,8 @@ function renderCareerCv(){
         <div class="glass panel"><div class="section-title-row"><h3>Cover letter</h3></div>
           <p style="font-size:12.5px; color:var(--ink-faint); margin-bottom:10px;">Write naturally — say why you want the role and what you bring. Keep it to a few honest paragraphs.</p>
           <div class="field"><label>Greeting</label><input type="text" id="cvCoverGreeting" value="${escapeHtml(cv.coverGreeting)}" placeholder="Dear Hiring Manager,"></div>
-          <div class="field"><label>Main body and closing</label><textarea id="cvCoverBody" style="min-height:140px;" placeholder="Write why you're a good fit for this role...">${escapeHtml(cv.coverBody)}</textarea></div>
-          <div class="field"><label>Put Only Your name</label><input type="text" id="cvCoverClosing" value="${escapeHtml(cv.coverClosing)}" placeholder="Kind regards, [Your name]"></div>
+          <div class="field"><label>Main body</label><textarea id="cvCoverBody" style="min-height:140px;" placeholder="Write why you're a good fit for this role...">${escapeHtml(cv.coverBody)}</textarea></div>
+          <div class="field"><label>Closing</label><input type="text" id="cvCoverClosing" value="${escapeHtml(cv.coverClosing)}" placeholder="Kind regards, [Your name]"></div>
         </div>
       </div>
       <div>
@@ -3060,7 +3077,7 @@ function renderCareerCv(){
       </div>
     </div>
   `;
-const fieldMap = {cvFullName:'fullName', cvLocation:'location', cvEmail:'email', cvPhone:'phone', cvSummary:'summary', cvExperience:'experience', cvEducation:'education', cvSkillsList:'skillsList', cvCoverGreeting:'coverGreeting', cvCoverBody:'coverBody', cvCoverClosing:'coverClosing'};
+  const fieldMap = {cvFullName:'fullName', cvLocation:'location', cvEmail:'email', cvPhone:'phone', cvSummary:'summary', cvExperience:'experience', cvEducation:'education', cvSkillsList:'skillsList', cvCoverGreeting:'coverGreeting', cvCoverBody:'coverBody', cvCoverClosing:'coverClosing'};
   let cvPreviewTimeout = null;
   Object.entries(fieldMap).forEach(([id,key])=>{
     const wasFilled = (cv[key]||'').trim().length>0;
@@ -3193,30 +3210,37 @@ function renderCareerResources(){
 function renderResourceList(){
   const list = document.getElementById('resourceList');
   const items = RESOURCE_LIBRARY.filter(r=> resourceActiveCategory==='All' || r.cat===resourceActiveCategory);
+  const STATUS_OPTS = [{v:'not_started', l:'Not started'}, {v:'in_progress', l:'In progress'}, {v:'done', l:'Done'}];
   list.innerHTML = items.map(r=>{
     const prog = state.career.resources[r.id] || {status:'not_started', notes:'', link:''};
     const isCert = state.career.certificates.includes(r.id);
     return `<div class="glass panel" style="padding:18px 20px; margin-bottom:12px;">
-      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap;">
         <div><div style="font-weight:700; font-size:14.5px;">${escapeHtml(r.title)}</div><div style="font-size:12px; color:var(--ink-faint); margin-top:2px;">${escapeHtml(r.cat)} · ~${r.hours}h · ${escapeHtml(r.level)}</div></div>
-        <select data-res-status="${r.id}" style="width:auto; padding:6px 10px; font-size:12px;">
-          <option value="not_started" ${prog.status==='not_started'?'selected':''}>Not started</option>
-          <option value="in_progress" ${prog.status==='in_progress'?'selected':''}>In progress</option>
-          <option value="done" ${prog.status==='done'?'selected':''}>Done</option>
-        </select>
+        <div class="chub-toggle-row" data-res-status-group="${r.id}">
+          ${STATUS_OPTS.map(o=>`<div class="chub-toggle ${prog.status===o.v?'active':''}${o.v==='done'?' gold':''}" data-res-status="${r.id}" data-status-val="${o.v}">${o.l}</div>`).join('')}
+        </div>
       </div>
       <div style="font-size:12.5px; color:var(--ink-dim); margin-bottom:10px;">${escapeHtml(r.desc)}</div>
-      <div class="field-row" style="margin-bottom:0;">
+      <div class="field-row" style="margin-bottom:12px;">
         <div class="field" style="margin-bottom:8px;"><label style="font-size:11px;">Your link (editable — paste a course/article you found)</label><input type="text" data-res-link="${r.id}" value="${escapeHtml(prog.link||'')}" placeholder="https://..."></div>
         <div class="field" style="margin-bottom:8px;"><label style="font-size:11px;">Notes</label><input type="text" data-res-notes="${r.id}" value="${escapeHtml(prog.notes||'')}" placeholder="Key takeaway..."></div>
       </div>
-      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-dim); cursor:pointer;"><input type="checkbox" data-res-cert="${r.id}" ${isCert?'checked':''} style="accent-color:var(--emerald); width:15px; height:15px;"> Mark as certificate/course completed</label>
+      <div class="chub-cert-btn ${isCert?'active':''}" data-res-cert="${r.id}">
+        <span class="cc-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12l5 5L20 7"/></svg></span>
+        Mark as certificate/course completed
+      </div>
     </div>`;
   }).join('') || emptyState('No resources in this category','');
-  list.querySelectorAll('[data-res-status]').forEach(sel=>{
-    sel.addEventListener('change', ()=>{
-      const id = sel.dataset.resStatus; const prog = state.career.resources[id] = state.career.resources[id]||{status:'not_started', notes:'', link:''};
-      prog.status = sel.value; saveState(); if(sel.value==='done') addXp(10);
+  list.querySelectorAll('[data-res-status]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const id = btn.dataset.resStatus; const val = btn.dataset.statusVal;
+      const prog = state.career.resources[id] = state.career.resources[id]||{status:'not_started', notes:'', link:''};
+      const wasDone = prog.status==='done';
+      prog.status = val; saveState();
+      if(val==='done' && !wasDone) addXp(10, e);
+      else if(val!=='done' && wasDone) addXp(-10, e);
+      renderResourceList();
     });
   });
   list.querySelectorAll('[data-res-link]').forEach(inp=>{
@@ -3225,12 +3249,12 @@ function renderResourceList(){
   list.querySelectorAll('[data-res-notes]').forEach(inp=>{
     inp.addEventListener('input', ()=>{ const id = inp.dataset.resNotes; const prog = state.career.resources[id] = state.career.resources[id]||{status:'not_started', notes:'', link:''}; prog.notes = inp.value; saveState(); });
   });
-  list.querySelectorAll('[data-res-cert]').forEach(cb=>{
-    cb.addEventListener('change', ()=>{
-      const id = cb.dataset.resCert; const idx = state.career.certificates.indexOf(id);
-      if(cb.checked && idx===-1){ state.career.certificates.push(id); addXp(20); pushCareerTimeline('Earned a certificate', RESOURCE_LIBRARY.find(r=>r.id===id)?.title||''); }
-      if(!cb.checked && idx>-1){ state.career.certificates.splice(idx,1); }
-      saveState();
+  list.querySelectorAll('[data-res-cert]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const id = btn.dataset.resCert; const idx = state.career.certificates.indexOf(id);
+      if(idx===-1){ state.career.certificates.push(id); addXp(20, e); pushCareerTimeline('Earned a certificate', RESOURCE_LIBRARY.find(r=>r.id===id)?.title||''); }
+      else { state.career.certificates.splice(idx,1); addXp(-20, e); }
+      saveState(); renderResourceList();
     });
   });
 }
