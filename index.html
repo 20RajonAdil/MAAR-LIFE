@@ -323,6 +323,63 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .notebook-editable img{max-width:100%; border-radius:10px; margin:12px 0; display:block; box-shadow:0 8px 24px rgba(0,0,0,0.3);}
 .notebook-editable ul, .notebook-editable ol{margin-left:22px; margin-bottom:10px;}
 .notebook-editable a{color:var(--emerald-bright);}
+.nb-size-select{font-family:var(--font-mono); font-weight:600;}
+
+/* ============================================================
+   PREMIUM POLISH PASS
+   Tactile depth, believable weight, and momentum-based motion
+   applied across every interactive surface in the app.
+============================================================ */
+:root{ --ease-press: cubic-bezier(0.32, 0, 0.67, 0); --ease-release: cubic-bezier(0.16, 1, 0.3, 1); }
+
+.glass{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 40px rgba(0,0,0,0.42), 0 2px 6px rgba(0,0,0,0.3); transition: box-shadow 0.3s var(--ease-release), border-color 0.3s var(--ease-release), transform 0.25s var(--ease-release); }
+
+.btn{ position:relative; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 2px rgba(0,0,0,0.2); transition: transform 0.18s var(--ease-release), box-shadow 0.25s var(--ease-release), background 0.25s var(--ease-release), border-color 0.2s var(--ease-release); }
+.btn:active{ transform: scale(0.965) translateY(1px); transition: transform 0.08s var(--ease-press); }
+.btn-primary{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 22px rgba(22,201,141,0.32), 0 2px 6px rgba(0,0,0,0.25); }
+.btn-primary:hover{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 10px 30px rgba(22,201,141,0.42), 0 2px 8px rgba(0,0,0,0.3); }
+.btn-primary:active{ box-shadow: inset 0 1px 4px rgba(0,0,0,0.25), 0 3px 12px rgba(22,201,141,0.3); }
+.btn-ghost:hover{ transform: translateY(-1px); }
+.btn-ghost:active{ transform: scale(0.97); }
+.btn-gold{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 6px 20px rgba(201,162,75,0.28); transition: transform 0.18s var(--ease-release), box-shadow 0.25s var(--ease-release); }
+.btn-gold:hover{ transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 10px 28px rgba(201,162,75,0.4); }
+.btn-gold:active{ transform: scale(0.965); }
+
+.nb-btn{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+.nb-btn:hover{ transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 3px 10px rgba(0,0,0,0.25); }
+.nb-btn:active{ transform: scale(0.92); transition: transform 0.08s var(--ease-press); }
+.nb-btn.active{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px rgba(22,201,141,0.15), 0 4px 14px rgba(22,201,141,0.2); }
+.nb-color{ transition: transform 0.18s var(--ease-release); }
+.nb-color:hover{ transform: scale(1.06); }
+
+.chip, .chub-toggle, .chub-cert-btn, .focus-mode-btn, .energy-chip, .rd-chip, .tab-btn, .religion-card, .option-card, .color-swatch{ transition: transform 0.18s var(--ease-release), box-shadow 0.25s var(--ease-release), background 0.2s var(--ease-release), border-color 0.2s var(--ease-release); }
+.chip:hover, .chub-toggle:hover, .chub-cert-btn:hover, .focus-mode-btn:hover, .energy-chip:hover, .rd-chip:hover{ transform: translateY(-1px); }
+.chip:active, .chub-toggle:active, .chub-cert-btn:active, .focus-mode-btn:active, .energy-chip:active, .rd-chip:active, .tab-btn:active{ transform: scale(0.955); transition: transform 0.08s var(--ease-press); }
+.chip.selected, .chub-toggle.active{ box-shadow: 0 3px 12px rgba(22,201,141,0.18); }
+.chip.selected.gold, .chub-toggle.active.gold{ box-shadow: 0 3px 12px rgba(201,162,75,0.2); }
+.tab-btn.active{ box-shadow: 0 3px 14px rgba(22,201,141,0.28); }
+
+.metric-card, .stat-card, .habit-card, .goal-card, .list-row, .option-card{ transition: transform 0.22s var(--ease-release), box-shadow 0.25s var(--ease-release), border-color 0.2s var(--ease-release), background 0.2s var(--ease-release); }
+.metric-card:hover, .stat-card:hover{ transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,0.3); border-color: rgba(232,230,222,0.14); }
+.list-row{ border-radius:12px; margin:0 -8px; padding-left:12px; padding-right:12px; }
+.list-row:hover{ background: rgba(255,255,255,0.025); }
+.option-card:hover{ transform: translateY(-1px); border-color: rgba(232,230,222,0.16); }
+.option-card:active{ transform: scale(0.99); }
+
+.rail-check{ transition: transform 0.2s var(--ease-release), background 0.2s var(--ease-release), border-color 0.2s var(--ease-release); }
+.rail-check:hover{ transform: scale(1.08); border-color: var(--emerald); }
+.rail-check:active{ transform: scale(0.9); }
+
+.color-swatch:hover{ transform: scale(1.12); }
+.color-swatch:active{ transform: scale(0.95); }
+
+.modal-box{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 30px 90px rgba(0,0,0,0.65), 0 8px 24px rgba(0,0,0,0.4); }
+
+.autopilot-card, .recovery-banner{ transition: box-shadow 0.3s var(--ease-release), transform 0.25s var(--ease-release); }
+.autopilot-card:hover{ box-shadow: 0 16px 44px rgba(22,201,141,0.1); }
+
+::selection{ background: var(--emerald); color: #06140F; }
+:focus-visible{ box-shadow: 0 0 0 4px rgba(22,201,141,0.18); }
 </style>
 </head>
 <body>
@@ -2348,6 +2405,7 @@ function renderSwNotebook(){
   const s = getWorkspaceSubject(); const panel = document.getElementById('swPanel');
   const looksLikeHtml = /<[a-z][\s\S]*>/i.test(s.notebook||'');
   const initialContent = looksLikeHtml ? s.notebook : escapeHtml(s.notebook||'').replace(/\n/g,'<br>');
+  const SIZES = [12,14,16,18,20,24,28,32,40];
   panel.innerHTML = `<div class="glass panel">
     <div class="section-title-row"><h3>Notebook</h3><span id="swNotebookSaved" style="font-size:11.5px; color:var(--ink-faint);">Saved</span></div>
     <div class="notebook-toolbar" id="swToolbar">
@@ -2357,11 +2415,8 @@ function renderSwNotebook(){
         <option value="Georgia, serif">Georgia</option>
         <option value="'JetBrains Mono', monospace">Mono</option>
       </select>
-      <select class="nb-select" id="swFontSize" title="Size">
-        <option value="2">Small</option>
-        <option value="3" selected>Normal</option>
-        <option value="5">Large</option>
-        <option value="7">Huge</option>
+      <select class="nb-select nb-size-select" id="swFontSize" title="Font size — shows the size at your cursor">
+        ${SIZES.map(px=>`<option value="${px}" ${px===16?'selected':''}>${px}px</option>`).join('')}
       </select>
       <div class="nb-sep"></div>
       <button type="button" class="nb-btn" data-cmd="bold" title="Bold">B</button>
@@ -2384,21 +2439,51 @@ function renderSwNotebook(){
     </div>
   </div>`;
   const editable = document.getElementById('swNotebookEditable'); const savedLbl = document.getElementById('swNotebookSaved');
+  const sizeSelect = document.getElementById('swFontSize');
   function markUnsaved(){
     savedLbl.textContent = 'Unsaved changes'; savedLbl.style.color = 'var(--gold-bright)';
     clearTimeout(_swNotebookTimeout);
     _swNotebookTimeout = setTimeout(doSave, 800);
   }
   function doSave(){ s.notebook = editable.innerHTML; saveState(); savedLbl.textContent = 'Saved'; savedLbl.style.color = 'var(--ink-faint)'; }
+  function applyFontSize(px){
+    document.execCommand('fontSize', false, '7');
+    editable.querySelectorAll('font[size="7"]').forEach(f=>{
+      const span = document.createElement('span'); span.style.fontSize = px+'px';
+      while(f.firstChild) span.appendChild(f.firstChild);
+      f.replaceWith(span);
+    });
+  }
+  function updateToolbarFromSelection(){
+    const sel = window.getSelection(); if(!sel || !sel.anchorNode) return;
+    let node = sel.anchorNode; if(node.nodeType===3) node = node.parentElement;
+    let sizePx = null;
+    while(node && node!==editable){ if(node.style && node.style.fontSize){ sizePx = parseInt(node.style.fontSize); break; } node = node.parentElement; }
+    if(sizePx && [...sizeSelect.options].some(o=>Number(o.value)===sizePx)) sizeSelect.value = sizePx;
+    else if(!sizePx) sizeSelect.value = 16;
+    ['bold','italic','underline'].forEach(cmd=>{
+      const btn = document.querySelector(`#swToolbar [data-cmd="${cmd}"]`);
+      if(btn){ try{ btn.classList.toggle('active', document.queryCommandState(cmd)); }catch(e){} }
+    });
+  }
   editable.addEventListener('input', markUnsaved);
-  document.getElementById('swSaveBtn').addEventListener('click', ()=>{ doSave(); showToast('Notebook saved'); });
+  editable.addEventListener('keyup', updateToolbarFromSelection);
+  editable.addEventListener('mouseup', updateToolbarFromSelection);
+  editable.addEventListener('focus', updateToolbarFromSelection);
+  document.addEventListener('selectionchange', ()=>{ if(document.activeElement===editable) updateToolbarFromSelection(); });
+  document.getElementById('swSaveBtn').addEventListener('click', async ()=>{
+    doSave();
+    const savedFile = await saveNotebookToDeviceFile(s, editable.innerHTML);
+    showToast(savedFile ? 'Saved — and written to your device as a file' : 'Saved on this device');
+  });
   document.querySelectorAll('#swToolbar .nb-btn[data-cmd]').forEach(btn=>{
     btn.addEventListener('mousedown', (e)=> e.preventDefault());
-    btn.addEventListener('click', ()=>{ editable.focus(); document.execCommand(btn.dataset.cmd, false, null); markUnsaved(); });
+    btn.addEventListener('click', ()=>{ editable.focus(); document.execCommand(btn.dataset.cmd, false, null); markUnsaved(); updateToolbarFromSelection(); });
   });
   document.getElementById('swFontFamily').addEventListener('mousedown', ()=> editable.focus());
   document.getElementById('swFontFamily').addEventListener('change', (e)=>{ editable.focus(); document.execCommand('fontName', false, e.target.value); markUnsaved(); });
-  document.getElementById('swFontSize').addEventListener('change', (e)=>{ editable.focus(); document.execCommand('fontSize', false, e.target.value); markUnsaved(); });
+  sizeSelect.addEventListener('mousedown', ()=> editable.focus());
+  sizeSelect.addEventListener('change', (e)=>{ editable.focus(); applyFontSize(Number(e.target.value)); markUnsaved(); });
   document.getElementById('swColor').addEventListener('input', (e)=>{ editable.focus(); document.execCommand('foreColor', false, e.target.value); markUnsaved(); });
   document.getElementById('swInsertImgBtn').addEventListener('click', ()=> document.getElementById('swImgInput').click());
   document.getElementById('swImgInput').addEventListener('change', (e)=>{
@@ -2409,6 +2494,35 @@ function renderSwNotebook(){
   });
   document.getElementById('swExportPdfBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('pdf'); });
   document.getElementById('swExportWordBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('word'); });
+}
+const _swFileHandles = {}; // subjectId -> FileSystemFileHandle, session-only (kept in memory, not persisted)
+async function saveNotebookToDeviceFile(s, html){
+  const filename = `${(s.name||'notebook').replace(/[^a-z0-9]+/gi,'_')}-notebook.html`;
+  const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(s.name)} — Notebook</title><style>body{font-family:Georgia,serif; padding:40px; color:#111; line-height:1.7; max-width:760px; margin:0 auto;} img{max-width:100%; border-radius:8px; margin:10px 0;} h1{font-family:Georgia,serif;}</style></head><body><h1>${escapeHtml(s.name)} — Notebook</h1>${html}</body></html>`;
+  if('showSaveFilePicker' in window){
+    try{
+      let handle = _swFileHandles[s.id];
+      if(!handle){
+        handle = await window.showSaveFilePicker({ suggestedName: filename, types:[{description:'HTML Document', accept:{'text/html':['.html']}}] });
+        _swFileHandles[s.id] = handle;
+      }
+      const writable = await handle.createWritable();
+      await writable.write(fullHtml);
+      await writable.close();
+      return true;
+    }catch(err){
+      if(err && err.name==='AbortError') return false; // user closed the picker — local save still happened
+      // fall through to plain download if the picker isn't usable here
+    }
+  }
+  try{
+    const blob = new Blob([fullHtml], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 1000);
+    return true;
+  }catch(err){ return false; }
 }
 function exportNotebook(kind){
   const s = getWorkspaceSubject(); const html = s.notebook || '<p></p>';
