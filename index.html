@@ -307,17 +307,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .chub-cert-btn.active .cc-dot{background:var(--gold); border-color:var(--gold);}
 .chub-cert-btn .cc-dot svg{width:10px;height:10px; stroke:#241C0A; stroke-width:3.5; opacity:0;}
 .chub-cert-btn.active .cc-dot svg{opacity:1;}
+
+/* ===== Study Hub — rich text notebook editor ===== */
+.notebook-toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px; margin-bottom:14px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:12px;}
+.notebook-toolbar .nb-sep{width:1px; height:24px; background:var(--card-border); margin:0 2px;}
+.nb-btn{width:34px; height:34px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); color:var(--ink); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s var(--ease); flex-shrink:0;}
+.nb-btn:hover{background:rgba(255,255,255,0.08); border-color:rgba(232,230,222,0.16);}
+.nb-btn.active{background:var(--emerald-dim); border-color:var(--emerald); color:var(--emerald-bright);}
+.nb-btn svg{width:16px; height:16px;}
+.nb-select{padding:8px 10px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); color:var(--ink); font-size:12.5px; width:auto; flex-shrink:0;}
+.nb-color{width:34px; height:34px; border-radius:8px; border:1px solid var(--card-border); background:transparent; cursor:pointer; padding:2px; flex-shrink:0;}
+.notebook-editable{min-height:420px; max-height:640px; overflow-y:auto; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; padding:20px; font-size:14.5px; line-height:1.7; color:var(--ink); outline:none;}
+.notebook-editable:focus{border-color:var(--emerald);}
+.notebook-editable:empty:before{content:attr(data-placeholder); color:var(--ink-faint);}
+.notebook-editable img{max-width:100%; border-radius:10px; margin:12px 0; display:block; box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+.notebook-editable ul, .notebook-editable ol{margin-left:22px; margin-bottom:10px;}
+.notebook-editable a{color:var(--emerald-bright);}
 </style>
 </head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BM7LV1JK5G"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-BM7LV1JK5G');
-</script>
 <body>
 <div class="app" id="app">
 
@@ -1159,7 +1166,7 @@ function finishOnboarding(){
   if(state.timetable.events.length === 0 && state.timetable.mode !== 'later') seedDefaultTimetable();
   saveState(); showToast('Welcome to MAAR LIFE — your system is live.'); enterApp();
 }
-const VIEW_TITLES = { home:'Dashboard', timetable:'Timetable', focus:'Focus Room', goals:'Goals & Planning', habits:'Habits', finance:'Finance Center', health:'Health Center', diet:'Diet Center', study:'Study Center', career:'Career Hub', faith:'Faith', journal:'Journal', mood:'Mood & Wellbeing', analytics:'Analytics', rank:'Rank & XP', milestones:'Milestones', reports:'Reports', settings:'Settings' };
+const VIEW_TITLES = { home:'Dashboard', timetable:'Timetable', focus:'Focus Room', goals:'Goals & Planning', habits:'Habits', finance:'Finance Center', health:'Health Center', diet:'Diet Center', study:'Study Hub', career:'Career Hub', faith:'Faith', journal:'Journal', mood:'Mood & Wellbeing', analytics:'Analytics', rank:'Rank & XP', milestones:'Milestones', reports:'Reports', settings:'Settings' };
 function enterApp(){
   showScreen('app'); _lastRankIdx = getRankInfo(state.xp).index; bindAppNav(); renderSidebarProfile(); updateXpPill(); navigateTo('home'); checkDailyReset();
   recoverFocusOnLoad();
@@ -2240,9 +2247,12 @@ function renderDietMealList(){
   wrap.querySelectorAll('[data-meal-del]').forEach(btn=> btn.addEventListener('click', ()=>{ state.diet.meals = state.diet.meals.filter(m=>m.id!==btn.dataset.mealDel); saveState(); VIEW_RENDERERS.diet(); }));
 }
 
+let studyWorkspaceSubjectId = null;
+let studyWorkspaceTab = 'notebook';
 VIEW_RENDERERS.study = function(){
+  if(studyWorkspaceSubjectId){ renderSubjectWorkspace(); return; }
   const view = document.getElementById('view-study');
-  view.innerHTML = `<div class="view-head"><div><h1>Study Center</h1><div class="vh-sub">Subjects, exams, and a link to the Focus Room for accurate session timing.</div></div><button class="btn btn-primary btn-sm" id="studySubjectAddBtn">+ Add subject</button></div>
+  view.innerHTML = `<div class="view-head"><div><h1>Study Hub</h1><div class="vh-sub">Every subject gets its own notebook, files, notes and flashcards.</div></div><button class="btn btn-primary btn-sm" id="studySubjectAddBtn">+ Add subject</button></div>
     <div class="two-col"><div><div class="glass panel" style="text-align:center;"><div class="section-title-row" style="justify-content:center;"><h3>Focus timer moved</h3></div><p style="color:var(--ink-dim); font-size:13.5px; margin-bottom:16px;">Timed sessions now live in the Focus Room, with an accurate timestamp-based timer that survives backgrounded tabs and refreshes.</p><button class="btn btn-primary" id="studyGoFocusBtn">Open Focus Room</button></div>
       <div class="glass panel"><div class="section-title-row"><h3>Subjects</h3></div><div id="studySubjectList"></div></div></div>
       <div><div class="glass panel"><div class="section-title-row"><h3>Exam countdowns</h3><button class="btn btn-ghost btn-sm" id="studyExamAddBtn">+ Add</button></div><div id="studyExamList"></div></div>
@@ -2252,10 +2262,20 @@ VIEW_RENDERERS.study = function(){
   document.getElementById('studyExamAddBtn').addEventListener('click', ()=> openExamModal());
   document.getElementById('studyGoFocusBtn').addEventListener('click', ()=> document.querySelector('.nav-item[data-view="focus"]').click());
 };
+function ensureSubjectWorkspace(s){
+  if(!s.notebook) s.notebook='';
+  if(!s.files) s.files=[];
+  if(!s.notes) s.notes=[];
+  if(!s.flashcards) s.flashcards=[];
+  return s;
+}
 function renderStudySubjects(){
-  const wrap = document.getElementById('studySubjectList'); if(!state.study.subjects.length){ wrap.innerHTML = emptyState('No subjects yet',''); return; }
-  wrap.innerHTML = state.study.subjects.map(s=>`<div class="list-row"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/></svg></div><div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">${s.homework||0} homework items</div></div><button class="lr-del" data-subj-del="${s.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`).join('');
-  wrap.querySelectorAll('[data-subj-del]').forEach(btn=>btn.addEventListener('click', ()=>{ state.study.subjects = state.study.subjects.filter(s=>s.id!==btn.dataset.subjDel); saveState(); VIEW_RENDERERS.study(); }));
+  const wrap = document.getElementById('studySubjectList'); if(!state.study.subjects.length){ wrap.innerHTML = emptyState('No subjects yet','Add a subject to open its own notebook, files and flashcards.'); return; }
+  wrap.innerHTML = state.study.subjects.map(s=>{ ensureSubjectWorkspace(s);
+    const activity = s.notebook.trim().length + s.files.length*3 + s.notes.length*2 + s.flashcards.length*2;
+    return `<div class="list-row" style="cursor:pointer;" data-subj-open="${s.id}"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/></svg></div><div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">${s.files.length} file${s.files.length!==1?'s':''} · ${s.notes.length} note${s.notes.length!==1?'s':''} · ${s.flashcards.length} flashcard${s.flashcards.length!==1?'s':''}</div></div>${activity>0?'<span class="badge badge-emerald">Active</span>':''}<button class="lr-del" data-subj-del="${s.id}" title="Delete subject"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`; }).join('');
+  wrap.querySelectorAll('[data-subj-open]').forEach(row=> row.addEventListener('click', (e)=>{ if(e.target.closest('[data-subj-del]')) return; studyWorkspaceSubjectId = row.dataset.subjOpen; studyWorkspaceTab='notebook'; VIEW_RENDERERS.study(); }));
+  wrap.querySelectorAll('[data-subj-del]').forEach(btn=>btn.addEventListener('click', (e)=>{ e.stopPropagation(); state.study.subjects = state.study.subjects.filter(s=>s.id!==btn.dataset.subjDel); saveState(); VIEW_RENDERERS.study(); }));
 }
 function renderStudyExams(){
   const wrap = document.getElementById('studyExamList'); if(!state.study.exams.length){ wrap.innerHTML = emptyState('No exams scheduled',''); return; }
@@ -2272,12 +2292,251 @@ function renderStudySessions(){
 function openSubjectModal(){
   const m = openModal('Add subject', `<div class="field"><label>Subject name</label><input type="text" id="mSubjName" placeholder="e.g. Mathematics"></div><div class="modal-actions"><button class="btn btn-primary btn-block" id="mSubjSave">Add</button></div>`);
   document.getElementById('mSubjSave').addEventListener('click', ()=>{ const name = document.getElementById('mSubjName').value.trim(); if(!name) return showToast('Enter a subject name');
-    state.study.subjects.push({id:uid(), name, homework:0}); saveState(); closeModal(); VIEW_RENDERERS.study(); });
+    const s = ensureSubjectWorkspace({id:uid(), name, homework:0}); state.study.subjects.push(s); saveState(); addXp(10); closeModal(); showToast('Subject created'); VIEW_RENDERERS.study(); });
 }
 function openExamModal(){
   const m = openModal('Add exam', `<div class="field"><label>Exam name</label><input type="text" id="mExamName" placeholder="e.g. Chemistry final"></div><div class="field"><label>Date</label><input type="date" id="mExamDate"></div><div class="modal-actions"><button class="btn btn-primary btn-block" id="mExamSave">Add</button></div>`);
   document.getElementById('mExamSave').addEventListener('click', ()=>{ const name = document.getElementById('mExamName').value.trim(); const date = document.getElementById('mExamDate').value; if(!name||!date) return showToast('Fill in both fields');
     state.study.exams.push({id:uid(), name, date}); saveState(); closeModal(); VIEW_RENDERERS.study(); });
+}
+
+/* ============================================================
+   STUDY HUB — per-subject workspace
+   Notebook, uploaded files (PDF text extracted client-side via
+   pdf.js), notes, flashcards, and a local "Ask" search that
+   finds and cites the most relevant passage across everything
+   you've saved for that subject. Fully offline — text extraction
+   and search both run in your browser, nothing is uploaded
+   anywhere.
+============================================================ */
+function getWorkspaceSubject(){ return state.study.subjects.find(s=>s.id===studyWorkspaceSubjectId); }
+function renderSubjectWorkspace(){
+  const s = getWorkspaceSubject();
+  if(!s){ studyWorkspaceSubjectId=null; VIEW_RENDERERS.study(); return; }
+  ensureSubjectWorkspace(s);
+  const view = document.getElementById('view-study');
+  view.innerHTML = `
+    <div class="view-head">
+      <div>
+        <button class="btn btn-ghost btn-sm" id="swBackBtn" style="margin-bottom:12px;">← Back to Study Hub</button>
+        <h1>${escapeHtml(s.name)}</h1><div class="vh-sub">Its own notebook, files, notes and flashcards.</div>
+      </div>
+    </div>
+    <div class="cards-row">
+      <div class="glass metric-card"><div class="mc-lbl">Files</div><div class="mc-val">${s.files.length}</div></div>
+      <div class="glass metric-card"><div class="mc-lbl">Notes</div><div class="mc-val">${s.notes.length}</div></div>
+      <div class="glass metric-card"><div class="mc-lbl">Flashcards</div><div class="mc-val">${s.flashcards.length}</div></div>
+      <div class="glass metric-card"><div class="mc-lbl">Notebook words</div><div class="mc-val">${(()=>{ const t=stripHtml(s.notebook).trim(); return t?t.split(/\s+/).length:0; })()}</div></div>
+    </div>
+    <div class="tabs" id="swTabs">
+      <button class="tab-btn ${studyWorkspaceTab==='notebook'?'active':''}" data-swtab="notebook">Notebook</button>
+      <button class="tab-btn ${studyWorkspaceTab==='files'?'active':''}" data-swtab="files">Files</button>
+      <button class="tab-btn ${studyWorkspaceTab==='notes'?'active':''}" data-swtab="notes">Notes</button>
+      <button class="tab-btn ${studyWorkspaceTab==='flashcards'?'active':''}" data-swtab="flashcards">Flashcards</button>
+      <button class="tab-btn ${studyWorkspaceTab==='ask'?'active':''}" data-swtab="ask">Ask</button>
+    </div>
+    <div id="swPanel"></div>
+  `;
+  document.getElementById('swBackBtn').addEventListener('click', ()=>{ studyWorkspaceSubjectId=null; VIEW_RENDERERS.study(); });
+  document.querySelectorAll('#swTabs .tab-btn').forEach(btn=> btn.addEventListener('click', ()=>{ studyWorkspaceTab = btn.dataset.swtab; renderSubjectWorkspace(); }));
+  const fns = {notebook:renderSwNotebook, files:renderSwFiles, notes:renderSwNotes, flashcards:renderSwFlashcards, ask:renderSwAsk};
+  (fns[studyWorkspaceTab]||renderSwNotebook)();
+}
+let _swNotebookTimeout = null;
+function stripHtml(html){ return (html||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' '); }
+function renderSwNotebook(){
+  const s = getWorkspaceSubject(); const panel = document.getElementById('swPanel');
+  const looksLikeHtml = /<[a-z][\s\S]*>/i.test(s.notebook||'');
+  const initialContent = looksLikeHtml ? s.notebook : escapeHtml(s.notebook||'').replace(/\n/g,'<br>');
+  panel.innerHTML = `<div class="glass panel">
+    <div class="section-title-row"><h3>Notebook</h3><span id="swNotebookSaved" style="font-size:11.5px; color:var(--ink-faint);">Saved</span></div>
+    <div class="notebook-toolbar" id="swToolbar">
+      <select class="nb-select" id="swFontFamily" title="Font">
+        <option value="'Inter', sans-serif">Inter</option>
+        <option value="'Fraunces', serif">Fraunces</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="'JetBrains Mono', monospace">Mono</option>
+      </select>
+      <select class="nb-select" id="swFontSize" title="Size">
+        <option value="2">Small</option>
+        <option value="3" selected>Normal</option>
+        <option value="5">Large</option>
+        <option value="7">Huge</option>
+      </select>
+      <div class="nb-sep"></div>
+      <button type="button" class="nb-btn" data-cmd="bold" title="Bold">B</button>
+      <button type="button" class="nb-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+      <button type="button" class="nb-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+      <input type="color" class="nb-color" id="swColor" title="Text colour" value="#e8e6de">
+      <div class="nb-sep"></div>
+      <button type="button" class="nb-btn" data-cmd="insertUnorderedList" title="Bullet list"><svg class="icon" viewBox="0 0 24 24"><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/><path d="M9 6h11M9 12h11M9 18h11"/></svg></button>
+      <button type="button" class="nb-btn" data-cmd="insertOrderedList" title="Numbered list"><svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 10v2h1M4 18h2"/></svg></button>
+      <button type="button" class="nb-btn" data-cmd="justifyLeft" title="Align left"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h14"/></svg></button>
+      <div class="nb-sep"></div>
+      <button type="button" class="nb-btn" id="swInsertImgBtn" title="Insert image"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
+      <input type="file" id="swImgInput" accept="image/*" class="hidden">
+    </div>
+    <div id="swNotebookEditable" class="notebook-editable" contenteditable="true" data-placeholder="Write freely — add headings, lists, images, colours...">${initialContent}</div>
+    <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" id="swSaveBtn">Save</button>
+      <button class="btn btn-ghost btn-sm" id="swExportPdfBtn">Export as PDF</button>
+      <button class="btn btn-ghost btn-sm" id="swExportWordBtn">Export as Word (.doc)</button>
+    </div>
+  </div>`;
+  const editable = document.getElementById('swNotebookEditable'); const savedLbl = document.getElementById('swNotebookSaved');
+  function markUnsaved(){
+    savedLbl.textContent = 'Unsaved changes'; savedLbl.style.color = 'var(--gold-bright)';
+    clearTimeout(_swNotebookTimeout);
+    _swNotebookTimeout = setTimeout(doSave, 800);
+  }
+  function doSave(){ s.notebook = editable.innerHTML; saveState(); savedLbl.textContent = 'Saved'; savedLbl.style.color = 'var(--ink-faint)'; }
+  editable.addEventListener('input', markUnsaved);
+  document.getElementById('swSaveBtn').addEventListener('click', ()=>{ doSave(); showToast('Notebook saved'); });
+  document.querySelectorAll('#swToolbar .nb-btn[data-cmd]').forEach(btn=>{
+    btn.addEventListener('mousedown', (e)=> e.preventDefault());
+    btn.addEventListener('click', ()=>{ editable.focus(); document.execCommand(btn.dataset.cmd, false, null); markUnsaved(); });
+  });
+  document.getElementById('swFontFamily').addEventListener('mousedown', ()=> editable.focus());
+  document.getElementById('swFontFamily').addEventListener('change', (e)=>{ editable.focus(); document.execCommand('fontName', false, e.target.value); markUnsaved(); });
+  document.getElementById('swFontSize').addEventListener('change', (e)=>{ editable.focus(); document.execCommand('fontSize', false, e.target.value); markUnsaved(); });
+  document.getElementById('swColor').addEventListener('input', (e)=>{ editable.focus(); document.execCommand('foreColor', false, e.target.value); markUnsaved(); });
+  document.getElementById('swInsertImgBtn').addEventListener('click', ()=> document.getElementById('swImgInput').click());
+  document.getElementById('swImgInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{ editable.focus(); document.execCommand('insertImage', false, reader.result); markUnsaved(); e.target.value=''; };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('swExportPdfBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('pdf'); });
+  document.getElementById('swExportWordBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('word'); });
+}
+function exportNotebook(kind){
+  const s = getWorkspaceSubject(); const html = s.notebook || '<p></p>';
+  const safeName = s.name.replace(/[^a-z0-9]+/gi,'_') || 'notebook';
+  if(kind==='pdf'){
+    const win = window.open('', '_blank');
+    if(!win){ showToast('Please allow pop-ups to export as PDF'); return; }
+    win.document.write(`<html><head><title>${escapeHtml(s.name)} — Notebook</title><style>body{font-family:Georgia,serif; padding:40px; color:#111; line-height:1.6;} img{max-width:100%; border-radius:8px; margin:10px 0;} h1{font-family:Georgia,serif;} @media print{body{padding:0;}}</style></head><body><h1>${escapeHtml(s.name)} — Notebook</h1>${html}</body></html>`);
+    win.document.close();
+    setTimeout(()=> win.print(), 300);
+  } else {
+    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${escapeHtml(s.name)}</title></head><body style="font-family:Calibri, sans-serif;"><h1>${escapeHtml(s.name)} — Notebook</h1>`;
+    const postHtml = `</body></html>`;
+    const blob = new Blob(['\ufeff', preHtml + html + postHtml], {type:'application/msword'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `${safeName}-notebook.doc`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 1000);
+    showToast('Word document downloaded');
+  }
+}
+function renderSwFiles(){
+  const s = getWorkspaceSubject(); const panel = document.getElementById('swPanel');
+  panel.innerHTML = `<div class="glass panel">
+    <div class="upload-zone" id="swFileUz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div class="uz-title">Upload a PDF or image</div><div class="uz-sub">PDF text is extracted so you can search and ask about it later</div><input type="file" id="swFileInput" accept="application/pdf,image/*" class="hidden"></div>
+    <div id="swFileStatus"></div></div>
+    <div id="swFileList"></div>`;
+  document.getElementById('swFileUz').addEventListener('click', ()=> document.getElementById('swFileInput').click());
+  document.getElementById('swFileInput').addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const statusEl = document.getElementById('swFileStatus');
+    if(file.type==='application/pdf'){
+      statusEl.innerHTML = `<div class="upload-status">Reading "${escapeHtml(file.name)}"…</div>`;
+      try{
+        await ensurePdfJs(); const buf = await file.arrayBuffer(); const pdf = await window.pdfjsLib.getDocument({data:buf}).promise;
+        let fullText = ''; for(let p=1;p<=pdf.numPages;p++){ const page = await pdf.getPage(p); const content = await page.getTextContent(); fullText += content.items.map(it=>it.str).join(' ') + '\n'; }
+        s.files.push({id:uid(), name:file.name, type:'pdf', text: fullText.slice(0,200000), pages: pdf.numPages, addedAt: todayKey()});
+        saveState(); addXp(10); statusEl.innerHTML=''; showToast('PDF added — text extracted for search & Ask');
+        if(s.files.length===1) pushSubjectMilestoneXp();
+        renderSwFiles();
+      }catch(err){ statusEl.innerHTML = `<div class="upload-status" style="background:var(--danger-dim); color:var(--danger);">Couldn't read that PDF.</div>`; }
+    } else {
+      const reader = new FileReader();
+      reader.onload = ()=>{ s.files.push({id:uid(), name:file.name, type:'image', text:'', dataUrl: reader.result, addedAt: todayKey()}); saveState(); addXp(5); showToast('Image added'); renderSwFiles(); };
+      reader.readAsDataURL(file);
+    }
+  });
+  const list = document.getElementById('swFileList');
+  if(!s.files.length){ list.innerHTML = emptyState('No files yet','Upload lecture PDFs, textbook chapters or photos of notes.'); return; }
+  list.innerHTML = s.files.map(f=>`<div class="glass panel" style="padding:16px 18px; margin-bottom:10px; display:flex; align-items:center; gap:14px;">
+    <div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+    <div style="flex:1; min-width:0;"><div class="lr-title">${escapeHtml(f.name)}</div><div class="lr-sub">${f.type==='pdf'?`${f.pages} page(s) · text extracted`:'Image'} · added ${fmtDateUK(f.addedAt)}</div></div>
+    <button class="lr-del" data-file-del="${f.id}"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>`).join('');
+  list.querySelectorAll('[data-file-del]').forEach(btn=> btn.addEventListener('click', ()=>{ s.files = s.files.filter(f=>f.id!==btn.dataset.fileDel); saveState(); renderSwFiles(); }));
+}
+function pushSubjectMilestoneXp(){ /* reserved hook for future subject milestones */ }
+function renderSwNotes(){
+  const s = getWorkspaceSubject(); const panel = document.getElementById('swPanel');
+  panel.innerHTML = `<div class="glass panel"><div class="field"><label>Quick note</label><textarea id="swNoteText" placeholder="A key fact, definition, or reminder..."></textarea></div><button class="btn btn-primary btn-sm" id="swNoteSaveBtn">Add note</button></div><div id="swNoteList"></div>`;
+  document.getElementById('swNoteSaveBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('swNoteText').value.trim(); if(!text){ showToast('Write a note first'); return; }
+    s.notes.unshift({id:uid(), text, date: new Date().toISOString()}); saveState(); addXp(5); showToast('Note saved'); renderSwNotes();
+  });
+  const list = document.getElementById('swNoteList');
+  if(!s.notes.length){ list.innerHTML = emptyState('No notes yet',''); return; }
+  list.innerHTML = s.notes.map(n=>`<div class="glass journal-entry"><div class="je-date">${new Date(n.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'})}</div><div class="je-text">${escapeHtml(n.text)}</div><button class="lr-del" data-note-del="${n.id}" style="float:right; margin-top:-30px;"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`).join('');
+  list.querySelectorAll('[data-note-del]').forEach(btn=> btn.addEventListener('click', ()=>{ s.notes = s.notes.filter(n=>n.id!==btn.dataset.noteDel); saveState(); renderSwNotes(); }));
+}
+function renderSwFlashcards(){
+  const s = getWorkspaceSubject(); const panel = document.getElementById('swPanel');
+  panel.innerHTML = `<div class="glass panel"><div class="field-row"><div class="field"><label>Front</label><input type="text" id="swCardFront" placeholder="Question or term"></div><div class="field"><label>Back</label><input type="text" id="swCardBack" placeholder="Answer or definition"></div></div><button class="btn btn-primary btn-sm" id="swCardSaveBtn">Add flashcard</button></div><div id="swCardList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;"></div>`;
+  document.getElementById('swCardSaveBtn').addEventListener('click', ()=>{
+    const front = document.getElementById('swCardFront').value.trim(); const back = document.getElementById('swCardBack').value.trim();
+    if(!front||!back){ showToast('Fill in both sides'); return; }
+    s.flashcards.push({id:uid(), front, back, flipped:false}); saveState(); addXp(5); showToast('Flashcard added'); renderSwFlashcards();
+  });
+  const list = document.getElementById('swCardList');
+  if(!s.flashcards.length){ list.innerHTML = emptyState('No flashcards yet',''); return; }
+  list.innerHTML = s.flashcards.map(c=>`<div class="glass panel" data-card-flip="${c.id}" style="padding:18px; cursor:pointer; min-height:110px; display:flex; flex-direction:column; justify-content:center; text-align:center; position:relative;">
+    <button class="lr-del" data-card-del="${c.id}" style="position:absolute; top:8px; right:8px;" title="Delete"><svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <div style="font-size:11px; color:var(--ink-faint); text-transform:uppercase; margin-bottom:8px;">${c.flipped?'Answer':'Question'}</div>
+    <div style="font-size:14px; font-weight:600;">${escapeHtml(c.flipped ? c.back : c.front)}</div>
+  </div>`).join('');
+  list.querySelectorAll('[data-card-flip]').forEach(card=> card.addEventListener('click', (e)=>{ if(e.target.closest('[data-card-del]')) return; const c = s.flashcards.find(x=>x.id===card.dataset.cardFlip); c.flipped=!c.flipped; renderSwFlashcards(); }));
+  list.querySelectorAll('[data-card-del]').forEach(btn=> btn.addEventListener('click', (e)=>{ e.stopPropagation(); s.flashcards = s.flashcards.filter(c=>c.id!==btn.dataset.cardDel); saveState(); renderSwFlashcards(); }));
+}
+function renderSwAsk(){
+  const s = getWorkspaceSubject(); const panel = document.getElementById('swPanel');
+  panel.innerHTML = `<div class="glass panel"><div class="section-title-row"><h3>Ask about ${escapeHtml(s.name)}</h3></div>
+    <p style="color:var(--ink-dim); font-size:12.5px; margin-bottom:14px; line-height:1.6;">Searches your notebook, notes and uploaded PDF text on this device — no internet needed — and shows you the most relevant passage plus exactly where it came from.</p>
+    <div class="field" style="margin-bottom:12px;"><input type="text" id="swAskInput" placeholder="e.g. What is the definition of..."></div>
+    <button class="btn btn-primary btn-sm" id="swAskBtn">Search</button></div>
+    <div id="swAskResults"></div>`;
+  const run = ()=>{
+    const q = document.getElementById('swAskInput').value.trim();
+    if(!q){ showToast('Type a question or keyword first'); return; }
+    const results = searchSubjectContent(s, q);
+    const box = document.getElementById('swAskResults');
+    if(!results.length){ box.innerHTML = `<div class="glass panel">${emptyState('No matches found', 'Try different keywords, or add more notes/files for this subject.')}</div>`; return; }
+    box.innerHTML = results.map(r=>`<div class="glass panel" style="padding:18px 20px; margin-bottom:12px;">
+      <div class="badge badge-emerald" style="margin-bottom:10px;">${escapeHtml(r.source)}</div>
+      <div style="font-size:13.5px; line-height:1.7; color:var(--ink);">${r.snippet}</div>
+    </div>`).join('');
+  };
+  document.getElementById('swAskBtn').addEventListener('click', run);
+  document.getElementById('swAskInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') run(); });
+}
+function searchSubjectContent(s, query){
+  const terms = query.toLowerCase().split(/\s+/).filter(w=>w.length>2);
+  if(!terms.length) return [];
+  const sources = [];
+  if(s.notebook) sources.push({label:'Notebook', text:stripHtml(s.notebook)});
+  s.notes.forEach(n=> sources.push({label:`Note (${fmtDateUK(todayKey(new Date(n.date)))})`, text:n.text}));
+  s.files.filter(f=>f.text).forEach(f=> sources.push({label:f.name, text:f.text}));
+  const results = [];
+  sources.forEach(src=>{
+    const lower = src.text.toLowerCase();
+    let bestIdx = -1, bestScore = 0;
+    terms.forEach(t=>{ let idx = lower.indexOf(t); while(idx>-1){ bestScore++; if(bestIdx===-1) bestIdx=idx; idx = lower.indexOf(t, idx+1); } });
+    if(bestScore>0 && bestIdx>-1){
+      const start = Math.max(0, bestIdx-120); const end = Math.min(src.text.length, bestIdx+220);
+      let snippet = escapeHtml(src.text.slice(start,end).trim());
+      terms.forEach(t=>{ const re = new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'); snippet = snippet.replace(re, '<strong style="color:var(--emerald-bright)">$1</strong>'); });
+      results.push({source:src.label, snippet: (start>0?'…':'')+snippet+(end<src.text.length?'…':''), score:bestScore});
+    }
+  });
+  return results.sort((a,b)=>b.score-a.score).slice(0,6);
 }
 
 VIEW_RENDERERS.faith = function(){
