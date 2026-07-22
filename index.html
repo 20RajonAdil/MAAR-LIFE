@@ -320,9 +320,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .notebook-editable{min-height:420px; max-height:640px; overflow-y:auto; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; padding:20px; font-size:14.5px; line-height:1.7; color:var(--ink); outline:none;}
 .notebook-editable:focus{border-color:var(--emerald);}
 .notebook-editable:empty:before{content:attr(data-placeholder); color:var(--ink-faint);}
-.notebook-editable img{max-width:100%; border-radius:10px; margin:12px 0; display:block; box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+.notebook-editable img{max-width:100%; border-radius:10px; display:block; box-shadow:0 8px 24px rgba(0,0,0,0.3);}
 .notebook-editable ul, .notebook-editable ol{margin-left:22px; margin-bottom:10px;}
 .notebook-editable a{color:var(--emerald-bright);}
+.nb-img-wrap{position:relative; display:inline-block; max-width:100%; margin:12px 0; line-height:0;}
+.nb-img-wrap.nb-img-selected{outline:2px solid var(--emerald); outline-offset:3px; border-radius:10px;}
+.nb-img-handle{position:absolute; right:-7px; bottom:-7px; width:16px; height:16px; border-radius:50%; background:var(--emerald); border:2px solid var(--void); cursor:nwse-resize; z-index:5;}
 .nb-size-select{font-family:var(--font-mono); font-weight:600;}
 
 /* ============================================================
@@ -2324,6 +2327,7 @@ function ensureSubjectWorkspace(s){
   if(!s.files) s.files=[];
   if(!s.notes) s.notes=[];
   if(!s.flashcards) s.flashcards=[];
+  if(!s.notebookHistory) s.notebookHistory=[];
   return s;
 }
 function renderStudySubjects(){
@@ -2432,12 +2436,14 @@ function renderSwNotebook(){
       <input type="file" id="swImgInput" accept="image/*" class="hidden">
     </div>
     <div id="swNotebookEditable" class="notebook-editable" contenteditable="true" data-placeholder="Write freely — add headings, lists, images, colours...">${initialContent}</div>
+    <div style="font-size:11px; color:var(--ink-faint); margin-top:8px;">Tip: click an image to resize it by its corner handle — like Word or Docs.</div>
     <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
       <button class="btn btn-primary btn-sm" id="swSaveBtn">Save</button>
       <button class="btn btn-ghost btn-sm" id="swExportPdfBtn">Export as PDF</button>
       <button class="btn btn-ghost btn-sm" id="swExportWordBtn">Export as Word (.doc)</button>
     </div>
-  </div>`;
+  </div>
+  <div class="glass panel" style="margin-top:20px;"><div class="section-title-row"><h3>Previous saved entries</h3></div><p style="color:var(--ink-dim); font-size:12px; margin-bottom:12px; margin-top:-8px;">Pressing Save archives your current note here and clears the notebook so it's ready for the next one.</p><div id="swNotebookHistoryList"></div></div>`;
   const editable = document.getElementById('swNotebookEditable'); const savedLbl = document.getElementById('swNotebookSaved');
   const sizeSelect = document.getElementById('swFontSize');
   function markUnsaved(){
@@ -2466,15 +2472,80 @@ function renderSwNotebook(){
       if(btn){ try{ btn.classList.toggle('active', document.queryCommandState(cmd)); }catch(e){} }
     });
   }
+  // --- normalize any images from older saves into resizable wraps, and guarantee a writable line after every image ---
+  editable.querySelectorAll('img').forEach(img=>{
+    if(!img.closest('.nb-img-wrap')){
+      const wrap = document.createElement('span');
+      wrap.className='nb-img-wrap'; wrap.contentEditable='false';
+      img.parentNode.insertBefore(wrap, img); wrap.appendChild(img);
+    }
+  });
+  function ensureTrailingLine(){
+    const last = editable.lastChild;
+    const isImgish = last && last.nodeType===1 && (last.classList?.contains('nb-img-wrap') || last.tagName==='IMG');
+    if(!last || isImgish){ const div = document.createElement('div'); div.innerHTML='<br>'; editable.appendChild(div); }
+  }
+  ensureTrailingLine();
+
+  // --- image insertion with a real DOM structure: wrapped, non-editable, always followed by a writable line ---
+  function insertImageAtCursor(dataUrl){
+    editable.focus();
+    const sel = window.getSelection();
+    let range;
+    if(sel && sel.rangeCount && editable.contains(sel.anchorNode)) range = sel.getRangeAt(0);
+    else { range = document.createRange(); range.selectNodeContents(editable); range.collapse(false); }
+    range.deleteContents();
+    const wrap = document.createElement('span');
+    wrap.className = 'nb-img-wrap'; wrap.contentEditable = 'false';
+    const img = document.createElement('img'); img.src = dataUrl; img.style.width = '320px'; img.draggable = false;
+    wrap.appendChild(img);
+    range.insertNode(wrap);
+    const lineAfter = document.createElement('div'); lineAfter.innerHTML = '<br>';
+    wrap.after(lineAfter);
+    const newRange = document.createRange(); newRange.setStart(lineAfter, 0); newRange.collapse(true);
+    sel.removeAllRanges(); sel.addRange(newRange);
+    markUnsaved();
+  }
+
+  // --- click-to-select + drag-corner resize, like Word/Docs ---
+  let _selectedWrap = null;
+  function deselectImage(){
+    if(_selectedWrap){ _selectedWrap.classList.remove('nb-img-selected'); const h = _selectedWrap.querySelector('.nb-img-handle'); if(h) h.remove(); _selectedWrap = null; }
+  }
+  function selectImageForResize(wrap){
+    if(_selectedWrap===wrap) return;
+    deselectImage(); _selectedWrap = wrap; wrap.classList.add('nb-img-selected');
+    const handle = document.createElement('div'); handle.className = 'nb-img-handle'; wrap.appendChild(handle);
+    handle.addEventListener('mousedown', (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      const img = wrap.querySelector('img'); const startX = e.clientX; const startWidth = img.offsetWidth;
+      function onMove(ev){ const w = Math.max(60, Math.min(editable.clientWidth, startWidth + (ev.clientX-startX))); img.style.width = w+'px'; }
+      function onUp(){ document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); markUnsaved(); }
+      document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+    });
+  }
+  editable.addEventListener('click', (e)=>{
+    const wrap = e.target.closest('.nb-img-wrap');
+    if(wrap) selectImageForResize(wrap); else deselectImage();
+  });
+  document.addEventListener('click', (e)=>{ if(!e.target.closest('.notebook-editable') && !e.target.closest('.nb-img-handle')) deselectImage(); });
+
   editable.addEventListener('input', markUnsaved);
   editable.addEventListener('keyup', updateToolbarFromSelection);
   editable.addEventListener('mouseup', updateToolbarFromSelection);
   editable.addEventListener('focus', updateToolbarFromSelection);
   document.addEventListener('selectionchange', ()=>{ if(document.activeElement===editable) updateToolbarFromSelection(); });
+
   document.getElementById('swSaveBtn').addEventListener('click', async ()=>{
-    doSave();
-    const savedFile = await saveNotebookToDeviceFile(s, editable.innerHTML);
-    showToast(savedFile ? 'Saved — and written to your device as a file' : 'Saved on this device');
+    const html = editable.innerHTML;
+    const hasContent = stripHtml(html).trim().length>0 || !!editable.querySelector('img');
+    if(!hasContent){ showToast('Nothing to save yet'); return; }
+    s.notebookHistory.unshift({id:uid(), html, date:new Date().toISOString()});
+    if(s.notebookHistory.length>100) s.notebookHistory.length = 100;
+    const savedFile = await saveNotebookToDeviceFile(s, html);
+    s.notebook = ''; saveState(); addXp(5);
+    showToast(savedFile ? 'Saved to your device — notebook cleared for your next note' : 'Saved on this device — notebook cleared for your next note');
+    renderSwNotebook();
   });
   document.querySelectorAll('#swToolbar .nb-btn[data-cmd]').forEach(btn=>{
     btn.addEventListener('mousedown', (e)=> e.preventDefault());
@@ -2489,11 +2560,30 @@ function renderSwNotebook(){
   document.getElementById('swImgInput').addEventListener('change', (e)=>{
     const file = e.target.files[0]; if(!file) return;
     const reader = new FileReader();
-    reader.onload = ()=>{ editable.focus(); document.execCommand('insertImage', false, reader.result); markUnsaved(); e.target.value=''; };
+    reader.onload = ()=>{ insertImageAtCursor(reader.result); e.target.value=''; };
     reader.readAsDataURL(file);
   });
   document.getElementById('swExportPdfBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('pdf'); });
   document.getElementById('swExportWordBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('word'); });
+
+  renderNotebookHistoryList();
+}
+function renderNotebookHistoryList(){
+  const s = getWorkspaceSubject(); const wrap = document.getElementById('swNotebookHistoryList'); if(!s || !wrap) return;
+  const hist = s.notebookHistory||[];
+  if(!hist.length){ wrap.innerHTML = emptyState('No saved entries yet','Write something and press Save to start your history.'); return; }
+  wrap.innerHTML = hist.map(h=>{
+    const preview = stripHtml(h.html).trim().slice(0,90);
+    return `<div class="list-row" style="cursor:pointer;" data-hist-open="${h.id}"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div style="flex:1; min-width:0;"><div class="lr-title">${escapeHtml(preview||'(Image only)')}${preview.length>=90?'…':''}</div><div class="lr-sub">${new Date(h.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'})}</div></div><button class="lr-del" data-hist-del="${h.id}" title="Delete entry"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`;
+  }).join('');
+  wrap.querySelectorAll('[data-hist-open]').forEach(row=> row.addEventListener('click', (e)=>{ if(e.target.closest('[data-hist-del]')) return; openHistoryEntryModal(row.dataset.histOpen); }));
+  wrap.querySelectorAll('[data-hist-del]').forEach(btn=> btn.addEventListener('click', (e)=>{ e.stopPropagation(); s.notebookHistory = s.notebookHistory.filter(h=>h.id!==btn.dataset.histDel); saveState(); renderNotebookHistoryList(); }));
+}
+function openHistoryEntryModal(id){
+  const s = getWorkspaceSubject(); const h = (s.notebookHistory||[]).find(x=>x.id===id); if(!h) return;
+  const m = openModal(new Date(h.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'}), `<div class="notebook-editable" style="max-height:50vh; cursor:default;">${h.html}</div><div class="modal-actions"><button class="btn btn-primary btn-block" id="histRestoreBtn">Restore to editor</button></div>`);
+  m.querySelector('.modal-box').classList.add('modal-wide');
+  document.getElementById('histRestoreBtn').addEventListener('click', ()=>{ s.notebook = h.html; saveState(); closeModal(); renderSwNotebook(); showToast('Restored to editor'); });
 }
 const _swFileHandles = {}; // subjectId -> FileSystemFileHandle, session-only (kept in memory, not persisted)
 async function saveNotebookToDeviceFile(s, html){
