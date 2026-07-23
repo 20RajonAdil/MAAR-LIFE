@@ -2869,7 +2869,16 @@ function openHistoryEntryModal(id){
   const s = getWorkspaceSubject(); const h = (s.notebookHistory||[]).find(x=>x.id===id); if(!h) return;
   const m = openModal(new Date(h.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'}), `<div class="notebook-editable" style="max-height:50vh; cursor:default;">${h.html}</div><div class="modal-actions"><button class="btn btn-primary btn-block" id="histRestoreBtn">Restore to editor</button></div>`);
   m.querySelector('.modal-box').classList.add('modal-wide');
-  document.getElementById('histRestoreBtn').addEventListener('click', ()=>{ s.notebook = h.html; saveState(); closeModal(); renderSwNotebook(); showToast('Restored to editor'); });
+  document.getElementById('histRestoreBtn').addEventListener('click', ()=>{
+    ensureNoteTree(s);
+    const now = new Date().toISOString();
+    const title = 'Restored — ' + new Date(h.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'});
+    const restoredNote = {id:uid(), parentId:null, title, content:h.html, tags:['restored'], createdAt:now, updatedAt:now};
+    s.noteTree.push(restoredNote);
+    s.activeNoteId = restoredNote.id;
+    saveState(); closeModal(); studyWorkspaceTab='notebook'; renderSwNotebook();
+    showToast('Restored as a new note — nothing was overwritten');
+  });
 }
 const _swFileHandles = {}; // subjectId -> FileSystemFileHandle, session-only (kept in memory, not persisted)
 async function saveNotebookToDeviceFile(s, html){
@@ -3204,11 +3213,37 @@ VIEW_RENDERERS.settings = function(){
     <div class="glass panel"><div class="section-title-row"><h3>Faith practice</h3></div><div class="religion-grid" id="sReligionGrid"></div></div>
     <div class="glass panel"><div class="section-title-row"><h3>Install</h3></div><p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">Install MAAR LIFE on your phone or desktop for offline access, like a native app.</p><button class="btn btn-gold btn-sm hidden" id="sInstallBtn">Install MAAR LIFE</button></div>
     <div class="glass panel" style="border-color:rgba(91,158,232,0.3);"><div class="section-title-row"><h3 style="color:var(--info);">How your data is stored</h3></div><p style="color:var(--ink-dim); font-size:13px; line-height:1.7;">MAAR LIFE is a single-page app with no server and no accounts. Everything above is stored only in this browser's local storage on this device. There is no login, no multi-device sync, and no way for this version to "mix data between users" because there is only ever one local profile per browser. If you need real accounts, cross-device sync, or an admin-managed ad system, those require a proper backend, database and authentication layer to be built.</p></div>
-    <div class="glass panel"><div class="section-title-row"><h3>Data</h3></div><p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device, in this browser. Nothing is sent anywhere.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" id="sExportBtn">Export data (JSON)</button><button class="btn btn-ghost btn-sm" id="sResetBtn" style="color:var(--danger);">Reset all data</button></div></div>`;
+    <div class="glass panel"><div class="section-title-row"><h3>Data</h3></div><p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device, in this browser. Nothing is sent anywhere.</p><div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;"><button class="btn btn-ghost btn-sm" id="sExportBtn">Export data (JSON)</button><button class="btn btn-ghost btn-sm" id="sImportBtn">Restore from backup (JSON)</button><input type="file" id="sImportFile" accept="application/json,.json" class="hidden"><button class="btn btn-ghost btn-sm" id="sResetBtn" style="color:var(--danger);">Reset all data</button></div><div id="sImportStatus" style="font-size:12.5px; color:var(--ink-faint); margin-top:10px;"></div></div>`;
   const grid = document.getElementById('sReligionGrid'); grid.innerHTML = RELIGIONS.map(r=>`<div class="religion-card ${state.religion===r.id?'selected':''}" data-rel="${r.id}">${r.name}</div>`).join('');
   grid.querySelectorAll('.religion-card').forEach(card=> card.addEventListener('click', ()=>{ state.religion = card.dataset.rel; saveState(); showToast('Updated'); VIEW_RENDERERS.settings(); }));
   document.getElementById('sSaveBtn').addEventListener('click', ()=>{ state.profile.name = document.getElementById('sName').value.trim(); state.profile.age = document.getElementById('sAge').value; state.profile.country = document.getElementById('sCountry').value; saveState(); renderSidebarProfile(); showToast('Profile updated'); });
   document.getElementById('sExportBtn').addEventListener('click', ()=>{ const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'maarlife-data.json'; document.body.appendChild(a); a.click(); a.remove(); });
+  document.getElementById('sImportBtn').addEventListener('click', ()=> document.getElementById('sImportFile').click());
+  document.getElementById('sImportFile').addEventListener('change', (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const statusEl = document.getElementById('sImportStatus');
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      let parsed;
+      try{ parsed = JSON.parse(reader.result); }
+      catch(err){ statusEl.textContent = "That file doesn't look like a valid MAAR LIFE backup (couldn't read it as JSON)."; statusEl.style.color = 'var(--danger)'; showToast('Restore failed — invalid file'); e.target.value=''; return; }
+      if(typeof parsed !== 'object' || parsed === null){ statusEl.textContent = "That file doesn't look like a valid MAAR LIFE backup."; statusEl.style.color = 'var(--danger)'; showToast('Restore failed — invalid file'); e.target.value=''; return; }
+      if(!confirm('Restoring this backup will replace everything currently on this device — profile, notebooks, habits, finance, journal, all of it — with what\'s in the file. This cannot be undone. Continue?')){ e.target.value=''; return; }
+      // Merge onto DEFAULT_STATE (not the raw parsed object) so a backup from an older or
+      // newer version of MAAR LIFE — missing fields that exist now, like scratchNotes — still
+      // loads cleanly instead of silently breaking a feature added since the backup was made.
+      const merged = Object.assign(DEFAULT_STATE(), parsed);
+      merged.timetable = Object.assign({has:null, mode:null, blocks:[], events:[], migrated:false}, parsed.timetable||{});
+      merged.energyToday = Object.assign({date:null, level:'normal'}, parsed.energyToday||{});
+      state = merged;
+      saveState();
+      showToast('Backup restored');
+      e.target.value = '';
+      location.reload();
+    };
+    reader.onerror = ()=>{ statusEl.textContent = 'Could not read that file.'; statusEl.style.color = 'var(--danger)'; showToast('Restore failed — could not read file'); };
+    reader.readAsText(file);
+  });
   document.getElementById('sResetBtn').addEventListener('click', ()=>{ if(confirm('This will permanently delete all your MAAR LIFE data on this device. Continue?')){ localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(FOCUS_KEY); location.reload(); } });
   const installBtn = document.getElementById('sInstallBtn'); if(_deferredInstallPrompt) installBtn.classList.remove('hidden');
   installBtn.addEventListener('click', async ()=>{ if(!_deferredInstallPrompt){ showToast('Your browser will show an install option in its menu.'); return; } _deferredInstallPrompt.prompt(); await _deferredInstallPrompt.userChoice; _deferredInstallPrompt = null; installBtn.classList.add('hidden'); });
