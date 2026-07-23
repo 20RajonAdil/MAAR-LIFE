@@ -328,6 +328,35 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .nb-img-handle{position:absolute; right:-7px; bottom:-7px; width:16px; height:16px; border-radius:50%; background:var(--emerald); border:2px solid var(--void); cursor:nwse-resize; z-index:5;}
 .nb-size-select{font-family:var(--font-mono); font-weight:600;}
 
+/* ===== Study Hub — Trilium-inspired note tree / knowledge base layout ===== */
+.nb-kb-layout{display:grid; grid-template-columns:260px 1fr; gap:16px; align-items:start;}
+@media (max-width:900px){.nb-kb-layout{grid-template-columns:1fr;}}
+.nb-kb-sidebar{padding:14px; max-height:760px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;}
+.nb-kb-search-row{display:flex; gap:8px;}
+.nb-kb-search-row input{flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:9px 12px; color:var(--ink); font-size:13px;}
+.nt-tree{flex:1; overflow-y:auto;}
+.nt-empty{color:var(--ink-faint); font-size:12.5px; padding:14px 8px;}
+.nt-row{display:flex; align-items:center; gap:4px; padding:7px 6px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--ink-dim); transition:background 0.15s;}
+.nt-row:hover{background:rgba(255,255,255,0.04);}
+.nt-row.active{background:var(--emerald-dim); color:var(--emerald-bright); font-weight:600;}
+.nt-toggle{width:14px; flex-shrink:0; color:var(--ink-faint); font-size:10px; text-align:center;}
+.nt-toggle-spacer{width:14px; flex-shrink:0;}
+.nt-title{flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.nt-add{width:20px; height:20px; border-radius:6px; background:transparent; border:none; color:var(--ink-faint); flex-shrink:0; font-size:14px; line-height:1; opacity:0; transition:opacity 0.15s;}
+.nt-row:hover .nt-add{opacity:1;} .nt-add:hover{background:var(--emerald-dim); color:var(--emerald-bright);}
+.nt-children{margin-left:2px;}
+.nb-kb-main{padding:22px;}
+.nt-breadcrumb{font-size:12px; color:var(--ink-faint); margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px; align-items:center;}
+.nt-crumb{cursor:pointer;} .nt-crumb:hover{color:var(--emerald-bright);} .nt-crumb-sep{opacity:0.5;}
+.nt-title-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.nt-title-input{flex:1; background:transparent; border:none; border-bottom:1px solid var(--card-border); padding:6px 2px; font-family:var(--font-display); font-size:22px; font-weight:600; color:var(--ink);}
+.nt-title-input:focus{border-color:var(--emerald); outline:none;}
+.nt-tags-row{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:14px;}
+.nt-tag-input{background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:100px; padding:5px 12px; font-size:12px; color:var(--ink); width:90px;}
+.nt-links-panel{margin-top:14px;} .nt-links-title{font-size:11px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px;}
+.nt-link-chip{display:inline-flex; padding:5px 12px; margin:0 6px 6px 0; border-radius:100px; background:var(--emerald-dim); color:var(--emerald-bright); font-size:12px; cursor:pointer;}
+.nt-link-chip:hover{background:rgba(22,201,141,0.28);}
+
 /* ============================================================
    PREMIUM POLISH PASS
    Tactile depth, believable weight, and momentum-based motion
@@ -579,6 +608,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
       <nav id="navList">
         <div class="nav-group">
           <a href="#" class="nav-item active" data-view="home"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg> Dashboard</a>
+          <a href="#" class="nav-item" data-view="scratch"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg> Scratch Notes</a>
           <a href="#" class="nav-item" data-view="timetable"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Timetable</a>
           <a href="#" class="nav-item" data-view="focus"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> Focus Room</a>
           <a href="#" class="nav-item" data-view="goals"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Goals & Planning</a>
@@ -672,6 +702,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
           </div>
         </div>
 
+        <div class="view" id="view-scratch"></div>
         <div class="view" id="view-timetable"></div>
         <div class="view" id="view-focus"></div>
         <div class="view" id="view-goals"></div>
@@ -768,6 +799,7 @@ const DEFAULT_STATE = () => ({
   habitsTracking:[], journal:[], mood:[], faithLog:[], taskCompletions:{}, achievements:[], lastVisit:null,
   energyToday:{date:null, level:'normal'},
   career: null,
+  scratchNotes:[],
 });
 
 let state = loadState();
@@ -1226,7 +1258,7 @@ function finishOnboarding(){
   if(state.timetable.events.length === 0 && state.timetable.mode !== 'later') seedDefaultTimetable();
   saveState(); showToast('Welcome to MAAR LIFE — your system is live.'); enterApp();
 }
-const VIEW_TITLES = { home:'Dashboard', timetable:'Timetable', focus:'Focus Room', goals:'Goals & Planning', habits:'Habits', finance:'Finance Center', health:'Health Center', diet:'Diet Center', study:'Study Hub', career:'Career Hub', faith:'Faith', journal:'Journal', mood:'Mood & Wellbeing', analytics:'Analytics', rank:'Rank & XP', milestones:'Milestones', reports:'Reports', settings:'Settings' };
+const VIEW_TITLES = { home:'Dashboard', scratch:'Scratch Notes', timetable:'Timetable', focus:'Focus Room', goals:'Goals & Planning', habits:'Habits', finance:'Finance Center', health:'Health Center', diet:'Diet Center', study:'Study Hub', career:'Career Hub', faith:'Faith', journal:'Journal', mood:'Mood & Wellbeing', analytics:'Analytics', rank:'Rank & XP', milestones:'Milestones', reports:'Reports', settings:'Settings' };
 function enterApp(){
   showScreen('app'); _lastRankIdx = getRankInfo(state.xp).index; bindAppNav(); renderSidebarProfile(); updateXpPill(); navigateTo('home'); checkDailyReset();
   recoverFocusOnLoad();
@@ -2307,6 +2339,58 @@ function renderDietMealList(){
   wrap.querySelectorAll('[data-meal-del]').forEach(btn=> btn.addEventListener('click', ()=>{ state.diet.meals = state.diet.meals.filter(m=>m.id!==btn.dataset.mealDel); saveState(); VIEW_RENDERERS.diet(); }));
 }
 
+/* ============================================================
+   SCRATCH NOTES — a fast, global, no-structure capture pad.
+   Deliberately separate from the Study Hub notebook system:
+   nothing typed here needs a subject, a folder, or a title.
+   Restored as its own top-level area per user request.
+============================================================ */
+const SCRATCH_COLORS = ['rgba(22,201,141,0.10)','rgba(201,162,75,0.10)','rgba(91,158,232,0.10)','rgba(232,230,222,0.06)'];
+let _scratchSaveTimeout = {};
+VIEW_RENDERERS.scratch = function(){
+  if(!state.scratchNotes) state.scratchNotes = [];
+  const view = document.getElementById('view-scratch');
+  view.innerHTML = `<div class="view-head"><div><h1>Scratch Notes</h1><div class="vh-sub">A fast, no-pressure place to jot things down — nothing here needs a folder, a title, or a subject. Just write.</div></div></div>
+    <div class="glass panel" style="margin-bottom:20px;">
+      <textarea id="scratchQuickInput" placeholder="Write a quick thought… (Ctrl+Enter to save)" style="width:100%; min-height:90px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; padding:14px 16px; color:var(--ink); font-size:14.5px; line-height:1.6; resize:vertical; font-family:inherit;"></textarea>
+      <div style="display:flex; justify-content:flex-end; margin-top:10px;"><button class="btn btn-primary btn-sm" id="scratchAddBtn">+ Add scratch note</button></div>
+    </div>
+    <div id="scratchGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px;"></div>`;
+  const input = document.getElementById('scratchQuickInput');
+  function addNote(){
+    const text = input.value.trim();
+    if(!text){ showToast('Write something first'); return; }
+    const now = new Date().toISOString();
+    state.scratchNotes.unshift({id:uid(), text, color: SCRATCH_COLORS[Math.floor(Math.random()*SCRATCH_COLORS.length)], date:now, updatedAt:now});
+    saveState(); addXp(2); input.value=''; input.focus(); renderScratchList();
+  }
+  document.getElementById('scratchAddBtn').addEventListener('click', addNote);
+  input.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key==='Enter'){ e.preventDefault(); addNote(); } });
+  renderScratchList();
+};
+function renderScratchList(){
+  const grid = document.getElementById('scratchGrid'); if(!grid) return;
+  if(!state.scratchNotes.length){ grid.innerHTML = emptyState('No scratch notes yet','Jot down a quick idea above — it stays here, separate from your notebooks, until you delete it.'); return; }
+  grid.innerHTML = state.scratchNotes.map(n=>`<div class="glass panel" style="padding:16px; background:${n.color||SCRATCH_COLORS[0]}; display:flex; flex-direction:column; min-height:120px;">
+      <div contenteditable="true" data-scratch-edit="${n.id}" style="flex:1; font-size:13.5px; line-height:1.6; color:var(--ink); outline:none; white-space:pre-wrap; word-break:break-word;">${escapeHtml(n.text)}</div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+        <span style="font-size:11px; color:var(--ink-faint);">${new Date(n.updatedAt||n.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'})}</span>
+        <button class="lr-del" data-scratch-del="${n.id}" title="Delete"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('[data-scratch-edit]').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      const id = el.dataset.scratchEdit; const n = state.scratchNotes.find(x=>x.id===id); if(!n) return;
+      n.text = el.textContent; n.updatedAt = new Date().toISOString();
+      clearTimeout(_scratchSaveTimeout[id]);
+      _scratchSaveTimeout[id] = setTimeout(saveState, 500);
+    });
+  });
+  grid.querySelectorAll('[data-scratch-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+    state.scratchNotes = state.scratchNotes.filter(n=>n.id!==btn.dataset.scratchDel); saveState(); showToast('Scratch note deleted'); renderScratchList();
+  }));
+}
+
 let studyWorkspaceSubjectId = null;
 let studyWorkspaceTab = 'notebook';
 VIEW_RENDERERS.study = function(){
@@ -2333,8 +2417,9 @@ function ensureSubjectWorkspace(s){
 function renderStudySubjects(){
   const wrap = document.getElementById('studySubjectList'); if(!state.study.subjects.length){ wrap.innerHTML = emptyState('No subjects yet','Add a subject to open its own notebook, files and flashcards.'); return; }
   wrap.innerHTML = state.study.subjects.map(s=>{ ensureSubjectWorkspace(s);
-    const activity = s.notebook.trim().length + s.files.length*3 + s.notes.length*2 + s.flashcards.length*2;
-    return `<div class="list-row" style="cursor:pointer;" data-subj-open="${s.id}"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/></svg></div><div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">${s.files.length} file${s.files.length!==1?'s':''} · ${s.notes.length} note${s.notes.length!==1?'s':''} · ${s.flashcards.length} flashcard${s.flashcards.length!==1?'s':''}</div></div>${activity>0?'<span class="badge badge-emerald">Active</span>':''}<button class="lr-del" data-subj-del="${s.id}" title="Delete subject"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`; }).join('');
+    const noteCount = (s.noteTree||[]).length;
+    const activity = s.notebook.trim().length + s.files.length*3 + noteCount*2 + s.flashcards.length*2;
+    return `<div class="list-row" style="cursor:pointer;" data-subj-open="${s.id}"><div class="lr-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/></svg></div><div><div class="lr-title">${escapeHtml(s.name)}</div><div class="lr-sub">${s.files.length} file${s.files.length!==1?'s':''} · ${noteCount||s.notes.length} note${(noteCount||s.notes.length)!==1?'s':''} · ${s.flashcards.length} flashcard${s.flashcards.length!==1?'s':''}</div></div>${activity>0?'<span class="badge badge-emerald">Active</span>':''}<button class="lr-del" data-subj-del="${s.id}" title="Delete subject"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`; }).join('');
   wrap.querySelectorAll('[data-subj-open]').forEach(row=> row.addEventListener('click', (e)=>{ if(e.target.closest('[data-subj-del]')) return; studyWorkspaceSubjectId = row.dataset.subjOpen; studyWorkspaceTab='notebook'; VIEW_RENDERERS.study(); }));
   wrap.querySelectorAll('[data-subj-del]').forEach(btn=>btn.addEventListener('click', (e)=>{ e.stopPropagation(); state.study.subjects = state.study.subjects.filter(s=>s.id!==btn.dataset.subjDel); saveState(); VIEW_RENDERERS.study(); }));
 }
@@ -2384,10 +2469,10 @@ function renderSubjectWorkspace(){
       </div>
     </div>
     <div class="cards-row">
+      <div class="glass metric-card"><div class="mc-lbl">Notebook notes</div><div class="mc-val">${(s.noteTree||[]).length || s.notes.length}</div></div>
       <div class="glass metric-card"><div class="mc-lbl">Files</div><div class="mc-val">${s.files.length}</div></div>
-      <div class="glass metric-card"><div class="mc-lbl">Notes</div><div class="mc-val">${s.notes.length}</div></div>
+      <div class="glass metric-card"><div class="mc-lbl">Quick notes</div><div class="mc-val">${s.notes.length}</div></div>
       <div class="glass metric-card"><div class="mc-lbl">Flashcards</div><div class="mc-val">${s.flashcards.length}</div></div>
-      <div class="glass metric-card"><div class="mc-lbl">Notebook words</div><div class="mc-val">${(()=>{ const t=stripHtml(s.notebook).trim(); return t?t.split(/\s+/).length:0; })()}</div></div>
     </div>
     <div class="tabs" id="swTabs">
       <button class="tab-btn ${studyWorkspaceTab==='notebook'?'active':''}" data-swtab="notebook">Notebook</button>
@@ -2405,63 +2490,206 @@ function renderSubjectWorkspace(){
 }
 let _swNotebookTimeout = null;
 function stripHtml(html){ return (html||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' '); }
+
+/* ============================================================
+   NOTE TREE — Trilium-inspired hierarchical knowledge base,
+   built ADDITIVELY on top of the original s.notebook /
+   s.notebookHistory / s.notes fields. Those originals are never
+   deleted — they're migrated once into note-tree entries so nothing
+   is ever lost, and they remain intact as a backup underneath.
+============================================================ */
+let _expandedNoteIds = new Set();
+function ensureNoteTree(s){
+  if(!s.noteTree) s.noteTree = [];
+  if(s.activeNoteId===undefined) s.activeNoteId = null;
+  if(!s.noteTreeMigrated){ migrateNoteTree(s); s.noteTreeMigrated = true; saveState(); }
+  if(!s.noteTree.length){
+    s.noteTree.push({id:uid(), parentId:null, title:'Welcome', content:'<p>This is your notebook, reimagined as a knowledge base. Click <strong>+ New</strong> to add a note, click the + next to a note to add a child under it, link notes together by typing <code>[[Note Title]]</code>, and use the search box to find anything instantly.</p>', tags:[], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()});
+    saveState();
+  }
+  if(!s.activeNoteId || !s.noteTree.some(n=>n.id===s.activeNoteId)) s.activeNoteId = (s.noteTree.find(n=>!n.parentId)||s.noteTree[0]).id;
+}
+function migrateNoteTree(s){
+  const now = new Date().toISOString();
+  const notebookHtml = (s.notebook||'').trim();
+  if(stripHtml(notebookHtml).trim().length || /<img/i.test(notebookHtml)){
+    s.noteTree.push({id:uid(), parentId:null, title:'Current Notebook', content:notebookHtml, tags:['migrated'], createdAt:now, updatedAt:now});
+  }
+  if((s.notebookHistory||[]).length){
+    const folderId = uid();
+    s.noteTree.push({id:folderId, parentId:null, title:'Saved Entries', content:'<p>Your older saved notebook entries, migrated automatically so nothing was lost.</p>', tags:[], createdAt:now, updatedAt:now});
+    s.notebookHistory.forEach(h=>{
+      let title; try{ title = new Date(h.date).toLocaleString('en-GB',{dateStyle:'medium', timeStyle:'short'}); }catch(e){ title = 'Saved entry'; }
+      s.noteTree.push({id:uid(), parentId:folderId, title, content:h.html, tags:['migrated'], createdAt:h.date, updatedAt:h.date});
+    });
+  }
+  if((s.notes||[]).length){
+    const folderId = uid();
+    s.noteTree.push({id:folderId, parentId:null, title:'Quick Notes', content:'<p>Your old quick notes, migrated automatically so nothing was lost.</p>', tags:[], createdAt:now, updatedAt:now});
+    s.notes.forEach(n=>{
+      s.noteTree.push({id:uid(), parentId:folderId, title: stripHtml(n.text||'').trim().slice(0,40) || 'Note', content:`<p>${escapeHtml(n.text||'')}</p>`, tags:['migrated'], createdAt:n.date||now, updatedAt:n.date||now});
+    });
+  }
+}
+function findNote(s, id){ return (s.noteTree||[]).find(n=>n.id===id); }
+function getNoteChildren(s, parentId){ return (s.noteTree||[]).filter(n=>n.parentId===parentId); }
+function getNotePath(s, id){ const path=[]; let cur=findNote(s,id); let guard=0; while(cur && guard++<50){ path.unshift(cur); cur = cur.parentId ? findNote(s,cur.parentId) : null; } return path; }
+function deleteNoteRecursive(s, id){ getNoteChildren(s,id).forEach(c=>deleteNoteRecursive(s,c.id)); s.noteTree = s.noteTree.filter(n=>n.id!==id); }
+function filterNotesFlat(s, query){
+  const q = (query||'').trim().toLowerCase(); if(!q) return null;
+  return (s.noteTree||[]).filter(n=> (n.title||'').toLowerCase().includes(q) || stripHtml(n.content||'').toLowerCase().includes(q) || (n.tags||[]).some(t=>t.toLowerCase().includes(q)));
+}
+function getOutgoingLinks(s, note){
+  const re = /\[\[([^\[\]]+)\]\]/g; const found = []; let m; const text = note.content||'';
+  while((m = re.exec(text))){ const t = m[1].trim().toLowerCase(); const target = (s.noteTree||[]).find(n=> n.id!==note.id && (n.title||'').trim().toLowerCase()===t); if(target && !found.some(f=>f.id===target.id)) found.push(target); }
+  return found;
+}
+function getBacklinks(s, note){
+  const title = (note.title||'').trim().toLowerCase(); if(!title) return [];
+  const marker = `[[${title}]]`;
+  return (s.noteTree||[]).filter(n=> n.id!==note.id && (n.content||'').toLowerCase().includes(marker));
+}
+let _nbShortcutsBound = false;
+function _bindStudyNotebookShortcuts(){
+  if(_nbShortcutsBound) return; _nbShortcutsBound = true;
+  document.addEventListener('keydown', (e)=>{
+    const active = document.getElementById('view-study')?.classList.contains('active') && studyWorkspaceSubjectId && studyWorkspaceTab==='notebook';
+    if(!active) return;
+    const s = getWorkspaceSubject(); if(!s) return;
+    const ctrl = e.ctrlKey || e.metaKey;
+    if(ctrl && e.key.toLowerCase()==='n'){ e.preventDefault(); createNoteUI(s, null); }
+    else if(ctrl && e.key.toLowerCase()==='f'){ e.preventDefault(); const inp = document.getElementById('ntSearchInput'); if(inp){ inp.focus(); inp.select(); } }
+    else if(ctrl && e.key.toLowerCase()==='s'){ e.preventDefault(); document.getElementById('swSaveBtn')?.click(); }
+  });
+}
+function createNoteUI(s, parentId){
+  const n = {id:uid(), parentId: parentId||null, title:'New note', content:'', tags:[], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+  s.noteTree.push(n); s.activeNoteId = n.id; if(parentId) _expandedNoteIds.add(parentId);
+  saveState(); renderSwNotebook();
+  setTimeout(()=>{ const t = document.getElementById('ntTitleInput'); if(t){ t.focus(); t.select(); } }, 30);
+}
+function renderNoteTreeHtml(s, parentId, depth){
+  const children = getNoteChildren(s, parentId).sort((a,b)=> a.title.localeCompare(b.title));
+  if(!children.length) return '';
+  return children.map(n=>{
+    const kids = getNoteChildren(s, n.id);
+    const expanded = _expandedNoteIds.has(n.id);
+    const isActive = n.id === s.activeNoteId;
+    return `<div class="nt-node">
+      <div class="nt-row ${isActive?'active':''}" data-note-open="${n.id}" style="padding-left:${depth*16+6}px;">
+        ${kids.length ? `<span class="nt-toggle" data-note-toggle="${n.id}">${expanded?'▾':'▸'}</span>` : `<span class="nt-toggle-spacer"></span>`}
+        <span class="nt-title">${escapeHtml(n.title||'Untitled')}</span>
+        <button type="button" class="nt-add" data-note-addchild="${n.id}" title="Add child note">+</button>
+      </div>
+      ${kids.length && expanded ? `<div class="nt-children">${renderNoteTreeHtml(s, n.id, depth+1)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
 function renderSwNotebook(){
   const s = getWorkspaceSubject(); const panel = document.getElementById('swPanel');
-  const looksLikeHtml = /<[a-z][\s\S]*>/i.test(s.notebook||'');
-  const initialContent = looksLikeHtml ? s.notebook : escapeHtml(s.notebook||'').replace(/\n/g,'<br>');
+  ensureNoteTree(s);
+  const note = findNote(s, s.activeNoteId);
+  const looksLikeHtml = /<[a-z][\s\S]*>/i.test(note.content||'');
+  const initialContent = looksLikeHtml ? (note.content||'') : escapeHtml(note.content||'').replace(/\n/g,'<br>');
   const SIZES = [12,14,16,18,20,24,28,32,40];
-  panel.innerHTML = `<div class="glass panel">
-    <div class="section-title-row"><h3>Notebook</h3><span id="swNotebookSaved" style="font-size:11.5px; color:var(--ink-faint);">Saved</span></div>
-    <div class="notebook-toolbar" id="swToolbar">
-      <select class="nb-select" id="swFontFamily" title="Font">
-        <option value="'Inter', sans-serif">Inter</option>
-        <option value="'Fraunces', serif">Fraunces</option>
-        <option value="Georgia, serif">Georgia</option>
-        <option value="'JetBrains Mono', monospace">Mono</option>
-      </select>
-      <select class="nb-select nb-size-select" id="swFontSize" title="Font size — shows the size at your cursor">
-        ${SIZES.map(px=>`<option value="${px}" ${px===16?'selected':''}>${px}px</option>`).join('')}
-      </select>
-      <div class="nb-sep"></div>
-      <button type="button" class="nb-btn" data-cmd="bold" title="Bold">B</button>
-      <button type="button" class="nb-btn" data-cmd="italic" title="Italic"><i>I</i></button>
-      <button type="button" class="nb-btn" data-cmd="underline" title="Underline"><u>U</u></button>
-      <input type="color" class="nb-color" id="swColor" title="Text colour" value="#e8e6de">
-      <div class="nb-sep"></div>
-      <button type="button" class="nb-btn" data-cmd="insertUnorderedList" title="Bullet list"><svg class="icon" viewBox="0 0 24 24"><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/><path d="M9 6h11M9 12h11M9 18h11"/></svg></button>
-      <button type="button" class="nb-btn" data-cmd="insertOrderedList" title="Numbered list"><svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 10v2h1M4 18h2"/></svg></button>
-      <button type="button" class="nb-btn" data-cmd="justifyLeft" title="Align left"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h14"/></svg></button>
-      <div class="nb-sep"></div>
-      <button type="button" class="nb-btn" id="swInsertImgBtn" title="Insert image"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
-      <input type="file" id="swImgInput" accept="image/*" class="hidden">
+  panel.innerHTML = `
+    <div class="nb-kb-layout">
+      <div class="nb-kb-sidebar glass">
+        <div class="nb-kb-search-row">
+          <input type="text" id="ntSearchInput" placeholder="Search notes… (Ctrl+F)">
+          <button type="button" class="btn btn-primary btn-sm" id="ntNewRootBtn" title="New root note (Ctrl+N)">+ New</button>
+        </div>
+        <div id="ntTreeWrap" class="nt-tree"></div>
+      </div>
+      <div class="nb-kb-main glass">
+        <div class="nt-breadcrumb" id="ntBreadcrumb"></div>
+        <div class="nt-title-row">
+          <input type="text" id="ntTitleInput" class="nt-title-input" value="${escapeHtml(note.title||'')}" placeholder="Note title">
+          <button class="lr-del" id="ntDeleteBtn" title="Delete this note"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        </div>
+        <div class="nt-tags-row" id="ntTagsRow"></div>
+        <div class="notebook-toolbar" id="swToolbar">
+          <select class="nb-select" id="swFontFamily" title="Font">
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'Fraunces', serif">Fraunces</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'JetBrains Mono', monospace">Mono</option>
+          </select>
+          <select class="nb-select nb-size-select" id="swFontSize" title="Font size — shows the size at your cursor">
+            ${SIZES.map(px=>`<option value="${px}" ${px===16?'selected':''}>${px}px</option>`).join('')}
+          </select>
+          <div class="nb-sep"></div>
+          <button type="button" class="nb-btn" data-cmd="bold" title="Bold">B</button>
+          <button type="button" class="nb-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+          <button type="button" class="nb-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+          <input type="color" class="nb-color" id="swColor" title="Text colour" value="#e8e6de">
+          <div class="nb-sep"></div>
+          <button type="button" class="nb-btn" data-cmd="insertUnorderedList" title="Bullet list"><svg class="icon" viewBox="0 0 24 24"><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/><path d="M9 6h11M9 12h11M9 18h11"/></svg></button>
+          <button type="button" class="nb-btn" data-cmd="insertOrderedList" title="Numbered list"><svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 10v2h1M4 18h2"/></svg></button>
+          <button type="button" class="nb-btn" data-cmd="justifyLeft" title="Align left"><svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h14"/></svg></button>
+          <div class="nb-sep"></div>
+          <button type="button" class="nb-btn" id="swInsertImgBtn" title="Insert image"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
+          <input type="file" id="swImgInput" accept="image/*" class="hidden">
+        </div>
+        <div id="swNotebookEditable" class="notebook-editable" contenteditable="true" data-placeholder="Write freely — add headings, lists, images, colours, or link another note with [[Note Title]]">${initialContent}</div>
+        <div style="font-size:11px; color:var(--ink-faint); margin-top:8px;">Tip: click an image to resize it by its corner handle. Link notes together by typing <code>[[Note Title]]</code>.</div>
+        <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; align-items:center;">
+          <button class="btn btn-primary btn-sm" id="swSaveBtn">Save (Ctrl+S)</button>
+          <button class="btn btn-ghost btn-sm" id="swExportPdfBtn">Export as PDF</button>
+          <button class="btn btn-ghost btn-sm" id="swExportWordBtn">Export as Word (.doc)</button>
+          <button class="btn btn-ghost btn-sm" id="swArchiveClearBtn" style="margin-left:auto; color:var(--ink-faint);" title="Old scratchpad behaviour: archive this note's content to history and clear it">Archive &amp; clear</button>
+          <span id="swNotebookSaved" style="font-size:11.5px; color:var(--ink-faint);">Saved</span>
+        </div>
+        <div class="nt-links-panel" id="ntOutgoingLinks"></div>
+        <div class="nt-links-panel" id="ntBacklinks"></div>
+      </div>
     </div>
-    <div id="swNotebookEditable" class="notebook-editable" contenteditable="true" data-placeholder="Write freely — add headings, lists, images, colours...">${initialContent}</div>
-    <div style="font-size:11px; color:var(--ink-faint); margin-top:8px;">Tip: click an image to resize it by its corner handle — like Word or Docs.</div>
-    <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
-      <button class="btn btn-primary btn-sm" id="swSaveBtn">Save</button>
-      <button class="btn btn-ghost btn-sm" id="swExportPdfBtn">Export as PDF</button>
-      <button class="btn btn-ghost btn-sm" id="swExportWordBtn">Export as Word (.doc)</button>
-    </div>
-  </div>
-  <div class="glass panel" style="margin-top:20px;"><div class="section-title-row"><h3>Previous saved entries</h3></div><p style="color:var(--ink-dim); font-size:12px; margin-bottom:12px; margin-top:-8px;">Pressing Save archives your current note here and clears the notebook so it's ready for the next one.</p><div id="swNotebookHistoryList"></div></div>`;
+    <div class="glass panel" style="margin-top:20px;"><div class="section-title-row"><h3>Archived entries</h3></div><p style="color:var(--ink-dim); font-size:12px; margin-bottom:12px; margin-top:-8px;">From "Archive &amp; clear" on any note — your original scratchpad-style workflow, kept for backward compatibility.</p><div id="swNotebookHistoryList"></div></div>`;
+
   const editable = document.getElementById('swNotebookEditable'); const savedLbl = document.getElementById('swNotebookSaved');
   const sizeSelect = document.getElementById('swFontSize');
+
+  // --- selection memory: the moment you click a toolbar control (a <select>, the colour
+  // swatch, etc.) the browser moves focus OFF the editor, and in most browsers that collapses
+  // or drops window.getSelection() entirely. That was the root cause of "I highlight text,
+  // pick a size, and nothing happens" — by the time the command ran there was no selection
+  // left to apply it to, so the browser fell back to setting the *typing* style instead, which
+  // is also why the chosen size then kept spreading to every new letter afterwards. Fix: keep
+  // our own copy of the last real selection made inside the editor, and restore it immediately
+  // before running any formatting command, regardless of what stole focus in between.
+  let savedRange = null;
+  function saveSelection(){
+    const sel = window.getSelection();
+    if(sel && sel.rangeCount && editable.contains(sel.anchorNode)) savedRange = sel.getRangeAt(0).cloneRange();
+  }
+  function restoreSelection(){
+    editable.focus();
+    if(!savedRange) return;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+  }
+
   function markUnsaved(){
     savedLbl.textContent = 'Unsaved changes'; savedLbl.style.color = 'var(--gold-bright)';
     clearTimeout(_swNotebookTimeout);
     _swNotebookTimeout = setTimeout(doSave, 800);
   }
-  function doSave(){ s.notebook = editable.innerHTML; saveState(); savedLbl.textContent = 'Saved'; savedLbl.style.color = 'var(--ink-faint)'; }
+  function doSave(){ note.content = editable.innerHTML; note.updatedAt = new Date().toISOString(); saveState(); savedLbl.textContent = 'Saved'; savedLbl.style.color = 'var(--ink-faint)'; renderLinkPanels(); }
   function applyFontSize(px){
+    restoreSelection();
     document.execCommand('fontSize', false, '7');
     editable.querySelectorAll('font[size="7"]').forEach(f=>{
       const span = document.createElement('span'); span.style.fontSize = px+'px';
       while(f.firstChild) span.appendChild(f.firstChild);
       f.replaceWith(span);
     });
+    saveSelection();
   }
   function updateToolbarFromSelection(){
     const sel = window.getSelection(); if(!sel || !sel.anchorNode) return;
+    if(editable.contains(sel.anchorNode)) saveSelection();
     let node = sel.anchorNode; if(node.nodeType===3) node = node.parentElement;
     let sizePx = null;
     while(node && node!==editable){ if(node.style && node.style.fontSize){ sizePx = parseInt(node.style.fontSize); break; } node = node.parentElement; }
@@ -2534,28 +2762,36 @@ function renderSwNotebook(){
   editable.addEventListener('keyup', updateToolbarFromSelection);
   editable.addEventListener('mouseup', updateToolbarFromSelection);
   editable.addEventListener('focus', updateToolbarFromSelection);
+  editable.addEventListener('blur', saveSelection);
   document.addEventListener('selectionchange', ()=>{ if(document.activeElement===editable) updateToolbarFromSelection(); });
 
   document.getElementById('swSaveBtn').addEventListener('click', async ()=>{
-    const html = editable.innerHTML;
-    const hasContent = stripHtml(html).trim().length>0 || !!editable.querySelector('img');
-    if(!hasContent){ showToast('Nothing to save yet'); return; }
-    s.notebookHistory.unshift({id:uid(), html, date:new Date().toISOString()});
+    doSave();
+    const savedFile = await saveNotebookToDeviceFile(s, note.content);
+    showToast(savedFile ? 'Saved — and written to your device as a file' : 'Saved on this device');
+  });
+  document.getElementById('swArchiveClearBtn').addEventListener('click', async ()=>{
+    doSave();
+    const html = note.content;
+    const hasContent = stripHtml(html).trim().length>0 || /<img/i.test(html);
+    if(!hasContent){ showToast('Nothing to archive yet'); return; }
+    s.notebookHistory = s.notebookHistory||[];
+    s.notebookHistory.unshift({id:uid(), html, date:new Date().toISOString(), noteTitle:note.title});
     if(s.notebookHistory.length>100) s.notebookHistory.length = 100;
-    const savedFile = await saveNotebookToDeviceFile(s, html);
-    s.notebook = ''; saveState(); addXp(5);
-    showToast(savedFile ? 'Saved to your device — notebook cleared for your next note' : 'Saved on this device — notebook cleared for your next note');
+    note.content = ''; note.updatedAt = new Date().toISOString(); saveState();
+    showToast('Archived — this note is now cleared and ready to write again');
     renderSwNotebook();
   });
   document.querySelectorAll('#swToolbar .nb-btn[data-cmd]').forEach(btn=>{
     btn.addEventListener('mousedown', (e)=> e.preventDefault());
-    btn.addEventListener('click', ()=>{ editable.focus(); document.execCommand(btn.dataset.cmd, false, null); markUnsaved(); updateToolbarFromSelection(); });
+    btn.addEventListener('click', ()=>{ restoreSelection(); document.execCommand(btn.dataset.cmd, false, null); markUnsaved(); updateToolbarFromSelection(); });
   });
-  document.getElementById('swFontFamily').addEventListener('mousedown', ()=> editable.focus());
-  document.getElementById('swFontFamily').addEventListener('change', (e)=>{ editable.focus(); document.execCommand('fontName', false, e.target.value); markUnsaved(); });
-  sizeSelect.addEventListener('mousedown', ()=> editable.focus());
-  sizeSelect.addEventListener('change', (e)=>{ editable.focus(); applyFontSize(Number(e.target.value)); markUnsaved(); });
-  document.getElementById('swColor').addEventListener('input', (e)=>{ editable.focus(); document.execCommand('foreColor', false, e.target.value); markUnsaved(); });
+  document.getElementById('swFontFamily').addEventListener('mousedown', saveSelection);
+  document.getElementById('swFontFamily').addEventListener('change', (e)=>{ restoreSelection(); document.execCommand('fontName', false, e.target.value); markUnsaved(); saveSelection(); });
+  sizeSelect.addEventListener('mousedown', saveSelection);
+  sizeSelect.addEventListener('change', (e)=>{ applyFontSize(Number(e.target.value)); markUnsaved(); });
+  document.getElementById('swColor').addEventListener('mousedown', saveSelection);
+  document.getElementById('swColor').addEventListener('input', (e)=>{ restoreSelection(); document.execCommand('foreColor', false, e.target.value); markUnsaved(); saveSelection(); });
   document.getElementById('swInsertImgBtn').addEventListener('click', ()=> document.getElementById('swImgInput').click());
   document.getElementById('swImgInput').addEventListener('change', (e)=>{
     const file = e.target.files[0]; if(!file) return;
@@ -2566,8 +2802,57 @@ function renderSwNotebook(){
   document.getElementById('swExportPdfBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('pdf'); });
   document.getElementById('swExportWordBtn').addEventListener('click', ()=>{ doSave(); exportNotebook('word'); });
 
+  // --- title, tags, breadcrumb, tree, links ---
+  const titleInput = document.getElementById('ntTitleInput');
+  titleInput.addEventListener('input', ()=>{ note.title = titleInput.value; note.updatedAt = new Date().toISOString(); saveState(); renderBreadcrumb(); });
+  titleInput.addEventListener('blur', ()=>{ renderTreeSidebar(); renderLinkPanels(); });
+  document.getElementById('ntDeleteBtn').addEventListener('click', ()=>{
+    if(!confirm(`Delete "${note.title||'this note'}" and any of its child notes?`)) return;
+    deleteNoteRecursive(s, note.id); saveState(); showToast('Note deleted'); renderSwNotebook();
+  });
+  function renderBreadcrumb(){
+    const wrap = document.getElementById('ntBreadcrumb'); if(!wrap) return;
+    const path = getNotePath(s, note.id);
+    wrap.innerHTML = path.map(n=>`<span class="nt-crumb" data-jump="${n.id}">${escapeHtml(n.title||'Untitled')}</span>`).join(' <span class="nt-crumb-sep">›</span> ');
+    wrap.querySelectorAll('[data-jump]').forEach(el=> el.addEventListener('click', ()=>{ s.activeNoteId = el.dataset.jump; saveState(); renderSwNotebook(); }));
+  }
+  function renderTagsRow(){
+    const wrap = document.getElementById('ntTagsRow'); if(!wrap) return;
+    note.tags = note.tags||[];
+    wrap.innerHTML = note.tags.map(t=>`<span class="chip selected" data-tag-remove="${escapeHtml(t)}">${escapeHtml(t)} ✕</span>`).join('') + `<input type="text" id="ntTagInput" class="nt-tag-input" placeholder="+ tag">`;
+    wrap.querySelectorAll('[data-tag-remove]').forEach(el=> el.addEventListener('click', ()=>{ note.tags = note.tags.filter(t=>t!==el.dataset.tagRemove); saveState(); renderTagsRow(); }));
+    const tagInput = document.getElementById('ntTagInput');
+    tagInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=tagInput.value.trim(); if(v && !note.tags.includes(v)){ note.tags.push(v); saveState(); renderTagsRow(); } } });
+  }
+  function renderLinkPanels(){
+    const outWrap = document.getElementById('ntOutgoingLinks'); const backWrap = document.getElementById('ntBacklinks');
+    if(!outWrap || !backWrap) return;
+    const outgoing = getOutgoingLinks(s, note); const backlinks = getBacklinks(s, note);
+    outWrap.innerHTML = outgoing.length ? `<div class="nt-links-title">Links to</div>` + outgoing.map(n=>`<span class="nt-link-chip" data-jump="${n.id}">${escapeHtml(n.title)}</span>`).join('') : '';
+    backWrap.innerHTML = backlinks.length ? `<div class="nt-links-title">Linked from</div>` + backlinks.map(n=>`<span class="nt-link-chip" data-jump="${n.id}">${escapeHtml(n.title)}</span>`).join('') : '';
+    [outWrap, backWrap].forEach(w=> w.querySelectorAll('[data-jump]').forEach(el=> el.addEventListener('click', ()=>{ s.activeNoteId = el.dataset.jump; saveState(); renderSwNotebook(); })));
+  }
+  function renderTreeSidebar(){
+    const wrap = document.getElementById('ntTreeWrap'); if(!wrap) return;
+    const searchVal = document.getElementById('ntSearchInput')?.value || '';
+    const filtered = filterNotesFlat(s, searchVal);
+    if(filtered){
+      wrap.innerHTML = filtered.length ? filtered.map(n=>`<div class="nt-row nt-flat ${n.id===s.activeNoteId?'active':''}" data-note-open="${n.id}"><span class="nt-title">${escapeHtml(n.title||'Untitled')}</span></div>`).join('') : `<div class="nt-empty">No matches</div>`;
+    } else {
+      wrap.innerHTML = renderNoteTreeHtml(s, null, 0) || `<div class="nt-empty">No notes yet</div>`;
+    }
+    wrap.querySelectorAll('[data-note-open]').forEach(el=> el.addEventListener('click', (e)=>{ if(e.target.closest('[data-note-addchild]')||e.target.closest('[data-note-toggle]')) return; s.activeNoteId = el.dataset.noteOpen; saveState(); renderSwNotebook(); }));
+    wrap.querySelectorAll('[data-note-toggle]').forEach(el=> el.addEventListener('click', (e)=>{ e.stopPropagation(); const id=el.dataset.noteToggle; if(_expandedNoteIds.has(id)) _expandedNoteIds.delete(id); else _expandedNoteIds.add(id); renderTreeSidebar(); }));
+    wrap.querySelectorAll('[data-note-addchild]').forEach(el=> el.addEventListener('click', (e)=>{ e.stopPropagation(); createNoteUI(s, el.dataset.noteAddchild); }));
+  }
+  document.getElementById('ntSearchInput').addEventListener('input', renderTreeSidebar);
+  document.getElementById('ntNewRootBtn').addEventListener('click', ()=> createNoteUI(s, null));
+
+  renderBreadcrumb(); renderTagsRow(); renderLinkPanels(); renderTreeSidebar();
   renderNotebookHistoryList();
 }
+_bindStudyNotebookShortcuts();
+
 function renderNotebookHistoryList(){
   const s = getWorkspaceSubject(); const wrap = document.getElementById('swNotebookHistoryList'); if(!s || !wrap) return;
   const hist = s.notebookHistory||[];
@@ -2615,16 +2900,17 @@ async function saveNotebookToDeviceFile(s, html){
   }catch(err){ return false; }
 }
 function exportNotebook(kind){
-  const s = getWorkspaceSubject(); const html = s.notebook || '<p></p>';
-  const safeName = s.name.replace(/[^a-z0-9]+/gi,'_') || 'notebook';
+  const s = getWorkspaceSubject(); const note = findNote(s, s.activeNoteId); const html = (note && note.content) || '<p></p>';
+  const title = note ? (note.title||'Note') : s.name;
+  const safeName = (title||'notebook').replace(/[^a-z0-9]+/gi,'_') || 'notebook';
   if(kind==='pdf'){
     const win = window.open('', '_blank');
     if(!win){ showToast('Please allow pop-ups to export as PDF'); return; }
-    win.document.write(`<html><head><title>${escapeHtml(s.name)} — Notebook</title><style>body{font-family:Georgia,serif; padding:40px; color:#111; line-height:1.6;} img{max-width:100%; border-radius:8px; margin:10px 0;} h1{font-family:Georgia,serif;} @media print{body{padding:0;}}</style></head><body><h1>${escapeHtml(s.name)} — Notebook</h1>${html}</body></html>`);
+    win.document.write(`<html><head><title>${escapeHtml(title)}</title><style>body{font-family:Georgia,serif; padding:40px; color:#111; line-height:1.6;} img{max-width:100%; border-radius:8px; margin:10px 0;} h1{font-family:Georgia,serif;} @media print{body{padding:0;}}</style></head><body><h1>${escapeHtml(title)}</h1>${html}</body></html>`);
     win.document.close();
     setTimeout(()=> win.print(), 300);
   } else {
-    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${escapeHtml(s.name)}</title></head><body style="font-family:Calibri, sans-serif;"><h1>${escapeHtml(s.name)} — Notebook</h1>`;
+    const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${escapeHtml(title)}</title></head><body style="font-family:Calibri, sans-serif;"><h1>${escapeHtml(title)}</h1>`;
     const postHtml = `</body></html>`;
     const blob = new Blob(['\ufeff', preHtml + html + postHtml], {type:'application/msword'});
     const url = URL.createObjectURL(blob);
@@ -2725,7 +3011,8 @@ function searchSubjectContent(s, query){
   const terms = query.toLowerCase().split(/\s+/).filter(w=>w.length>2);
   if(!terms.length) return [];
   const sources = [];
-  if(s.notebook) sources.push({label:'Notebook', text:stripHtml(s.notebook)});
+  if(s.notebook) sources.push({label:'Notebook (legacy)', text:stripHtml(s.notebook)});
+  (s.noteTree||[]).forEach(n=> sources.push({label:`Note: ${n.title||'Untitled'}`, text:stripHtml(n.content||'')}));
   s.notes.forEach(n=> sources.push({label:`Note (${fmtDateUK(todayKey(new Date(n.date)))})`, text:n.text}));
   s.files.filter(f=>f.text).forEach(f=> sources.push({label:f.name, text:f.text}));
   const results = [];
