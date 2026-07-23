@@ -331,9 +331,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 /* ===== Study Hub — Trilium-inspired note tree / knowledge base layout ===== */
 .nb-kb-layout{display:grid; grid-template-columns:260px 1fr; gap:16px; align-items:start;}
 @media (max-width:900px){.nb-kb-layout{grid-template-columns:1fr;}}
-.nb-kb-sidebar{padding:14px; max-height:760px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;}
-.nb-kb-search-row{display:flex; gap:8px;}
-.nb-kb-search-row input{flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:9px 12px; color:var(--ink); font-size:13px;}
+.nb-kb-sidebar{padding:14px; max-height:760px; overflow-y:auto; overflow-x:hidden; display:flex; flex-direction:column; gap:10px;}
+.nb-kb-search-row{display:flex; gap:8px; min-width:0;}
+.nb-kb-search-row input{flex:1; min-width:0; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:9px 12px; color:var(--ink); font-size:13px;}
+.nb-kb-search-row .btn{flex-shrink:0;}
 .nt-tree{flex:1; overflow-y:auto;}
 .nt-empty{color:var(--ink-faint); font-size:12.5px; padding:14px 8px;}
 .nt-row{display:flex; align-items:center; gap:4px; padding:7px 6px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--ink-dim); transition:background 0.15s;}
