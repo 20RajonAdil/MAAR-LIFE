@@ -56,7 +56,7 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.
 .progress-fill.gold{background:linear-gradient(90deg, var(--gold), var(--gold-bright));}
 svg.icon{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0;}
 .landing{min-height:100vh; display:flex; flex-direction:column; position:relative; overflow:hidden;}
-.landing-nav{display:flex; align-items:center; justify-content:space-between; padding:28px clamp(20px,5vw,64px); position:relative; z-index:2;}
+.landing-nav{display:flex; align-items:center; justify-content:space-between; padding:28px clamp(20px,5vw,64px); position:relative; z-index:2; padding-top:60px;}
 .brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:20px; font-weight:700;}
 .brand-mark{width:34px; height:34px; border-radius:10px; background:linear-gradient(155deg, var(--emerald-deep), var(--void)); border:1px solid var(--card-border-hi); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); color:var(--emerald-bright); font-size:18px; font-weight:700;}
 .landing-hero{flex:1; display:flex; align-items:center; justify-content:center; padding:20px clamp(20px,5vw,64px) 60px; position:relative; z-index:2;}
@@ -123,7 +123,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .wizard-nav{position:fixed; bottom:0; left:0; right:0; z-index:10; display:flex; justify-content:center; gap:14px; padding:18px 20px; background:linear-gradient(to top, var(--void) 60%, transparent);}
 .wizard-nav-inner{display:flex; gap:12px; width:100%; max-width:640px;} .wizard-nav .btn{flex:1;} .wizard-nav .btn-back{flex:0 0 auto; padding:14px 22px;}
 .appshell{display:flex; min-height:100vh; position:relative;}
-.sidebar{width:240px; flex-shrink:0; border-right:1px solid var(--card-border); display:flex; flex-direction:column; padding:24px 16px; position:sticky; top:0; height:100vh;}
+.sidebar{width:240px; flex-shrink:0; border-right:1px solid var(--card-border); display:flex; flex-direction:column; padding:60px 16px 24px; position:sticky; top:0; height:100vh;}
 .sidebar .brand{padding:0 8px 28px; font-size:17px;}
 .nav-item{display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; color:var(--ink-dim); font-size:14px; font-weight:500; margin-bottom:2px;}
 .nav-item svg{width:18px; height:18px;} .nav-item:hover{background:rgba(255,255,255,0.04); color:var(--ink);}
@@ -193,7 +193,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .quote-card{padding:24px; text-align:center;} .quote-card .q-mark{font-family:var(--font-display); font-size:40px; color:var(--gold-bright); opacity:0.5; line-height:0.5;}
 .quote-card p{font-family:var(--font-display); font-size:17px; line-height:1.5; margin:10px 0; font-style:italic;} .quote-card .q-author{font-size:12px; color:var(--ink-faint); font-family:var(--font-mono);}
 .mobile-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:39; display:none;}
-@media (max-width:900px){.sidebar{position:fixed; left:0; top:0; z-index:40; transform:translateX(-100%); transition:transform 0.3s var(--ease); background:var(--void); box-shadow:20px 0 60px rgba(0,0,0,0.5);} .sidebar.open{transform:translateX(0);} .mobile-overlay.open{display:block;} .mobile-menu-btn{display:flex;}}
+@media (max-width:900px){.sidebar{position:fixed; left:0; top:0; z-index:40; transform:translateX(-100%); transition:transform 0.3s var(--ease); background:var(--void); box-shadow:20px 0 60px rgba(0,0,0,0.5); padding-top:60px;} .sidebar.open{transform:translateX(0);} .mobile-overlay.open{display:block;} .mobile-menu-btn{display:flex;} .topbar{padding-left:60px;}}
 .view-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:26px;}
 .view-head h1{font-size:clamp(22px,3vw,28px);} .view-head .vh-sub{color:var(--ink-dim); font-size:13.5px; margin-top:4px;}
 .tabs{display:flex; gap:6px; padding:5px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:14px; margin-bottom:22px; overflow-x:auto;}
