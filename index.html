@@ -55,6 +55,13 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.
 .field input,.field select,.field textarea{width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; padding:13px 16px; color:var(--ink); font-size:14.5px;}
 .field textarea{resize:vertical; min-height:80px;}
 .field-row{display:grid; grid-template-columns:1fr 1fr; gap:16px;} @media (max-width:560px){.field-row{grid-template-columns:1fr;}}
+.status-row{display:flex; align-items:center; justify-content:space-between; padding:12px 2px; border-bottom:1px solid var(--card-border); font-size:13.5px; gap:12px;} .status-row:last-of-type{border-bottom:none;}
+.status-row-label{color:var(--ink-dim); display:flex; align-items:center; gap:8px;}
+.status-row-value{font-weight:600; text-align:right;}
+.status-dot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint); flex-shrink:0; display:inline-block;}
+.status-dot.is-ok{background:var(--emerald-bright); box-shadow:0 0 8px rgba(63,232,172,0.6);}
+.status-dot.is-warn{background:var(--gold-bright); box-shadow:0 0 8px rgba(227,196,117,0.5);}
+.status-dot.is-off{background:var(--danger); box-shadow:0 0 8px rgba(226,101,79,0.5);}
 .badge{display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:100px; font-size:11.5px; font-weight:700; text-transform:uppercase;}
 .badge-emerald{background:var(--emerald-dim); color:var(--emerald-bright);} .badge-gold{background:var(--gold-dim); color:var(--gold-bright);} .badge-danger{background:var(--danger-dim); color:var(--danger);}
 .progress-track{height:8px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden;}
@@ -830,7 +837,163 @@ function loadState(){
   }catch(e){ console.warn('Could not load state', e); }
   return DEFAULT_STATE();
 }
-function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.warn('Could not save state', e); } }
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.warn('Could not save state', e); }
+  if(typeof DataFile !== 'undefined') DataFile.scheduleSave();
+}
+
+/* ============================================================
+   DATA FILE SYNC
+   Optional live sync of `state` to a single JSON file the user picks
+   on their own device, via the File System Access API. This is in
+   addition to the always-on localStorage save above — the browser
+   copy never goes away, the file is an extra mirror the user controls
+   (e.g. a synced folder, a USB drive, somewhere they can find it).
+   If the file becomes unreachable (moved, deleted, or permission
+   revoked by the browser), saving falls back to localStorage only
+   and the Settings page offers a one-click "Reattach file" to relink.
+   ============================================================ */
+const DATAFILE_SUPPORTED = typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function' && typeof window.showOpenFilePicker === 'function';
+const DF_IDB_NAME = 'maar-life-fs', DF_IDB_STORE = 'handles', DF_IDB_KEY = 'fileHandle';
+function dfIdbOpen(){
+  return new Promise((resolve, reject)=>{
+    if(!('indexedDB' in window)) return reject(new Error('no-idb'));
+    const req = indexedDB.open(DF_IDB_NAME, 1);
+    req.onupgradeneeded = ()=> req.result.createObjectStore(DF_IDB_STORE);
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function dfIdbSet(value){
+  const db = await dfIdbOpen();
+  return new Promise((resolve, reject)=>{ const tx = db.transaction(DF_IDB_STORE,'readwrite'); tx.objectStore(DF_IDB_STORE).put(value, DF_IDB_KEY); tx.oncomplete=()=>resolve(); tx.onerror=()=>reject(tx.error); });
+}
+async function dfIdbGet(){
+  const db = await dfIdbOpen();
+  return new Promise((resolve, reject)=>{ const tx = db.transaction(DF_IDB_STORE,'readonly'); const req = tx.objectStore(DF_IDB_STORE).get(DF_IDB_KEY); req.onsuccess=()=>resolve(req.result||null); req.onerror=()=>reject(req.error); });
+}
+async function dfIdbClear(){
+  try{ const db = await dfIdbOpen(); return new Promise((resolve)=>{ const tx = db.transaction(DF_IDB_STORE,'readwrite'); tx.objectStore(DF_IDB_STORE).delete(DF_IDB_KEY); tx.oncomplete=()=>resolve(); tx.onerror=()=>resolve(); }); }catch(e){ /* ignore */ }
+}
+
+const DataFile = {
+  mode: DATAFILE_SUPPORTED ? 'checking' : 'unsupported', // 'file' | 'needs-permission' | 'unsupported' | 'off' | 'checking'
+  handle: null,
+  fileName: '',
+  saveTimer: null,
+  busy: false,
+  lastSavedAt: null,
+
+  async verifyPermission(mode){ try{ return (await this.handle.queryPermission({mode})) === 'granted'; }catch(e){ return false; } },
+  async requestPermission(mode){ try{ return (await this.handle.requestPermission({mode})) === 'granted'; }catch(e){ return false; } },
+
+  // Called once on boot. Never prompts — only relinks silently if the
+  // browser already remembers write permission was granted for this file.
+  async tryAutoReconnect(){
+    if(!DATAFILE_SUPPORTED){ this.mode = 'unsupported'; return; }
+    try{
+      const handle = await dfIdbGet();
+      if(!handle){ this.mode = 'off'; return; }
+      this.handle = handle; this.fileName = handle.name || 'data file';
+      const ok = await this.verifyPermission('readwrite');
+      this.mode = ok ? 'file' : 'needs-permission';
+    }catch(e){ console.warn('Data file auto-reconnect failed', e); this.mode = 'off'; }
+  },
+
+  // Create/pick a brand-new file and start writing the current state to it.
+  async connectNewFile(){
+    if(!DATAFILE_SUPPORTED) throw new Error('unsupported');
+    const handle = await window.showSaveFilePicker({ suggestedName:'maarlife-data.json', types:[{description:'MAAR LIFE data file', accept:{'application/json':['.json']}}] });
+    this.handle = handle; this.fileName = handle.name; this.mode = 'file';
+    await dfIdbSet(handle);
+    await this.writeNow();
+    return handle;
+  },
+
+  // Point at a file that may already contain MAAR LIFE data (e.g. re-linking
+  // after moving devices, or attaching a file exported earlier).
+  async connectExistingFile(){
+    if(!DATAFILE_SUPPORTED) throw new Error('unsupported');
+    const [handle] = await window.showOpenFilePicker({ types:[{description:'MAAR LIFE data file', accept:{'application/json':['.json']}}], multiple:false });
+    const granted = await handle.requestPermission({mode:'readwrite'}).catch(()=>'denied');
+    if(granted !== 'granted'){ const err = new Error('permission-denied'); err.code='permission-denied'; throw err; }
+    let loadedFromFile = false;
+    try{
+      const text = await (await handle.getFile()).text();
+      if(text && text.trim()){
+        const parsed = JSON.parse(text);
+        if(parsed && typeof parsed === 'object' && ('profile' in parsed || 'onboarded' in parsed)){
+          if(confirm('This file already has MAAR LIFE data in it. Load it into the app now? (This replaces what\'s currently shown — your existing data stays safe in this browser until you overwrite it.)')){
+            const merged = Object.assign(DEFAULT_STATE(), parsed);
+            merged.timetable = Object.assign({has:null, mode:null, blocks:[], events:[], migrated:false}, parsed.timetable||{});
+            merged.energyToday = Object.assign({date:null, level:'normal'}, parsed.energyToday||{});
+            state = merged;
+            loadedFromFile = true;
+          }
+        }
+      }
+    }catch(e){ console.warn('Could not read existing file, will overwrite it instead', e); }
+    this.handle = handle; this.fileName = handle.name; this.mode = 'file';
+    await dfIdbSet(handle);
+    await this.writeNow();
+    if(loadedFromFile) saveState();
+    return { handle, loadedFromFile };
+  },
+
+  // User asks to relink a file that was disconnected (permission lapsed,
+  // or the browser forgot it after a restart). Requires a click since
+  // permission prompts need a user gesture.
+  async reattach(){
+    if(!DATAFILE_SUPPORTED) throw new Error('unsupported');
+    if(this.handle){
+      const ok = await this.requestPermission('readwrite');
+      if(ok){ this.mode = 'file'; await this.writeNow(); return true; }
+    }
+    // Handle missing or permission permanently refused — let the user pick again.
+    await this.connectExistingFile();
+    return true;
+  },
+
+  detach(){
+    this.handle = null; this.fileName = ''; this.mode = 'off';
+    if(this.saveTimer) clearTimeout(this.saveTimer);
+    dfIdbClear();
+  },
+
+  scheduleSave(){
+    if(this.mode !== 'file' || !this.handle) return;
+    if(this.saveTimer) clearTimeout(this.saveTimer);
+    this.saveTimer = setTimeout(()=> this.writeNow(), 800);
+  },
+
+  async writeNow(){
+    if(this.mode !== 'file' || !this.handle) return;
+    if(this.busy){ this.saveTimer = setTimeout(()=> this.writeNow(), 400); return; }
+    this.busy = true;
+    try{
+      const writable = await this.handle.createWritable();
+      await writable.write(JSON.stringify(state, null, 2));
+      await writable.close();
+      this.lastSavedAt = new Date();
+      updateDataFileIndicator();
+    }catch(e){
+      console.warn('Write to data file failed', e);
+      this.mode = 'needs-permission';
+      updateDataFileIndicator();
+      showToast('Lost the connection to your data file — your changes are still saved in this browser. Reattach it from Settings.');
+    }finally{ this.busy = false; }
+  },
+};
+function updateDataFileIndicator(){
+  const dot = document.getElementById('dfDot'), val = document.getElementById('dfStatusValue'), nameEl = document.getElementById('dfFileName');
+  if(!dot || !val) return;
+  dot.classList.remove('is-ok','is-warn','is-off');
+  if(DataFile.mode === 'file'){ dot.classList.add('is-ok'); val.textContent = 'Synced'; }
+  else if(DataFile.mode === 'needs-permission'){ dot.classList.add('is-warn'); val.textContent = 'Disconnected — needs reattaching'; }
+  else if(DataFile.mode === 'unsupported'){ dot.classList.add('is-off'); val.textContent = 'Not supported in this browser'; }
+  else { dot.classList.add('is-off'); val.textContent = 'Not connected'; }
+  if(nameEl) nameEl.textContent = DataFile.fileName || '—';
+}
 
 function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
 function todayKey(d=new Date()){ const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
@@ -908,8 +1071,9 @@ function setupInstallPrompt(){
 }
 function showScreen(name){ ['landing','wizard','app'].forEach(s=>{ const el = document.getElementById('screen-'+s); if(el) el.classList.toggle('hidden', s!==name); }); window.scrollTo(0,0); }
 
-function boot(){
+async function boot(){
   setupPwa(); setupInstallPrompt(); migrateLegacyTimetable(); renderHeroDomains();
+  if(typeof DataFile !== 'undefined') await DataFile.tryAutoReconnect().catch(()=>{});
   const resumeLink = document.getElementById('resumeLink');
   if(state.onboardStep > 0 && !state.onboarded) resumeLink.classList.remove('hidden');
   document.getElementById('btnStartJourney').addEventListener('click', ()=>{ showScreen('wizard'); initWizard(); });
@@ -3218,6 +3382,47 @@ function generateReport(){
   document.body.appendChild(a); a.click(); a.remove(); showToast('Report downloaded');
 }
 
+function renderDataFileSection(){
+  updateDataFileIndicator();
+  const btnNew = document.getElementById('dfConnectNewBtn'), btnExisting = document.getElementById('dfConnectExistingBtn'),
+        btnReattach = document.getElementById('dfReattachBtn'), btnDetach = document.getElementById('dfDetachBtn'),
+        note = document.getElementById('dfUnsupportedNote');
+  if(!btnNew) return;
+  if(DataFile.mode === 'unsupported'){
+    btnNew.classList.add('hidden'); btnExisting.classList.add('hidden'); btnReattach.classList.add('hidden'); btnDetach.classList.add('hidden');
+    note.classList.remove('hidden');
+  } else if(DataFile.mode === 'file'){
+    btnNew.classList.add('hidden'); btnExisting.classList.add('hidden'); btnReattach.classList.add('hidden'); btnDetach.classList.remove('hidden');
+    note.classList.add('hidden');
+  } else if(DataFile.mode === 'needs-permission'){
+    btnNew.classList.add('hidden'); btnExisting.classList.add('hidden'); btnReattach.classList.remove('hidden'); btnDetach.classList.remove('hidden');
+    note.classList.add('hidden');
+  } else {
+    btnNew.classList.remove('hidden'); btnExisting.classList.remove('hidden'); btnReattach.classList.add('hidden'); btnDetach.classList.add('hidden');
+    note.classList.add('hidden');
+  }
+  btnNew.addEventListener('click', async ()=>{
+    try{ await DataFile.connectNewFile(); showToast(`Now syncing to "${DataFile.fileName}"`); renderDataFileSection(); }
+    catch(e){ if(e.name !== 'AbortError') showToast('Could not set up that file.'); }
+  });
+  btnExisting.addEventListener('click', async ()=>{
+    try{
+      const {loadedFromFile} = await DataFile.connectExistingFile();
+      showToast(loadedFromFile ? `Loaded data from "${DataFile.fileName}"` : `Now syncing to "${DataFile.fileName}"`);
+      renderSidebarProfile(); updateXpPill(); _lastRankIdx = getRankInfo(state.xp).index;
+      VIEW_RENDERERS.settings();
+    }catch(e){ if(e.name !== 'AbortError' && e.code !== 'permission-denied') showToast('Could not attach that file.'); else if(e.code==='permission-denied') showToast('Permission to write to that file was denied.'); }
+  });
+  btnReattach.addEventListener('click', async ()=>{
+    try{ await DataFile.reattach(); showToast(DataFile.mode==='file' ? `Reattached "${DataFile.fileName}"` : 'Could not reattach.'); renderDataFileSection(); }
+    catch(e){ if(e.name !== 'AbortError') showToast('Could not reattach that file.'); }
+  });
+  btnDetach.addEventListener('click', ()=>{
+    if(!confirm('Stop syncing to this file? Your data stays exactly as-is in this browser — only the live mirror to the file stops.')) return;
+    DataFile.detach(); showToast('Stopped syncing to file'); renderDataFileSection();
+  });
+}
+
 VIEW_RENDERERS.settings = function(){
   const view = document.getElementById('view-settings');
   view.innerHTML = `<div class="view-head"><div><h1>Settings</h1><div class="vh-sub">Manage your profile and data.</div></div></div>
@@ -3225,7 +3430,21 @@ VIEW_RENDERERS.settings = function(){
     <div class="glass panel"><div class="section-title-row"><h3>Faith practice</h3></div><div class="religion-grid" id="sReligionGrid"></div></div>
     <div class="glass panel"><div class="section-title-row"><h3>Install</h3></div><p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">Install MAAR LIFE on your phone or desktop for offline access, like a native app.</p><button class="btn btn-gold btn-sm hidden" id="sInstallBtn">Install MAAR LIFE</button></div>
     <div class="glass panel" style="border-color:rgba(91,158,232,0.3);"><div class="section-title-row"><h3 style="color:var(--info);">How your data is stored</h3></div><p style="color:var(--ink-dim); font-size:13px; line-height:1.7;">MAAR LIFE is a single-page app with no server and no accounts. Everything above is stored only in this browser's local storage on this device. There is no login, no multi-device sync, and no way for this version to "mix data between users" because there is only ever one local profile per browser. If you need real accounts, cross-device sync, or an admin-managed ad system, those require a proper backend, database and authentication layer to be built.</p></div>
+    <div class="glass panel">
+      <div class="section-title-row"><h3><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg> Live data file</h3></div>
+      <p style="color:var(--ink-dim); font-size:13px; line-height:1.7; margin-bottom:14px;">Optionally mirror your data live to a JSON file you pick — on this device, a synced folder, or a USB drive. Every change autosaves there in addition to the browser. If MAAR LIFE ever loses the connection (file moved, permission reset by the browser, new device), reattach it in one click without losing anything — your data stays safe in this browser the whole time.</p>
+      <div class="status-row"><span class="status-row-label"><span class="status-dot" id="dfDot"></span>Status</span><span class="status-row-value" id="dfStatusValue">Checking…</span></div>
+      <div class="status-row"><span class="status-row-label">File</span><span class="status-row-value" id="dfFileName">—</span></div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px;">
+        <button class="btn btn-primary btn-sm" id="dfConnectNewBtn">Save to a file…</button>
+        <button class="btn btn-ghost btn-sm" id="dfConnectExistingBtn">Attach existing file…</button>
+        <button class="btn btn-gold btn-sm hidden" id="dfReattachBtn">Reattach file</button>
+        <button class="btn btn-ghost btn-sm hidden" id="dfDetachBtn" style="color:var(--danger);">Stop syncing</button>
+      </div>
+      <p id="dfUnsupportedNote" class="hidden" style="color:var(--ink-faint); font-size:12px; margin-top:12px; line-height:1.6;">This browser doesn't support live file sync (Safari and Firefox don't yet support the File System Access API). Use "Export data (JSON)" and "Restore from backup (JSON)" below to move data manually instead.</p>
+    </div>
     <div class="glass panel"><div class="section-title-row"><h3>Data</h3></div><p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device, in this browser. Nothing is sent anywhere.</p><div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;"><button class="btn btn-ghost btn-sm" id="sExportBtn">Export data (JSON)</button><button class="btn btn-ghost btn-sm" id="sImportBtn">Restore from backup (JSON)</button><input type="file" id="sImportFile" accept="application/json,.json" class="hidden"><button class="btn btn-ghost btn-sm" id="sResetBtn" style="color:var(--danger);">Reset all data</button></div><div id="sImportStatus" style="font-size:12.5px; color:var(--ink-faint); margin-top:10px;"></div></div>`;
+  renderDataFileSection();
   const grid = document.getElementById('sReligionGrid'); grid.innerHTML = RELIGIONS.map(r=>`<div class="religion-card ${state.religion===r.id?'selected':''}" data-rel="${r.id}">${r.name}</div>`).join('');
   grid.querySelectorAll('.religion-card').forEach(card=> card.addEventListener('click', ()=>{ state.religion = card.dataset.rel; saveState(); showToast('Updated'); VIEW_RENDERERS.settings(); }));
   document.getElementById('sSaveBtn').addEventListener('click', ()=>{ state.profile.name = document.getElementById('sName').value.trim(); state.profile.age = document.getElementById('sAge').value; state.profile.country = document.getElementById('sCountry').value; saveState(); renderSidebarProfile(); showToast('Profile updated'); });
