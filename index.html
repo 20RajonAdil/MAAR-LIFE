@@ -45,7 +45,7 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.
 .glass{background:linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)); border:1px solid var(--card-border); border-radius:var(--radius-lg); backdrop-filter:blur(20px); box-shadow:var(--shadow-soft);}
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 28px; border-radius:14px; border:1px solid transparent; font-weight:600; font-size:14.5px; letter-spacing:0.01em; transition:transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease); white-space:nowrap; -webkit-tap-highlight-color:transparent; touch-action:manipulation;}
 .btn-primary{background:linear-gradient(135deg, var(--emerald), #0EA876); color:#06140F; box-shadow:0 4px 20px rgba(22,201,141,0.28);}
-.btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 28px rgba(22,201,141,0.4);}
+@media (hover:hover) and (pointer:fine){ .btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 28px rgba(22,201,141,0.4);} }
 .btn-ghost{background:rgba(255,255,255,0.03); border:1px solid var(--card-border); color:var(--ink);}
 .btn-ghost:hover{background:rgba(255,255,255,0.06); border-color:rgba(232,230,222,0.16);}
 .btn-gold{background:linear-gradient(135deg, var(--gold-bright), var(--gold)); color:#241C0A; box-shadow:0 4px 20px rgba(201,162,75,0.25);}
@@ -235,9 +235,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 @media (max-width:480px){.content{padding:16px;} .score-dial{width:min(200px,62vw); height:min(200px,62vw);} .focus-ring-wrap{width:min(220px,68vw); height:min(220px,68vw);} .score-dial-num{font-size:40px;} .score-dial-num span{font-size:16px;}}
 .view-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:26px;}
 .view-head h1{font-size:clamp(22px,3vw,28px);} .view-head .vh-sub{color:var(--ink-dim); font-size:13.5px; margin-top:4px;}
-.tabs{display:flex; gap:6px; padding:5px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:14px; margin-bottom:22px; overflow-x:auto;}
+.tabs{display:flex; gap:6px; padding:5px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:14px; margin-bottom:22px; overflow-x:auto; position:relative; z-index:1;}
 .tab-btn{padding:9px 18px; border-radius:10px; font-size:13.5px; font-weight:600; color:var(--ink-faint); white-space:nowrap;}
 .tab-btn.active{background:var(--emerald); color:#06140F;} .tab-panel{display:none;} .tab-panel.active{display:block; animation:viewIn 0.3s var(--ease);}
+@media (hover:hover) and (pointer:fine){ .tab-btn:not(.active):hover{background:rgba(255,255,255,0.05); color:var(--ink);} }
 .cards-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px;}
 .metric-card{padding:18px 20px; border-radius:16px;} .metric-card .mc-lbl{font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; margin-bottom:8px;}
 .metric-card .mc-val{font-family:var(--font-display); font-size:26px; font-weight:600;} .metric-card .mc-val.small{font-size:18px;} .metric-card .mc-sub{font-size:12px; color:var(--ink-faint); margin-top:6px;}
@@ -411,18 +412,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .btn-primary{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 22px rgba(22,201,141,0.32), 0 2px 6px rgba(0,0,0,0.25); }
 .btn-primary:hover{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 10px 30px rgba(22,201,141,0.42), 0 2px 8px rgba(0,0,0,0.3); }
 .btn-primary:active{ box-shadow: inset 0 1px 4px rgba(0,0,0,0.25), 0 3px 12px rgba(22,201,141,0.3); }
-.btn-ghost:hover{ transform: translateY(-1px); }
-.btn-ghost:active{ transform: scale(0.97); }
 .btn-gold{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 6px 20px rgba(201,162,75,0.28); transition: transform 0.18s var(--ease-release), box-shadow 0.25s var(--ease-release); }
-.btn-gold:hover{ transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 10px 28px rgba(201,162,75,0.4); }
+.btn-gold:hover{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 10px 28px rgba(201,162,75,0.4); }
 .btn-gold:active{ transform: scale(0.965); }
 
 .nb-btn{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
-.nb-btn:hover{ transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 3px 10px rgba(0,0,0,0.25); }
+.nb-btn:hover{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 3px 10px rgba(0,0,0,0.25); }
 .nb-btn:active{ transform: scale(0.92); transition: transform 0.08s var(--ease-press); }
 .nb-btn.active{ box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px rgba(22,201,141,0.15), 0 4px 14px rgba(22,201,141,0.2); }
 .nb-color{ transition: transform 0.18s var(--ease-release); }
-.nb-color:hover{ transform: scale(1.06); }
 
 /* Nav, menu and modal-close buttons get the same instant press feedback
    as .btn — respond on pointer-down, not on release (apple-design §1). */
@@ -432,7 +430,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .mobile-menu-btn:hover, .modal-close:hover{ background:rgba(255,255,255,0.08); }
 .mobile-menu-btn:active, .modal-close:active{ transform:scale(0.9); transition:transform 0.08s var(--ease-press); }
 .storagegate-card{ transition:transform 0.25s var(--ease-release), border-color 0.25s var(--ease-release), box-shadow 0.25s var(--ease-release); }
-.storagegate-card:hover{ transform:translateY(-2px); border-color:var(--card-border-hi); }
+.storagegate-card:hover{ border-color:var(--card-border-hi); }
+
+/* Hover-only MOTION (lift/scale), gated so a mobile tap never leaves an
+   element visually "stuck" mid-lift — touch fires :hover with no
+   corresponding :hover-out (apple-design §7 / animate skill hard rule). */
+@media (hover:hover) and (pointer:fine){
+  .btn-ghost:hover{ transform: translateY(-1px); }
+  .btn-gold:hover{ transform: translateY(-2px); }
+  .nb-btn:hover{ transform: translateY(-1px); }
+  .nb-color:hover{ transform: scale(1.06); }
+  .storagegate-card:hover{ transform:translateY(-2px); }
+  .chip:hover, .chub-toggle:hover, .chub-cert-btn:hover, .focus-mode-btn:hover, .energy-chip:hover, .rd-chip:hover{ transform: translateY(-1px); }
+  .metric-card:hover, .stat-card:hover{ transform: translateY(-2px); }
+}
 
 /* Reduced motion: keep feedback, drop the physical motion (apple-design §14) */
 @media (prefers-reduced-motion: reduce){
@@ -442,20 +453,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
   .chip:hover, .chub-toggle:hover, .chub-cert-btn:hover, .focus-mode-btn:hover, .energy-chip:hover, .rd-chip:hover,
   .chip:active, .chub-toggle:active, .chub-cert-btn:active, .focus-mode-btn:active, .energy-chip:active, .rd-chip:active, .tab-btn:active,
   .nav-item, .nav-item:active, .mobile-menu-btn, .modal-close, .mobile-menu-btn:active, .modal-close:active,
-  .storagegate-card, .storagegate-card:hover, .glass{
+  .storagegate-card, .storagegate-card:hover, .glass, .metric-card, .stat-card, .metric-card:hover, .stat-card:hover{
     transform:none !important; transition:background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease !important;
   }
 }
 
 .chip, .chub-toggle, .chub-cert-btn, .focus-mode-btn, .energy-chip, .rd-chip, .tab-btn, .religion-card, .option-card, .color-swatch{ transition: transform 0.18s var(--ease-release), box-shadow 0.25s var(--ease-release), background 0.2s var(--ease-release), border-color 0.2s var(--ease-release); }
-.chip:hover, .chub-toggle:hover, .chub-cert-btn:hover, .focus-mode-btn:hover, .energy-chip:hover, .rd-chip:hover{ transform: translateY(-1px); }
 .chip:active, .chub-toggle:active, .chub-cert-btn:active, .focus-mode-btn:active, .energy-chip:active, .rd-chip:active, .tab-btn:active{ transform: scale(0.955); transition: transform 0.08s var(--ease-press); }
 .chip.selected, .chub-toggle.active{ box-shadow: 0 3px 12px rgba(22,201,141,0.18); }
 .chip.selected.gold, .chub-toggle.active.gold{ box-shadow: 0 3px 12px rgba(201,162,75,0.2); }
 .tab-btn.active{ box-shadow: 0 3px 14px rgba(22,201,141,0.28); }
 
 .metric-card, .stat-card, .habit-card, .goal-card, .list-row, .option-card{ transition: transform 0.22s var(--ease-release), box-shadow 0.25s var(--ease-release), border-color 0.2s var(--ease-release), background 0.2s var(--ease-release); }
-.metric-card:hover, .stat-card:hover{ transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,0.3); border-color: rgba(232,230,222,0.14); }
+.metric-card:hover, .stat-card:hover{ box-shadow: 0 10px 26px rgba(0,0,0,0.3); border-color: rgba(232,230,222,0.14); }
 .list-row{ border-radius:12px; margin:0 -8px; padding-left:12px; padding-right:12px; }
 .list-row:hover{ background: rgba(255,255,255,0.025); }
 .option-card:hover{ transform: translateY(-1px); border-color: rgba(232,230,222,0.16); }
