@@ -43,14 +43,18 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.
 .app{position:relative; z-index:1; min-height:100vh;}
 .hidden{display:none !important;}
 .glass{background:linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)); border:1px solid var(--card-border); border-radius:var(--radius-lg); backdrop-filter:blur(20px); box-shadow:var(--shadow-soft);}
-.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 28px; border-radius:14px; border:1px solid transparent; font-weight:600; font-size:14.5px; letter-spacing:0.01em; transition:transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease); white-space:nowrap;}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 28px; border-radius:14px; border:1px solid transparent; font-weight:600; font-size:14.5px; letter-spacing:0.01em; transition:transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease); white-space:nowrap; -webkit-tap-highlight-color:transparent; touch-action:manipulation;}
 .btn-primary{background:linear-gradient(135deg, var(--emerald), #0EA876); color:#06140F; box-shadow:0 4px 20px rgba(22,201,141,0.28);}
 .btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 28px rgba(22,201,141,0.4);}
 .btn-ghost{background:rgba(255,255,255,0.03); border:1px solid var(--card-border); color:var(--ink);}
 .btn-ghost:hover{background:rgba(255,255,255,0.06); border-color:rgba(232,230,222,0.16);}
 .btn-gold{background:linear-gradient(135deg, var(--gold-bright), var(--gold)); color:#241C0A; box-shadow:0 4px 20px rgba(201,162,75,0.25);}
+.btn-danger{background:var(--danger-dim); border:1px solid rgba(226,101,79,0.35); color:#F0A08D;}
+.btn-danger:hover{background:rgba(226,101,79,0.2); border-color:var(--danger);}
 .btn-sm{padding:9px 18px; font-size:13px; border-radius:10px;}
+.btn-lg{padding:18px 36px; font-size:16px; border-radius:16px;}
 .btn-block{width:100%;} .btn:disabled{opacity:0.4; cursor:not-allowed; transform:none !important;}
+.btn[style*="width:100%"], .btn-block{white-space:normal; text-align:center; line-height:1.35;}
 .field{margin-bottom:20px;} .field label{display:block; font-size:13px; font-weight:600; color:var(--ink-dim); margin-bottom:8px;}
 .field input,.field select,.field textarea{width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; padding:13px 16px; color:var(--ink); font-size:14.5px;}
 .field textarea{resize:vertical; min-height:80px;}
@@ -62,6 +66,25 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.
 .status-dot.is-ok{background:var(--emerald-bright); box-shadow:0 0 8px rgba(63,232,172,0.6);}
 .status-dot.is-warn{background:var(--gold-bright); box-shadow:0 0 8px rgba(227,196,117,0.5);}
 .status-dot.is-off{background:var(--danger); box-shadow:0 0 8px rgba(226,101,79,0.5);}
+/* Storage gate (New User / Existing User) */
+.storagegate{min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:100px 20px 60px;}
+.storagegate-shell{width:100%; max-width:760px;}
+.storagegate-head{text-align:center; margin-bottom:32px;}
+.storagegate-head h1{font-family:var(--font-display); font-size:clamp(24px,3.4vw,32px); font-weight:600; margin-bottom:10px;}
+.storagegate-head p{color:var(--ink-dim); max-width:540px; margin:0 auto; font-size:14.5px; line-height:1.6;}
+.storagegate-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;}
+@media (max-width:680px){.storagegate-grid{grid-template-columns:1fr;}}
+.storagegate-card{padding:28px 24px; display:flex; flex-direction:column; gap:12px; text-align:left;}
+.storagegate-card-icon{width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--emerald-dim); color:var(--emerald-bright);}
+.storagegate-card h3{font-size:16px; font-weight:700;}
+.storagegate-card p{color:var(--ink-dim); font-size:13px; line-height:1.6; flex:1;}
+.storagegate-note{background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:14px; padding:14px 16px; font-size:12.5px; color:var(--ink-dim); display:flex; gap:10px; align-items:flex-start; margin-top:6px; line-height:1.6;}
+.storagegate-note svg{flex-shrink:0; margin-top:2px; color:var(--gold-bright);}
+.storagegate-error{background:var(--danger-dim); border:1px solid rgba(226,101,79,0.3); border-radius:14px; padding:14px 16px; font-size:13px; color:var(--danger); margin-top:16px; display:none;}
+.storagegate-error.is-visible{display:block;}
+.storagegate-skip{text-align:center; margin-top:20px;}
+.storagegate-skip button{color:var(--ink-faint); font-size:12.5px; text-decoration:underline; text-underline-offset:3px; background:none; border:none;}
+.storagegate-skip button:hover{color:var(--ink-dim);}
 .badge{display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:100px; font-size:11.5px; font-weight:700; text-transform:uppercase;}
 .badge-emerald{background:var(--emerald-dim); color:var(--emerald-bright);} .badge-gold{background:var(--gold-dim); color:var(--gold-bright);} .badge-danger{background:var(--danger-dim); color:var(--danger);}
 .progress-track{height:8px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden;}
@@ -401,6 +424,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
 .nb-color{ transition: transform 0.18s var(--ease-release); }
 .nb-color:hover{ transform: scale(1.06); }
 
+/* Nav, menu and modal-close buttons get the same instant press feedback
+   as .btn — respond on pointer-down, not on release (apple-design §1). */
+.nav-item{ -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:background 0.2s var(--ease-release), color 0.2s var(--ease-release), transform 0.18s var(--ease-release); }
+.nav-item:active{ transform:scale(0.975); transition:transform 0.08s var(--ease-press); }
+.mobile-menu-btn, .modal-close{ transition:transform 0.18s var(--ease-release), background 0.2s var(--ease-release), border-color 0.2s var(--ease-release); -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+.mobile-menu-btn:hover, .modal-close:hover{ background:rgba(255,255,255,0.08); }
+.mobile-menu-btn:active, .modal-close:active{ transform:scale(0.9); transition:transform 0.08s var(--ease-press); }
+.storagegate-card{ transition:transform 0.25s var(--ease-release), border-color 0.25s var(--ease-release), box-shadow 0.25s var(--ease-release); }
+.storagegate-card:hover{ transform:translateY(-2px); border-color:var(--card-border-hi); }
+
+/* Reduced motion: keep feedback, drop the physical motion (apple-design §14) */
+@media (prefers-reduced-motion: reduce){
+  .btn, .btn:active, .btn-ghost:hover, .btn-ghost:active, .btn-gold:hover, .btn-gold:active,
+  .nb-btn, .nb-btn:hover, .nb-btn:active, .nb-color, .nb-color:hover,
+  .chip, .chub-toggle, .chub-cert-btn, .focus-mode-btn, .energy-chip, .rd-chip, .tab-btn, .religion-card, .option-card, .color-swatch,
+  .chip:hover, .chub-toggle:hover, .chub-cert-btn:hover, .focus-mode-btn:hover, .energy-chip:hover, .rd-chip:hover,
+  .chip:active, .chub-toggle:active, .chub-cert-btn:active, .focus-mode-btn:active, .energy-chip:active, .rd-chip:active, .tab-btn:active,
+  .nav-item, .nav-item:active, .mobile-menu-btn, .modal-close, .mobile-menu-btn:active, .modal-close:active,
+  .storagegate-card, .storagegate-card:hover, .glass{
+    transform:none !important; transition:background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease !important;
+  }
+}
+
 .chip, .chub-toggle, .chub-cert-btn, .focus-mode-btn, .energy-chip, .rd-chip, .tab-btn, .religion-card, .option-card, .color-swatch{ transition: transform 0.18s var(--ease-release), box-shadow 0.25s var(--ease-release), background 0.2s var(--ease-release), border-color 0.2s var(--ease-release); }
 .chip:hover, .chub-toggle:hover, .chub-cert-btn:hover, .focus-mode-btn:hover, .energy-chip:hover, .rd-chip:hover{ transform: translateY(-1px); }
 .chip:active, .chub-toggle:active, .chub-cert-btn:active, .focus-mode-btn:active, .energy-chip:active, .rd-chip:active, .tab-btn:active{ transform: scale(0.955); transition: transform 0.08s var(--ease-press); }
@@ -448,7 +494,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
         <h1>Run your life like<br><em>a well-built system.</em></h1>
         <p class="hero-sub">MAAR LIFE turns health, money, faith, study and discipline into small daily actions — tracked, scored, and compounded. One dashboard. Every important part of your life.</p>
         <div class="hero-actions">
-          <button class="btn btn-primary" id="btnStartJourney">Start My Journey
+          <button class="btn btn-primary btn-lg" id="btnStartJourney">Start My Journey
             <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
           </button>
           <button class="btn btn-ghost" id="btnLearnMore">What's inside</button>
@@ -461,6 +507,37 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
       <div class="strip-stat"><div class="num">21</div><div class="lbl">Rank tiers to climb</div></div>
       <div class="strip-stat"><div class="num">100%</div><div class="lbl">Private — data stays on device</div></div>
       <div class="strip-stat"><div class="num">0</div><div class="lbl">Accounts or servers needed</div></div>
+    </div>
+  </section>
+
+  <section class="storagegate hidden" id="screen-storagegate">
+    <div class="storagegate-shell">
+      <div class="storagegate-head">
+        <h1>Where should your data live?</h1>
+        <p>MAAR LIFE saves everything privately on your own device — no accounts, no servers. Choose how you'd like to store your data.</p>
+      </div>
+      <div class="storagegate-grid">
+        <div class="storagegate-card glass">
+          <div class="storagegate-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <h3>New User</h3>
+          <p>First time here. Create or choose a file on your device where MAAR LIFE will keep your data, organised and always yours.</p>
+          <button class="btn btn-primary" id="btnGateNewUser" style="width:100%;">Choose or Create File</button>
+        </div>
+        <div class="storagegate-card glass">
+          <div class="storagegate-card-icon" style="background:var(--gold-dim); color:var(--gold-bright);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 7l9-4 9 4-9 4-9-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 7v10l9 4 9-4V7" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+          <h3>Existing User</h3>
+          <p>Already using MAAR LIFE — on this computer, a new one, or after reinstalling. Reconnect to your existing data file to continue exactly where you left off.</p>
+          <button class="btn btn-ghost" id="btnGateExistingUser" style="width:100%; border:1px solid var(--card-border-hi);">Select Your File</button>
+        </div>
+      </div>
+      <div class="storagegate-note" id="gateFsaNote" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v.01M12 11v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Your browser doesn't support file storage (this works best in Chrome or Edge on desktop or Android). You can still use MAAR LIFE fully — your data will be saved securely on this device, and you can move it between devices anytime using Export / Import in Settings.</span>
+      </div>
+      <div class="storagegate-error" id="gateErrorBox"></div>
+      <div class="storagegate-skip">
+        <button id="btnGateSkip">Continue without file storage for now</button>
+      </div>
     </div>
   </section>
 
@@ -1069,14 +1146,51 @@ let _deferredInstallPrompt = null;
 function setupInstallPrompt(){
   window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); _deferredInstallPrompt = e; const btn = document.getElementById('sInstallBtn'); if(btn) btn.classList.remove('hidden'); });
 }
-function showScreen(name){ ['landing','wizard','app'].forEach(s=>{ const el = document.getElementById('screen-'+s); if(el) el.classList.toggle('hidden', s!==name); }); window.scrollTo(0,0); }
+function showScreen(name){ ['landing','storagegate','wizard','app'].forEach(s=>{ const el = document.getElementById('screen-'+s); if(el) el.classList.toggle('hidden', s!==name); }); window.scrollTo(0,0); }
+
+/* ============================================================
+   STORAGE GATE — New User / Existing User
+   Shown once, the moment someone starts their journey, so they can
+   choose whether MAAR LIFE should live-sync to a file on their
+   device right from the start, or just use browser storage for now.
+   ============================================================ */
+function openStorageGate(){
+  const box = document.getElementById('gateErrorBox'); box.classList.remove('is-visible'); box.textContent = '';
+  document.getElementById('gateFsaNote').hidden = DATAFILE_SUPPORTED;
+  showScreen('storagegate');
+}
+function showGateError(message){ const box = document.getElementById('gateErrorBox'); box.textContent = message; box.classList.add('is-visible'); }
+function afterGateChoice(){
+  if(state.onboarded){ enterApp(); } else { showScreen('wizard'); initWizard(); }
+}
+function bindStorageGate(){
+  document.getElementById('btnGateNewUser').addEventListener('click', async ()=>{
+    if(!DATAFILE_SUPPORTED){ showGateError("File storage isn't supported in this browser. Use \"Continue without file storage\" below, or switch to Chrome/Edge."); return; }
+    try{ await DataFile.connectNewFile(); showToast(`Now syncing to "${DataFile.fileName}"`); afterGateChoice(); }
+    catch(e){ if(e && e.name === 'AbortError') return; showGateError('Could not set up that file. Please try again or choose a different file.'); }
+  });
+  document.getElementById('btnGateExistingUser').addEventListener('click', async ()=>{
+    if(!DATAFILE_SUPPORTED){ showGateError("File storage isn't supported in this browser. Use \"Continue without file storage\" below, or switch to Chrome/Edge, then use Export/Import in Settings to bring your data over."); return; }
+    try{
+      const {loadedFromFile} = await DataFile.connectExistingFile();
+      showToast(loadedFromFile ? `Loaded data from "${DataFile.fileName}"` : `Now syncing to "${DataFile.fileName}"`);
+      if(loadedFromFile){ renderSidebarProfile(); updateXpPill(); _lastRankIdx = getRankInfo(state.xp).index; }
+      afterGateChoice();
+    }catch(e){
+      if(e && e.name === 'AbortError') return;
+      if(e && e.code === 'permission-denied') showGateError('Permission to use that file was denied.');
+      else showGateError('Could not read that file. Please try again, or pick "New User" to start fresh.');
+    }
+  });
+  document.getElementById('btnGateSkip').addEventListener('click', ()=>{ afterGateChoice(); });
+}
 
 async function boot(){
-  setupPwa(); setupInstallPrompt(); migrateLegacyTimetable(); renderHeroDomains();
+  setupPwa(); setupInstallPrompt(); migrateLegacyTimetable(); renderHeroDomains(); bindStorageGate();
   if(typeof DataFile !== 'undefined') await DataFile.tryAutoReconnect().catch(()=>{});
   const resumeLink = document.getElementById('resumeLink');
   if(state.onboardStep > 0 && !state.onboarded) resumeLink.classList.remove('hidden');
-  document.getElementById('btnStartJourney').addEventListener('click', ()=>{ showScreen('wizard'); initWizard(); });
+  document.getElementById('btnStartJourney').addEventListener('click', openStorageGate);
   resumeLink.addEventListener('click', (e)=>{ e.preventDefault(); showScreen('wizard'); initWizard(); });
   document.getElementById('btnLearnMore').addEventListener('click', ()=>{ document.querySelector('.landing-strip').scrollIntoView({behavior:'smooth'}); });
   if(state.onboarded) enterApp(); else showScreen('landing');
@@ -3439,11 +3553,11 @@ VIEW_RENDERERS.settings = function(){
         <button class="btn btn-primary btn-sm" id="dfConnectNewBtn">Save to a file…</button>
         <button class="btn btn-ghost btn-sm" id="dfConnectExistingBtn">Attach existing file…</button>
         <button class="btn btn-gold btn-sm hidden" id="dfReattachBtn">Reattach file</button>
-        <button class="btn btn-ghost btn-sm hidden" id="dfDetachBtn" style="color:var(--danger);">Stop syncing</button>
+        <button class="btn btn-danger btn-sm hidden" id="dfDetachBtn">Stop syncing</button>
       </div>
       <p id="dfUnsupportedNote" class="hidden" style="color:var(--ink-faint); font-size:12px; margin-top:12px; line-height:1.6;">This browser doesn't support live file sync (Safari and Firefox don't yet support the File System Access API). Use "Export data (JSON)" and "Restore from backup (JSON)" below to move data manually instead.</p>
     </div>
-    <div class="glass panel"><div class="section-title-row"><h3>Data</h3></div><p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device, in this browser. Nothing is sent anywhere.</p><div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;"><button class="btn btn-ghost btn-sm" id="sExportBtn">Export data (JSON)</button><button class="btn btn-ghost btn-sm" id="sImportBtn">Restore from backup (JSON)</button><input type="file" id="sImportFile" accept="application/json,.json" class="hidden"><button class="btn btn-ghost btn-sm" id="sResetBtn" style="color:var(--danger);">Reset all data</button></div><div id="sImportStatus" style="font-size:12.5px; color:var(--ink-faint); margin-top:10px;"></div></div>`;
+    <div class="glass panel"><div class="section-title-row"><h3>Data</h3></div><p style="color:var(--ink-dim); font-size:13px; margin-bottom:14px;">All your data is stored only on this device, in this browser. Nothing is sent anywhere.</p><div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;"><button class="btn btn-ghost btn-sm" id="sExportBtn">Export data (JSON)</button><button class="btn btn-ghost btn-sm" id="sImportBtn">Restore from backup (JSON)</button><input type="file" id="sImportFile" accept="application/json,.json" class="hidden"><button class="btn btn-danger btn-sm" id="sResetBtn">Reset all data</button></div><div id="sImportStatus" style="font-size:12.5px; color:var(--ink-faint); margin-top:10px;"></div></div>`;
   renderDataFileSection();
   const grid = document.getElementById('sReligionGrid'); grid.innerHTML = RELIGIONS.map(r=>`<div class="religion-card ${state.religion===r.id?'selected':''}" data-rel="${r.id}">${r.name}</div>`).join('');
   grid.querySelectorAll('.religion-card').forEach(card=> card.addEventListener('click', ()=>{ state.religion = card.dataset.rel; saveState(); showToast('Updated'); VIEW_RENDERERS.settings(); }));
