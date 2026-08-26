@@ -66,6 +66,19 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.
 .status-dot.is-ok{background:var(--emerald-bright); box-shadow:0 0 8px rgba(63,232,172,0.6);}
 .status-dot.is-warn{background:var(--gold-bright); box-shadow:0 0 8px rgba(227,196,117,0.5);}
 .status-dot.is-off{background:var(--danger); box-shadow:0 0 8px rgba(226,101,79,0.5);}
+/* Hero CTA specular rim — a light that tracks the cursor, reserved for this
+   single rare/first-time button (animate skill: delight-tier motion is only
+   earned at that frequency; a WebGL version per-button would also blow past
+   the browser's simultaneous-context limit, so this is a CSS-only stand-in). */
+.cta-glow{ position:relative; display:inline-block; border-radius:calc(var(--radius-md) + 3px); }
+.cta-glow::before{
+  content:''; position:absolute; inset:-3px; border-radius:inherit; padding:1.5px;
+  background:conic-gradient(from var(--cta-angle,220deg), transparent 0deg, rgba(255,255,255,0.95) 16deg, transparent 42deg, transparent 318deg, rgba(255,255,255,0.95) 344deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity 0.4s var(--ease-release); pointer-events:none;
+}
+@media (hover:hover) and (pointer:fine){ .cta-glow.glow-near::before{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){ .cta-glow::before{ display:none; } }
 /* Storage gate (New User / Existing User) */
 .storagegate{min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:100px 20px 60px;}
 .storagegate-shell{width:100%; max-width:760px;}
@@ -504,9 +517,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; hei
         <h1>Run your life like<br><em>a well-built system.</em></h1>
         <p class="hero-sub">MAAR LIFE turns health, money, faith, study and discipline into small daily actions — tracked, scored, and compounded. One dashboard. Every important part of your life.</p>
         <div class="hero-actions">
-          <button class="btn btn-primary btn-lg" id="btnStartJourney">Start My Journey
-            <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-          </button>
+          <span class="cta-glow" id="ctaGlow">
+            <button class="btn btn-primary btn-lg" id="btnStartJourney">Start My Journey
+              <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+            </button>
+          </span>
           <button class="btn btn-ghost" id="btnLearnMore">What's inside</button>
         </div>
         <div class="hero-domains" id="heroDomains"></div>
@@ -1195,8 +1210,38 @@ function bindStorageGate(){
   document.getElementById('btnGateSkip').addEventListener('click', ()=>{ afterGateChoice(); });
 }
 
+function initCtaGlow(){
+  const wrap = document.getElementById('ctaGlow');
+  const landing = document.getElementById('screen-landing');
+  if(!wrap || !landing) return;
+  let raf = null, targetAngle = 220, angle = 220, near = false;
+  const PROXIMITY = 220;
+  function onMove(e){
+    if(landing.classList.contains('hidden')) { if(near){ near=false; wrap.classList.remove('glow-near'); } return; }
+    const rect = wrap.getBoundingClientRect();
+    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right);
+    const dy = Math.max(rect.top - e.clientY, 0, e.clientY - rect.bottom);
+    const dist = Math.hypot(dx, dy);
+    near = dist < PROXIMITY;
+    wrap.classList.toggle('glow-near', near);
+    if(near){
+      targetAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+      if(!raf) raf = requestAnimationFrame(tick);
+    }
+  }
+  function tick(){
+    raf = null;
+    const diff = ((targetAngle - angle + 540) % 360) - 180;
+    angle += diff * 0.18;
+    wrap.style.setProperty('--cta-angle', (angle + 90).toFixed(1) + 'deg'); // conic-gradient's 0deg is north, our angle math is 0deg=east
+    if(near) raf = requestAnimationFrame(tick);
+  }
+  window.addEventListener('pointermove', onMove, {passive:true});
+}
+
 async function boot(){
-  setupPwa(); setupInstallPrompt(); migrateLegacyTimetable(); renderHeroDomains(); bindStorageGate();
+  setupPwa(); setupInstallPrompt(); migrateLegacyTimetable(); renderHeroDomains(); bindStorageGate(); initCtaGlow();
   if(typeof DataFile !== 'undefined') await DataFile.tryAutoReconnect().catch(()=>{});
   const resumeLink = document.getElementById('resumeLink');
   if(state.onboardStep > 0 && !state.onboarded) resumeLink.classList.remove('hidden');
